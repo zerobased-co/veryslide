@@ -1,7 +1,6 @@
 html, body {
   margin: 0;
   padding: 0;
-  overflow: hidden;
 }
 
 .vs-editor {
@@ -10,6 +9,7 @@ html, body {
   height: 100vh;
   background: #ccc;
   flex-direction: column;
+  overflow: hidden;
 
   font-family: sans-serif;
 }
@@ -18,7 +18,7 @@ html, body {
   width: 160px;
   border: 1px solid gray;
   display: flex;
-  flex-direction: column;
+  height: 100%;
 }
 
 .vs-pagelist {
@@ -35,6 +35,7 @@ html, body {
   border: 1px solid #ccc;
   box-sizing: border-box;
   box-shadow: 0 0 5px 2px #ddd;
+  transition: all 0.1s ease-out;
 }
 
 .vs-pagethumb.focus {
@@ -47,14 +48,14 @@ html, body {
   border: 1px solid gray;
   box-shadow: 0 0 5px 3px #aaa;
   position: absolute;
-
-  transition: all 0.075s ease-out;
 }
 
 .vs-menu {
   background: white;
   display: flex;
   flex-direction: row;
+  flex-shrink: 0;
+  height: 54px;
 }
 
 .vs-button {

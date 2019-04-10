@@ -7,13 +7,29 @@ class BaseObject {
     this.y = 0;
     this.width = 0;
     this.height = 0;
+    this.name = '';
   }
 }
 
 class Shape extends BaseObject {
+  constructor() {
+    super();
+    this.name = 'Shape';
+  }
 }
 
 class Page extends BaseObject {
+  constructor() {
+    super();
+    this.name = 'Page';
+    this.number = null;
+
+    channel.bind(this, 'Page', 'addShape', this.addShape);
+  }
+
+  addShape(value) {
+    console.log(this.number, value);
+  }
 }
 
 class Document {

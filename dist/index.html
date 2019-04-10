@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>veryslide test page</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="veryslide.js"></script>
+</head>
+<body>
+  <div id="veryslide">
+  </div>
+  <script>
+  const elem = document.getElementById('veryslide');
+  var editor = new Veryslide(elem, {
+    'this': 'that',
+  });
+  </script>
+</body>
+</html>

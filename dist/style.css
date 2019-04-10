@@ -1,0 +1,95 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.vs-editor {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  background: #ccc;
+  flex-direction: column;
+
+  font-family: sans-serif;
+}
+
+.vs-navigator {
+  width: 160px;
+  border: 1px solid gray;
+  display: flex;
+  flex-direction: column;
+}
+
+.vs-pagelist {
+  flex: 1;
+  overflow-y: scroll;
+  background: #eee;
+}
+
+.vs-pagethumb {
+  margin: 20px;
+  width: 120px;
+  height: 80px;
+  background: white;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  box-shadow: 0 0 5px 2px #ddd;
+}
+
+.vs-pagethumb.focus {
+  border: 2px solid #FFC120;
+  box-shadow: 0 0 5px 3px #aaa;
+}
+
+.vs-page {
+  background: white;
+  border: 1px solid gray;
+  box-shadow: 0 0 5px 3px #aaa;
+  position: absolute;
+
+  transition: all 0.075s ease-out;
+}
+
+.vs-menu {
+  background: white;
+  display: flex;
+  flex-direction: row;
+}
+
+.vs-button {
+  width: 100px;
+  height: 30px;
+  margin: 10px;
+  font-size: 0.8em;
+
+  border: 1px solid gray;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  font-weight: 700;
+  user-select: none;
+}
+
+.vs-row {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+}
+
+.vs-viewport {
+  flex: 1;
+  overflow: scroll;
+  position: relative;
+  outline: none;
+  border: 1px solid gray;
+  border-width: 1px 0;
+}
+
+.vs-toolbox {
+  width: 320px;
+  border: 1px solid gray;
+  overflow-y: scroll;
+}

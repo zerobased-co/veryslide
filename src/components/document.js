@@ -27,6 +27,8 @@ class Document {
   addPage(value) {
     let page = this.pages.spawn();
     this.pages.append(page);
+    page.width = this.width;
+    page.height = this.height;
     page.number = this.pages.count;
 
     channel.send(null, 'addPage:done', page);

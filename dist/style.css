@@ -3,10 +3,14 @@ html, body {
   padding: 0;
 }
 
-.vs-editor {
-  display: flex;
+#veryslide {
   width: 100vw;
   height: 100vh;
+}
+
+.vs-editor {
+  display: flex;
+  height: 100%;
   background: #ccc;
   flex-direction: column;
   overflow: hidden;
@@ -14,15 +18,21 @@ html, body {
   font-family: sans-serif;
 }
 
+.vs-editor * {
+  box-sizing: border-box;
+}
+
 .vs-navigator {
   width: 160px;
   border: 1px solid gray;
-  display: flex;
   height: 100%;
+  position: relative;
 }
 
 .vs-pagelist {
-  flex: 1;
+  position: absolute;
+  width: 100%;
+  height: 100%;
   overflow-y: scroll;
   background: #eee;
 }
@@ -33,7 +43,6 @@ html, body {
   height: 80px;
   background: white;
   border: 1px solid #ccc;
-  box-sizing: border-box;
   box-shadow: 0 0 5px 2px #ddd;
   transition: all 0.1s ease-out;
 }

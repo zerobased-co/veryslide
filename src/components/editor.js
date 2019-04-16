@@ -21,13 +21,13 @@ class PageList extends Window {
   }
 
   addPage(pageInfo) {
-    let page = this.pages.spawn();
-    page.pageInfo = pageInfo;
-    this.pages.append(page);
+    let pagethumb = this.pages.spawn(this);
+    pagethumb.pageInfo = pageInfo;
+    this.pages.append(pagethumb);
 
-    this.node.append(page.render());
-    page.node.scrollIntoView();
-    page.select();
+    this.node.append(pagethumb.render());
+    pagethumb.node.scrollIntoView();
+    pagethumb.select();
   }
 
   render() {

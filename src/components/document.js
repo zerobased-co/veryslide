@@ -1,5 +1,4 @@
-import List from '../core/list';
-import channel from '../core/channel';
+import List from '../core/List';
 
 class BaseObject {
   constructor() {
@@ -22,13 +21,10 @@ class Page extends BaseObject {
   constructor() {
     super();
     this.name = 'Page';
-    this.number = null;
-
-    channel.bind(this, 'Page', 'addShape', this.addShape);
+    this.objects = new List(BaseObject);
   }
 
-  addShape(value) {
-    console.log(this.number, value);
+  addObject(value) {
   }
 }
 
@@ -37,17 +33,22 @@ class Document {
     this.width = 1024;
     this.height = 768;
     this.pages = new List(Page);
-    channel.bind(this, 'Document', 'addPage', this.addPage);
   }
 
-  addPage(value) {
-    let page = this.pages.spawn();
+  addPage() {
+    let page = this.pages.spawn(this);
     this.pages.append(page);
+
     page.width = this.width;
     page.height = this.height;
-    page.number = this.pages.count;
 
-    channel.send(null, 'addPage:done', page);
+    return page;
+  }
+
+  removePage(page) {
+    let nextpage = this.pages.remove(page);
+    console.log(nextpage);
+    return nextpage;
   }
 }
 

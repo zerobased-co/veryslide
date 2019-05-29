@@ -1,10 +1,14 @@
-import List from '../core/list';
-import channel from '../core/channel';
+import List from '../core/List';
+import channel from '../core/Channel';
 
 class Window {
   construct(parent) {
     this.parent = parent;
     this.node = null;
+  }
+
+  destruct() {
+    this.node.parentNode.removeChild(this.node);
   }
 
   render() {
@@ -16,18 +20,46 @@ class Window {
 class PageList extends Window {
   constructor(...args) {
     super(...args);
-    this.pages = new List(PageThumb);
-    channel.bind(this, null, 'addPage:done', this.addPage);
+    this.pagethumbs = new List(PageThumb);
+    channel.bind(this, 'PageList:addPage', this.addPage);
+    channel.bind(this, 'PageList:selectPage', this.selectPage);
+    channel.bind(this, 'PageList:removePage', this.removePage);
   }
 
   addPage(pageInfo) {
-    let pagethumb = this.pages.spawn(this);
+    let pagethumb = this.pagethumbs.spawn(this);
     pagethumb.pageInfo = pageInfo;
-    this.pages.append(pagethumb);
+    this.pagethumbs.append(pagethumb);
 
     this.node.append(pagethumb.render());
     pagethumb.node.scrollIntoView();
     pagethumb.select();
+  }
+
+  selectPage(pageInfo) {
+    console.log('now PageList:selectPage', pageInfo.order);
+    let pagethumb = this.pagethumbs.findby((item) => {
+      console.log('func:', item.pageInfo.order);
+      return item.pageInfo.order == pageInfo.order;
+    });
+
+    if (pagethumb !== null) {
+      pagethumb.select();
+    }
+  }
+
+  removePage(pageInfo) {
+    console.log('now PageList:removePage', pageInfo.order);
+    let pagethumb = this.pagethumbs.findby((item) => {
+      console.log('func:', item.pageInfo.order);
+      return item.pageInfo.order == pageInfo.order;
+    });
+
+    if (pagethumb !== null) {
+      console.log('find pagethumb!');
+      let nextthumb = this.pagethumbs.remove(pagethumb);
+      pagethumb.destruct();
+    }
   }
 
   render() {
@@ -58,13 +90,19 @@ class Menu extends Window {
     this.btnAddPage = new Button(this);
     this.btnAddPage.title = 'Add a page';
     this.btnAddPage.click = event => {
-      channel.send('Document', 'addPage', null);
+      channel.send('Document:addPage', null);
+    };
+
+    this.btnRemovePage = new Button(this);
+    this.btnRemovePage.title = 'Remove page';
+    this.btnRemovePage.click = event => {
+      channel.send('Document:removePage', null);
     };
 
     this.btnZoom = new Button(this);
     this.btnZoom.title = 'Reset zoom';
     this.btnZoom.click = event => {
-      channel.send('Viewport', 'zoom', 1.0);
+      channel.send('zoom', 1.0);
     };
   }
 
@@ -73,6 +111,7 @@ class Menu extends Window {
     this.node.className = 'vs-menu';
 
     this.node.appendChild(this.btnAddPage.render());
+    this.node.appendChild(this.btnRemovePage.render());
     this.node.appendChild(this.btnZoom.render());
     return this.node;
   }
@@ -83,15 +122,16 @@ class PageThumb extends Window {
     super(...args);
     this.pageInfo = null;
 
-    channel.bind(this, 'PageThumb', 'deselect', value => {
+    channel.bind(this, 'PageThumb:deselect', value => {
       this.deselect();
     });
   }
 
   select() {
-    channel.send('PageThumb', 'deselect', null);
+    channel.send('PageThumb:deselect', null);
     this.node.classList.toggle('focus');
-    channel.send('Viewport', 'selectPage', this.pageInfo);
+    console.log('PageThumb:select', this.pageInfo.order);
+    channel.send('selectPage', this.pageInfo);
   }
 
   deselect() {
@@ -131,7 +171,7 @@ class Page extends Window {
   setup(pageInfo) {
     this.node.style.width = pageInfo.width + "px";
     this.node.style.height = pageInfo.height + "px";
-    this.node.innerHTML = pageInfo.number;
+    this.node.innerHTML = pageInfo.order;
   }
 
   render() {
@@ -155,15 +195,21 @@ class Viewport extends Window {
     this.scale = 1.0;
     //this.zoomLevel = [10, 25, 50, 75, 100, 200, 400];
 
-    channel.bind(this, 'Viewport', 'selectPage', this.selectPage);
-    channel.bind(this, 'Viewport', 'zoom', this.zoom);
+    channel.bind(this, 'selectPage', this.selectPage);
+    channel.bind(this, 'Viewport:clear', this.clear);
+    channel.bind(this, 'zoom', this.zoom);
   }
 
-  selectPage(pageInfo) {
+  clear() {
     if (this.page !== undefined) {
       this.node.innerHTML = '';
       delete this.page;
+      this.page = null;
     }
+  }
+
+  selectPage(pageInfo) {
+    this.clear();
     this.page = new Page(this);
     this.node.append(this.page.render());
     this.page.setup(pageInfo);
@@ -225,10 +271,8 @@ class Viewport extends Window {
 
     this.node.addEventListener('mousemove', event => {
       if (this.drag === true && this.page !== undefined) {
-        console.log('dragging');
         let dx = event.clientX - this.dragStart.x;
         let dy = event.clientY - this.dragStart.y;
-        console.log(dx, dy);
 
         this.translate.x = dx;
         this.translate.y = dy;
@@ -237,7 +281,6 @@ class Viewport extends Window {
     });
 
     this.node.addEventListener('mousedown', event => {
-      console.log('mousedown');
       if (this.grab === true && this.page !== undefined) {
         this.node.style.cursor = 'grabbing';
         this.drag = true;
@@ -249,7 +292,6 @@ class Viewport extends Window {
     });
 
     this.node.addEventListener('mouseup', event => {
-      console.log('mouseup');
       if (this.grab === true) {
         this.node.style.cursor = 'grab';
         this.drag = false;

@@ -1,12 +1,7 @@
-import List from './list.js';
-
-function __key(name, type) {
-  return [name, type].join(",");
-}
+import List from './List.js';
 
 class Message {
-  constructor(target, type, value, callback) {
-    this.target = target;
+  constructor(type, value, callback) {
     this.type = type;
     this.value = value;
     this.callback = callback;
@@ -19,40 +14,39 @@ class Channel {
     this.listeners = new Object();
   }
 
-  bind(listener, name, type, handler) {
-    const key = __key(name, type);
-    if (!(key in this.listeners)) {
-      this.listeners[key] = new Array();
+  bind(listener, type, handler) {
+    if (!(type in this.listeners)) {
+      this.listeners[type] = new Array();
     }
-    this.listeners[key].push({
+    this.listeners[type].push({
       'listener': listener,
       'handler': handler,
     });
   }
 
-  unbind(listener, name, type) {
-    const key = __key(name, type);
-    if (key in this.listeners) {
-      this.listeners[key] = this.listeners[key].filter(function(elem) {
+  unbind(listener, type) {
+    if (type in this.listeners) {
+      this.listeners[type] = this.listeners[type].filter(function(elem) {
         return elem['listener'] === listener;
       });
     }
   }
 
-  post(target, type, value, callback) {
+  post(type, value, callback) {
   /*
-    msg = new Message(target, type, value, callback);
+    msg = new Message(type, value, callback);
     this.messages.append(msg);
   */
   }
 
-  send(target, type, value) {
-    const key = __key(target, type);
-    if (key in this.listeners) {
-      this.listeners[key].forEach(function(obj) {
-        obj['handler'].call(obj['listener'], value);
+  send(type, value) {
+    let responses = new Array();
+    if (type in this.listeners) {
+      this.listeners[type].forEach(function(obj) {
+        responses.push(obj['handler'].call(obj['listener'], value));
       });
     }
+    return responses;
   }
 
   process() {

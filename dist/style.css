@@ -1,6 +1,7 @@
 html, body {
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
 
 #veryslide {
@@ -33,12 +34,12 @@ html, body {
   position: absolute;
   width: 100%;
   height: 100%;
-  overflow-y: scroll;
-  background: #eee;
+  overflow-y: auto;
+  background: #E1E2E4;
 }
 
 .vs-pagethumb {
-  margin: 20px;
+  margin: 10px 20px;
   width: 120px;
   height: 80px;
   background: white;
@@ -91,15 +92,16 @@ html, body {
 
 .vs-viewport {
   flex: 1;
-  overflow: scroll;
+  overflow: hidden;
   position: relative;
   outline: none;
   border: 1px solid gray;
   border-width: 1px 0;
+  background: #C7CDD4;
 }
 
 .vs-toolbox {
   width: 320px;
   border: 1px solid gray;
-  overflow-y: scroll;
+  overflow-y: auto;
 }

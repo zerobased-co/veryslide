@@ -37,9 +37,7 @@ class PageList extends Window {
   }
 
   selectPage(pageInfo) {
-    console.log('now PageList:selectPage', pageInfo.order);
     let pagethumb = this.pagethumbs.findby((item) => {
-      console.log('func:', item.pageInfo.order);
       return item.pageInfo.order == pageInfo.order;
     });
 
@@ -49,14 +47,11 @@ class PageList extends Window {
   }
 
   removePage(pageInfo) {
-    console.log('now PageList:removePage', pageInfo.order);
     let pagethumb = this.pagethumbs.findby((item) => {
-      console.log('func:', item.pageInfo.order);
       return item.pageInfo.order == pageInfo.order;
     });
 
     if (pagethumb !== null) {
-      console.log('find pagethumb!');
       let nextthumb = this.pagethumbs.remove(pagethumb);
       pagethumb.destruct();
     }
@@ -102,7 +97,14 @@ class Menu extends Window {
     this.btnZoom = new Button(this);
     this.btnZoom.title = 'Reset zoom';
     this.btnZoom.click = event => {
-      channel.send('zoom', 1.0);
+      channel.send('Viewport:zoom', 1.0);
+      channel.send('Viewport:move', [0, 0]);
+    };
+
+    this.btnAddTextBox = new Button(this);
+    this.btnAddTextBox.title = 'Add a text';
+    this.btnAddTextBox.click = event => {
+      channel.send('Document:addObject', 'TextBox');
     };
   }
 
@@ -113,6 +115,7 @@ class Menu extends Window {
     this.node.appendChild(this.btnAddPage.render());
     this.node.appendChild(this.btnRemovePage.render());
     this.node.appendChild(this.btnZoom.render());
+    this.node.appendChild(this.btnAddTextBox.render());
     return this.node;
   }
 }
@@ -130,12 +133,16 @@ class PageThumb extends Window {
   select() {
     channel.send('PageThumb:deselect', null);
     this.node.classList.toggle('focus');
-    console.log('PageThumb:select', this.pageInfo.order);
     channel.send('selectPage', this.pageInfo);
   }
 
   deselect() {
     this.node.classList.remove('focus');
+  }
+
+  destruct() {
+    super.destruct();
+    channel.unbind(this);
   }
 
   render() {
@@ -166,17 +173,177 @@ class Navigator extends Window {
 class Page extends Window {
   constructor(...args) {
     super(...args);
+    this.page = null;
   }
 
-  setup(pageInfo) {
-    this.node.style.width = pageInfo.width + "px";
-    this.node.style.height = pageInfo.height + "px";
-    this.node.innerHTML = pageInfo.order;
+  setup(page) {
+    this.page = page;
+  }
+
+  findObject(x, y) {
+    for(var i = this.page.objects.array.length - 1; i >= 0; i--) {
+      let object = this.page.objects.array[i];
+      if (object.contain(x, y) === true) {
+        return object;
+      }
+    }
+    return null;
+  }
+
+  render() {
+    this.node = this.page.render();
+    //this.node.innerHTML = this.page.order;
+    return this.node;
+  }
+}
+
+class Handler extends Window {
+  constructor(...args) {
+    super(...args);
+    this.object = null;
+    this.transform = null;
+    this.dragStart = undefined;
+    this.basePos = undefined;
+    this.baseSize = undefined;
+  }
+
+  connect(object) {
+    this.object = object;
+    this.show(true);
+
+    this.node.style.left = object.x + 'px';
+    this.node.style.top = object.y + 'px';
+    this.node.style.width = object.width + 'px';
+    this.node.style.height = object.height + 'px';
+  }
+
+  show(isShow) {
+    if (isShow) {
+      this.node.style.visibility = 'visible';
+    } else {
+      this.node.style.visibility = 'hidden';
+    }
   }
 
   render() {
     this.node = document.createElement('div');
-    this.node.className = 'vs-page';
+    this.node.className = 'vs-handler';
+    this.node.innerHTML = ''
+      + '<div class="vs-dot vs-dot-nw">nw</div>'
+      + '<div class="vs-dot vs-dot-n">n</div>'
+      + '<div class="vs-dot vs-dot-ne">ne</div>'
+      + '<div class="vs-dot vs-dot-e">e</div>'
+      + '<div class="vs-dot vs-dot-se">se</div>'
+      + '<div class="vs-dot vs-dot-s">s</div>'
+      + '<div class="vs-dot vs-dot-sw">sw</div>'
+      + '<div class="vs-dot vs-dot-w">w</div>';
+
+    var mousemove = function(event) {
+      if (this.object == null) return;
+      event.stopPropagation();
+
+      if (this.transform != null) {
+        if (this.object.node.classList.contains('vs-transforming') === false) {
+          this.object.node.classList.add('vs-transforming');
+        }
+
+        let dx = event.clientX - this.dragStart.x;
+        let dy = event.clientY - this.dragStart.y;
+
+        let x = 0;
+        let y = 0;
+        let w = 0;
+        let h = 0;
+
+        switch(this.transform) {
+          case 'move': x = dx; y = dy; break;
+          case 'e': w = dx; break;
+          case 'se': w = dx; h = dy; break;
+          case 's': h = dy; break;
+          case 'sw': x = dx; w = -dx; h = dy; break;
+          case 'w': x = dx; w = -dx; break;
+          case 'nw': x = dx; w = -dx; y = dy; h = -dy; break;
+          case 'n': y = dy; h = -dy; break;
+          case 'ne': w = dx; y = dy; h = -dy; break;
+        }
+
+        if (event.shiftKey) {
+          if (Math.abs(w) / (this.baseSize.width / this.baseSize.height) > Math.abs(h)) {
+            h = w * (this.baseSize.height / this.baseSize.width);
+          } else {
+            w = h * (this.baseSize.width / this.baseSize.height);
+          }
+        }
+
+        if (event.altKey) {
+          x -= w;
+          w *= 2;
+          y -= h;
+          h *= 2;
+        }
+
+        x += this.basePos.x;
+        y += this.basePos.y;
+        w += this.baseSize.width;
+        h += this.baseSize.height;
+
+        this.node.style.left = x + 'px';
+        this.node.style.top = y + 'px';
+        this.object.node.style.left = x + 'px';
+        this.object.node.style.top = y + 'px';
+
+        this.node.style.width = w + 'px';
+        this.node.style.height = h + 'px';
+        this.object.node.style.width = w + 'px';
+        this.object.node.style.height = h + 'px';
+
+        this.object.x = x;
+        this.object.y = y;
+        this.object.width = w;
+        this.object.height = h;
+      }
+    };
+
+    var mouseup = function(event) {
+      if (this.object == null) return;
+      event.stopPropagation();
+
+      if (this.transform != null) {
+        this.object.node.classList.remove('vs-transforming');
+        this.transform = null;
+      }
+
+      window.removeEventListener('mousemove', mousemove);
+      window.removeEventListener('mouseup', mouseup);
+    };
+
+    this.node.addEventListener('mousedown', event => {
+      if (this.object == null) return;
+      event.stopPropagation();
+
+      this.dragStart = {
+        x: event.clientX,
+        y: event.clientY,
+      };
+      this.basePos = {
+        x: this.object.x,
+        y: this.object.y,
+      };
+      this.baseSize = {
+        width: this.object.width,
+        height: this.object.height,
+      };
+
+      if (event.target.classList.contains('vs-dot')) {
+        this.transform = event.target.innerText;
+      } else {
+        this.transform = 'move';
+      }
+
+      window.addEventListener('mousemove', mousemove.bind(this));
+      window.addEventListener('mouseup', mouseup.bind(this));
+    });
+
     return this.node;
   }
 }
@@ -194,30 +361,60 @@ class Viewport extends Window {
     this.translate = {x: 0, y: 0};
     this.scale = 1.0;
     //this.zoomLevel = [10, 25, 50, 75, 100, 200, 400];
+    this.handler = null;
 
     channel.bind(this, 'selectPage', this.selectPage);
     channel.bind(this, 'Viewport:clear', this.clear);
-    channel.bind(this, 'zoom', this.zoom);
+    channel.bind(this, 'Viewport:move', this.move);
+    channel.bind(this, 'Viewport:zoom', this.zoom);
+    channel.bind(this, 'Viewport:addObject', this.addObject);
+    channel.bind(this, 'Viewport:focus', this.focus);
   }
 
   clear() {
-    if (this.page !== undefined) {
-      this.node.innerHTML = '';
-      delete this.page;
-      this.page = null;
-    }
+    if (this.page === null) return;
+
+    this.blur();
+   
+    this.node.removeChild(this.page.node);
+    delete this.page;
+    this.page = null;
   }
 
-  selectPage(pageInfo) {
+  selectPage(page) {
     this.clear();
     this.page = new Page(this);
+    this.page.setup(page);
     this.node.append(this.page.render());
-    this.page.setup(pageInfo);
     this.update();
   }
 
+  addObject(object) {
+    this.page.node.append(object.render());
+  }
+
   update() {
+    if (this.page === null) return;
     this.page.node.style.transform = 'translate(' + this.translate.x + 'px, ' + this.translate.y + 'px) scale(' + this.scale + ')';
+    this.handler.node.style.transform = 'translate(' + this.translate.x + 'px, ' + this.translate.y + 'px)';
+  }
+
+  focus(object) {
+    if (this.handler === null) return;
+    this.handler.connect(object);
+  }
+
+  blur() {
+    if (this.handler === null) return;
+    this.handler.show(false);
+  }
+
+  move(args) {
+    this.translate = {
+      x: args[0],
+      y: args[1],
+    };
+    this.update();
   }
 
   zoom(scale) {
@@ -249,6 +446,7 @@ class Viewport extends Window {
         if (this.grab === false) {
           this.node.style.cursor = 'grab';
           this.grab = true;
+          this.blur();
         }
       }
 
@@ -270,7 +468,8 @@ class Viewport extends Window {
     });
 
     this.node.addEventListener('mousemove', event => {
-      if (this.drag === true && this.page !== undefined) {
+      if (this.page === undefined) return;
+      if (this.drag === true) {
         let dx = event.clientX - this.dragStart.x;
         let dy = event.clientY - this.dragStart.y;
 
@@ -281,12 +480,22 @@ class Viewport extends Window {
     });
 
     this.node.addEventListener('mousedown', event => {
-      if (this.grab === true && this.page !== undefined) {
+      if (this.page === undefined) return;
+      if (this.grab === true) {
         this.node.style.cursor = 'grabbing';
         this.drag = true;
         this.dragStart = {
-          x: event.clientX - parseInt(this.translate.x),
-          y: event.clientY - parseInt(this.translate.y),
+          x: event.clientX - this.translate.x,
+          y: event.clientY - this.translate.y,
+        }
+      } else {
+        let x = event.clientX - this.translate.x - this.node.offsetLeft;
+        let y = event.clientY - this.translate.y - this.node.offsetTop;
+        let pickedObject = this.page.findObject(x, y);
+        if (pickedObject != null) {
+          this.focus(pickedObject);
+        } else {
+          this.blur();
         }
       }
     });
@@ -303,6 +512,9 @@ class Viewport extends Window {
       this.grab = false;
       this.drag = false;
     });
+
+    this.handler = new Handler();
+    this.node.appendChild(this.handler.render());
 
     return this.node;
   }
@@ -338,7 +550,6 @@ class Editor {
   render() {
     this.node = document.createElement('div');
     this.node.className = 'vs-editor';
-
     this.node.appendChild(this.menu.render());
 
     let row = new Row(this);

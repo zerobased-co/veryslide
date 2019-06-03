@@ -42,9 +42,6 @@ class List {
     this.array.push(node);
     this.tail = node;
     this.count++;
-
-    console.log('after append ', typeof this.type, this.array);
-    console.log('count', this.count);
   }
 
   prepend(node) {
@@ -65,7 +62,6 @@ class List {
   }
 
   reorder(from) {
-    console.log('reordering ', typeof this.type, ' from ', from, ' to ', this.array.length);
     for(var i = from; i < this.array.length; i++) {
       this.array[i].order = i;
     }
@@ -89,9 +85,6 @@ class List {
     }
 
     this.array.splice(node.order, 1);
-    console.log('after splice ', typeof this.type, this.array);
-    console.log('count', this.count);
-
     this.reorder(node.order);
 
     node = undefined;

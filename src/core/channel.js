@@ -25,10 +25,17 @@ class Channel {
   }
 
   unbind(listener, type) {
-    if (type in this.listeners) {
+    if (type && type in this.listeners) {
       this.listeners[type] = this.listeners[type].filter(function(elem) {
-        return elem['listener'] === listener;
+        return elem['listener'] !== listener;
       });
+    } else {
+      // unbind from all
+      for (const key in this.listeners) {
+        this.listeners[key] = this.listeners[key].filter(function(elem) {
+          return elem['listener'] !== listener;
+        });
+      }
     }
   }
 
@@ -40,9 +47,12 @@ class Channel {
   }
 
   send(type, value) {
+    console.log('Send', type, value);
+
     let responses = new Array();
     if (type in this.listeners) {
       this.listeners[type].forEach(function(obj) {
+        console.log('-- Recv', obj['listener']);
         responses.push(obj['handler'].call(obj['listener'], value));
       });
     }

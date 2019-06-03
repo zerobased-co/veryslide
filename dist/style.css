@@ -21,6 +21,7 @@ html, body {
 
 .vs-editor * {
   box-sizing: border-box;
+  user-select: none;
 }
 
 .vs-navigator {
@@ -74,14 +75,28 @@ html, body {
   margin: 10px;
   font-size: 0.8em;
 
-  border: 1px solid gray;
+  border: 1px solid #ccc;
+  border-radius: 3px;
 
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
-  font-weight: 700;
+  background: #efefef;
+  font-weight: 400;
   user-select: none;
+
+  transition: all 0.1s ease-out;
+}
+
+.vs-button:hover {
+  background: white;
+  cursor: pointer;
+  box-shadow: 0 0 5px 2px #ddd;
+}
+
+.vs-button:active {
+  transform: scale(0.95, 0.95);
+  box-shadow: 0 0 5px 0px #eee;
 }
 
 .vs-row {
@@ -104,4 +119,42 @@ html, body {
   width: 320px;
   border: 1px solid gray;
   overflow-y: auto;
+}
+
+.vs-object {
+  display: flex;
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+}
+
+.vs-handler {
+  display: flex;
+  position: absolute;
+  z-index: 9999;
+  visibility: hidden;
+}
+
+.vs-dot {
+  position: absolute;
+  border: 1px solid black;
+  background: white;
+  width: 7px;
+  height: 7px;
+  font-size: 0;
+}
+
+.vs-dot-n {top: -2px; left: calc(50% - 2px); cursor: row-resize;}
+.vs-dot-e {top: calc(50% - 2px); right: -4px; cursor: col-resize;}
+.vs-dot-w {top: calc(50% - 2px); left: -2px; cursor: col-resize;}
+.vs-dot-s {bottom: -4px; left: calc(50% - 2px); cursor: row-resize;}
+
+.vs-dot-nw {top: -2px; left: -2px; cursor: nwse-resize;}
+.vs-dot-ne {top: -2px; right: -4px; cursor: nesw-resize;}
+.vs-dot-se {bottom: -4px; right: -4px; cursor: nwse-resize;}
+.vs-dot-sw {bottom: -4px; left: -2px; cursor: nesw-resize;}
+
+.vs-transforming {
+  opacity: 0.5;
+  z-index: 9998;
 }

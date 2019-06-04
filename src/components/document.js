@@ -18,6 +18,17 @@ class BaseObject {
   contain(x, y) {
     return (x >= this.x) && (x < this.x + this.width) && (y >= this.y) && (y < this.y + this.height);
   }
+
+  render() {
+    this.node = document.createElement('div');
+    this.node.className = 'vs-object';
+    this.node.style.backgroundColor = this.backgroundColor;
+    this.node.style.color = this.color;
+    this.node.style.left = this.x + 'px';
+    this.node.style.top = this.y + 'px';
+    this.node.style.width = this.width + 'px';
+    this.node.style.height = this.height + 'px';
+  }
 }
 
 class Shape extends BaseObject {
@@ -26,12 +37,32 @@ class Shape extends BaseObject {
     this.width = randomInt(100, 300);
     this.height = randomInt(100, 300);
     this.name = 'Shape';
-
-    this.border = 1;
-    this.backgroundColor = randomColor();
   }
 
   render() {
+    super.render();
+    return this.node;
+  }
+}
+
+class ImageList extends Shape {
+  constructor() {
+    super();
+    this.name = 'ImageList';
+    this.content = null;
+  }
+
+  record() {
+    this.content = this.node.innerHTML;
+  }
+
+  render() {
+    super.render();
+    this.node.classList.add('vs-imagelist');
+    if (this.content) {
+      this.node.innerHTML = this.content;
+    }
+    return this.node;
   }
 }
 
@@ -43,19 +74,13 @@ class TextBox extends Shape {
     this.text = 'Text' + id;
     id += 1;
     this.color = '#ffffff';
+    this.backgroundColor = randomColor();
   }
 
   render() {
-    this.node = document.createElement('div');
-    this.node.className = 'vs-object';
-    this.node.style.backgroundColor = this.backgroundColor;
-    this.node.style.color = this.color;
+    super.render();
+    this.node.classList.add('vs-textbox');
     this.node.innerText = this.text;
-    this.node.style.left = this.x + 'px';
-    this.node.style.top = this.y + 'px';
-    this.node.style.width = this.width + 'px';
-    this.node.style.height = this.height + 'px';
-
     return this.node;
   }
 }
@@ -68,7 +93,15 @@ class Page extends BaseObject {
   }
 
   addObject(type) {
-    let object = this.objects.spawn(TextBox);
+    let object = null;
+    switch(type) {
+      case 'TextBox':
+        object = this.objects.spawn(TextBox);
+        break;
+      case 'ImageList':
+        object = this.objects.spawn(ImageList);
+        break;
+    }
     object.page = this;
     this.objects.append(object);
     return object;

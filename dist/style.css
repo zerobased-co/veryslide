@@ -147,21 +147,22 @@ html, body {
 .vs-dot {
   position: absolute;
   border: 1px solid rgba(0, 0, 0, 0.75);
+  border-radius: 5px;
   background: white;
-  width: 7px;
-  height: 7px;
+  width: 9px;
+  height: 9px;
   font-size: 0;
 }
 
-.vs-dot-n {top: -2px; left: calc(50% - 2px); cursor: row-resize;}
-.vs-dot-e {top: calc(50% - 2px); right: -4px; cursor: col-resize;}
-.vs-dot-w {top: calc(50% - 2px); left: -2px; cursor: col-resize;}
-.vs-dot-s {bottom: -4px; left: calc(50% - 2px); cursor: row-resize;}
+.vs-dot-n {top: -3px; left: calc(50% - 3px); cursor: row-resize;}
+.vs-dot-e {top: calc(50% - 3px); right: -5px; cursor: col-resize;}
+.vs-dot-w {top: calc(50% - 3px); left: -3px; cursor: col-resize;}
+.vs-dot-s {bottom: -5px; left: calc(50% - 3px); cursor: row-resize;}
 
-.vs-dot-nw {top: -2px; left: -2px; cursor: nwse-resize;}
-.vs-dot-ne {top: -2px; right: -4px; cursor: nesw-resize;}
-.vs-dot-se {bottom: -4px; right: -4px; cursor: nwse-resize;}
-.vs-dot-sw {bottom: -4px; left: -2px; cursor: nesw-resize;}
+.vs-dot-nw {top: -3px; left: -3px; cursor: nwse-resize;}
+.vs-dot-ne {top: -3px; right: -5px; cursor: nesw-resize;}
+.vs-dot-se {bottom: -5px; right: -5px; cursor: nwse-resize;}
+.vs-dot-sw {bottom: -5px; left: -3px; cursor: nesw-resize;}
 
 .vs-transforming {
   opacity: 0.5;
@@ -170,11 +171,13 @@ html, body {
 }
 
 .vs-hidechildren * {
-  visibility: hidden;
+  opacity: 0.1;
+  transition: opacity 0.2s ease-out;
 }
 
 .vs-showme {
-  visibility: visible !important;
+  opacity: 1.0 !important;
+  transition: opacity 0.2s ease-out;
 }
 
 .vs-box {
@@ -197,4 +200,19 @@ html, body {
 .vs-panel {
   background: #E1E2E4;
   height: 300px;
+}
+
+.vs-textbox {
+}
+
+.vs-imagelist {
+  border: 1px solid black;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.vs-imagelistitem {
+  width: auto;
 }

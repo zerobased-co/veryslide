@@ -1,5 +1,7 @@
+import { parse } from 'papaparse';
 import List from '../core/List';
 import channel from '../core/Channel';
+import { randomInt } from '../core/Util';
 
 class Window {
   construct(parent) {
@@ -109,9 +111,15 @@ class Menu extends Window {
     channel.bind(this, 'Menu:toggleSnap', this.toggleSnap);
 
     this.btnAddTextBox = new Button(this);
-    this.btnAddTextBox.title = 'Add a text';
+    this.btnAddTextBox.title = 'New TextBox';
     this.btnAddTextBox.click = event => {
       channel.send('Document:addObject', 'TextBox');
+    };
+
+    this.btnAddImageList = new Button(this);
+    this.btnAddImageList.title = 'New ImageList';
+    this.btnAddImageList.click = event => {
+      channel.send('Document:addObject', 'ImageList');
     };
 
     this.btnRemoveObject = new Button(this);
@@ -144,6 +152,7 @@ class Menu extends Window {
     this.node.appendChild(this.btnZoom.render());
     this.node.appendChild(this.btnSnap.render());
     this.node.appendChild(this.btnAddTextBox.render());
+    this.node.appendChild(this.btnAddImageList.render());
     this.node.appendChild(this.btnRemoveObject.render());
     return this.node;
   }
@@ -667,6 +676,61 @@ class PanelForTextBox extends Panel {
   }
 }
 
+class PanelForImageList extends Panel {
+  render() {
+    super.render();
+
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.addEventListener('change', event => {
+      // getting a hold of the file reference
+      var file = event.target.files[0];
+
+      // setting up the reader
+      var reader = new FileReader();
+      reader.readAsText(file, 'UTF-8');
+
+      // here we tell the reader what to do when it's done reading...
+      reader.onload = readerEvent => {
+        var csv = readerEvent.target.result; // this is the content!
+        var results = parse(csv, {header: true});
+        console.log(results);
+
+        var item_height = randomInt(40, 60);
+        var item_count = randomInt(10, 100);
+        var item_start = randomInt(0, results.data.length - item_count);
+
+        for(var i = item_start; i < item_start + item_count; i++) {
+          var data = results.data[i];
+          console.log(data);
+
+          let node = document.createElement('img');
+          node.className = 'vs-imagelistitem';
+          node.src = 'static/logo/' + data['UID'] + '.png';
+          node.style.maxHeight = item_height + 'px';
+          node.style.maxWidth = (item_height * 1.25) + 'px';
+          this.object.node.appendChild(node);
+          this.object.record();
+        }
+
+        /*
+
+        item.height(item_height);
+        item.html(
+            "<div class='aligner' data-toggle='tooltip' title='" + data['Name'] + "'>"
+            + "<a target='_blank' href='" + data['Homepage'] + "'>"
+            + "<img src='" + data['Image URL'] + "' style='max-height:" + item_height + "px; max-width:" + (item_height * 2) + "px'>"
+            + "</a></div>");
+        item.data('name', data['Name (English)']);
+        content.append(item);
+        */
+      }
+    });
+    this.node.appendChild(input);
+    return this.node;
+  }
+}
+
 class TitleBar extends Window {
   constructor(...args) {
     super(...args);
@@ -704,6 +768,9 @@ class Property extends Window {
     this.panel.destruct();
 
     switch(object.name) {
+      case 'ImageList':
+        this.panel = new PanelForImageList(this);
+        break;
       case 'TextBox':
         this.panel = new PanelForTextBox(this);
         break;

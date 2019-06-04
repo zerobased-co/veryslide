@@ -166,6 +166,7 @@ html, body {
 .vs-transforming {
   opacity: 0.5;
   z-index: 9998;
+  transition: opacity 0.2s ease-out;
 }
 
 .vs-hidechildren * {

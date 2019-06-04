@@ -100,10 +100,8 @@ class Menu extends Window {
 
     this.btnZoom = new Button(this);
     this.btnZoom.title = 'Reset zoom';
-    this.btnZoom.click = event => {
-      channel.send('Viewport:zoom', 1.0);
-      channel.send('Viewport:move', [0, 0]);
-    };
+    this.btnZoom.click = this.resetZoom.bind(this);
+    channel.bind(this, 'Menu:resetZoom', this.resetZoom);
 
     this.btnSnap = new Button(this);
     this.btnSnap.title = 'Snap Off';
@@ -121,6 +119,11 @@ class Menu extends Window {
     this.btnRemoveObject.click = event => {
       channel.send('Document:removeObject', null);
     };
+  }
+
+  resetZoom() {
+    channel.send('Viewport:zoom', 1.0);
+    channel.send('Viewport:move', [0, 0]);
   }
 
   toggleSnap() {
@@ -450,6 +453,7 @@ class Viewport extends Window {
     this.page.setup(page);
     this.node.append(this.page.render());
     this.update();
+    this.setPageSnap();
     channel.send('Document:selectPage', page);
   }
 
@@ -461,11 +465,8 @@ class Viewport extends Window {
     if (this.object == null) return;
     channel.send('Document:removeObject', this.object);
   }
-
-  toggleSnap() {
-    this.snap = !this.snap;
-    this.handler.snap = this.snap;
-
+  
+  setPageSnap() {
     if (this.page) {
       if (this.snap) {
         this.page.node.classList.add('snap');
@@ -473,6 +474,12 @@ class Viewport extends Window {
         this.page.node.classList.remove('snap');
       }
     }
+  }
+
+  toggleSnap() {
+    this.snap = !this.snap;
+    this.handler.snap = this.snap;
+    this.setPageSnap();
     return this.snap;
   }
 
@@ -545,6 +552,10 @@ class Viewport extends Window {
 
       if (event.keyCode === 83) {
         channel.send('Menu:toggleSnap', null);
+      }
+
+      if (event.keyCode === 48) {
+        channel.send('Menu:resetZoom', null);
       }
 
       if (event.keyCode === 46 || event.keyCode === 8) {

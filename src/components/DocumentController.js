@@ -5,14 +5,16 @@ class DocumentController {
     this.doc = doc;
     this.editor = editor;
     this.page = null;
+    this.object = null;
 
     channel.bind(this, 'Document:addPage', (value) => {
       const newPage = this.doc.addPage();
       channel.send('PageList:addPage', newPage);
     });
 
-    channel.bind(this, 'selectPage', (page) => {
+    channel.bind(this, 'Document:selectPage', (page) => {
       this.page = page;
+      this.object = null;
     });
 
     channel.bind(this, 'Document:removePage', (value) => {
@@ -35,6 +37,18 @@ class DocumentController {
       let newObject = this.page.addObject(value);
       channel.send('Viewport:addObject', newObject);
       channel.send('Viewport:focus', newObject);
+    });
+
+    channel.bind(this, 'Document:selectObject', (object) => {
+      this.object = object;
+    });
+
+    channel.bind(this, 'Document:removeObject', (value) => {
+      if (this.object === null) return;
+      this.page.removeObject(this.object);
+      this.object = null;
+
+      channel.send('Viewport:blur', null);
     });
   }
 }

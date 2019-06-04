@@ -1,14 +1,13 @@
 class List {
-  constructor(type) {
-    this.type = type;
+  constructor() {
     this.head = null;
     this.tail = null;
     this.array = new Array();
     this.count = 0;
   }
   
-  spawn(...args) {
-    let node = new this.type(...args);
+  spawn(type, ...args) {
+    let node = new type(...args);
     node.prev = null;
     node.next = null;
     node.order = null;

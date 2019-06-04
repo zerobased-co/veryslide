@@ -109,3 +109,5 @@ venv.bak/
 # For frontend
 node_modules/
 webpack-stats.json
+
+.DS_Store

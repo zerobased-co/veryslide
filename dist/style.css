@@ -137,7 +137,7 @@ html, body {
 
 .vs-dot {
   position: absolute;
-  border: 1px solid black;
+  border: 1px solid rgba(0, 0, 0, 0.75);
   background: white;
   width: 7px;
   height: 7px;
@@ -157,4 +157,34 @@ html, body {
 .vs-transforming {
   opacity: 0.5;
   z-index: 9998;
+}
+
+.vs-hidechildren * {
+  visibility: hidden;
+}
+
+.vs-showme {
+  visibility: visible !important;
+}
+
+.vs-box {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.vs-titlebar {
+  width: 100%;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #E1E2E4;
+  font-size: 0.8em;
+  border-bottom: 1px solid #ccc;
+}
+
+.vs-panel {
+  background: #E1E2E4;
+  height: 300px;
 }

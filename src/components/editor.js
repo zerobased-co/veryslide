@@ -20,14 +20,14 @@ class Window {
 class PageList extends Window {
   constructor(...args) {
     super(...args);
-    this.pagethumbs = new List(PageThumb);
+    this.pagethumbs = new List();
     channel.bind(this, 'PageList:addPage', this.addPage);
     channel.bind(this, 'PageList:selectPage', this.selectPage);
     channel.bind(this, 'PageList:removePage', this.removePage);
   }
 
   addPage(pageInfo) {
-    let pagethumb = this.pagethumbs.spawn(this);
+    let pagethumb = this.pagethumbs.spawn(PageThumb);
     pagethumb.pageInfo = pageInfo;
     this.pagethumbs.append(pagethumb);
 
@@ -106,6 +106,12 @@ class Menu extends Window {
     this.btnAddTextBox.click = event => {
       channel.send('Document:addObject', 'TextBox');
     };
+
+    this.btnRemoveObject = new Button(this);
+    this.btnRemoveObject.title = 'Remove object';
+    this.btnRemoveObject.click = event => {
+      channel.send('Document:removeObject', null);
+    };
   }
 
   render() {
@@ -116,6 +122,7 @@ class Menu extends Window {
     this.node.appendChild(this.btnRemovePage.render());
     this.node.appendChild(this.btnZoom.render());
     this.node.appendChild(this.btnAddTextBox.render());
+    this.node.appendChild(this.btnRemoveObject.render());
     return this.node;
   }
 }
@@ -133,7 +140,7 @@ class PageThumb extends Window {
   select() {
     channel.send('PageThumb:deselect', null);
     this.node.classList.toggle('focus');
-    channel.send('selectPage', this.pageInfo);
+    channel.send('Viewport:selectPage', this.pageInfo);
   }
 
   deselect() {
@@ -205,6 +212,7 @@ class Handler extends Window {
     this.dragStart = undefined;
     this.basePos = undefined;
     this.baseSize = undefined;
+    this.currentDot = null;
   }
 
   connect(object) {
@@ -245,6 +253,9 @@ class Handler extends Window {
       if (this.transform != null) {
         if (this.object.node.classList.contains('vs-transforming') === false) {
           this.object.node.classList.add('vs-transforming');
+        }
+        if (this.node.classList.contains('vs-hidechildren') === false) {
+          this.node.classList.add('vs-hidechildren');
         }
 
         let dx = event.clientX - this.dragStart.x;
@@ -309,8 +320,14 @@ class Handler extends Window {
       event.stopPropagation();
 
       if (this.transform != null) {
+        this.node.classList.remove('vs-hidechildren');
         this.object.node.classList.remove('vs-transforming');
         this.transform = null;
+      }
+      
+      if (this.currentDot != null) {
+        this.currentDot.classList.remove('vs-showme');
+        this.currentDot = null;
       }
 
       window.removeEventListener('mousemove', mousemove);
@@ -336,6 +353,8 @@ class Handler extends Window {
 
       if (event.target.classList.contains('vs-dot')) {
         this.transform = event.target.innerText;
+        this.currentDot = event.target;
+        this.currentDot.classList.add('vs-showme');
       } else {
         this.transform = 'move';
       }
@@ -352,6 +371,7 @@ class Viewport extends Window {
   constructor(...args) {
     super(...args);
     this.page = null;
+    this.object = null;
 
     this.scrollX = 0;
     this.scrollY = 0;
@@ -363,19 +383,19 @@ class Viewport extends Window {
     //this.zoomLevel = [10, 25, 50, 75, 100, 200, 400];
     this.handler = null;
 
-    channel.bind(this, 'selectPage', this.selectPage);
+    channel.bind(this, 'Viewport:selectPage', this.selectPage);
     channel.bind(this, 'Viewport:clear', this.clear);
     channel.bind(this, 'Viewport:move', this.move);
     channel.bind(this, 'Viewport:zoom', this.zoom);
     channel.bind(this, 'Viewport:addObject', this.addObject);
     channel.bind(this, 'Viewport:focus', this.focus);
+    channel.bind(this, 'Viewport:blur', this.blur);
   }
 
   clear() {
-    if (this.page === null) return;
+    if (this.page == null) return;
 
     this.blur();
-   
     this.node.removeChild(this.page.node);
     delete this.page;
     this.page = null;
@@ -387,25 +407,34 @@ class Viewport extends Window {
     this.page.setup(page);
     this.node.append(this.page.render());
     this.update();
+    channel.send('Document:selectPage', page);
   }
 
   addObject(object) {
     this.page.node.append(object.render());
   }
 
+  removeFocusedObject() {
+    if (this.object == null) return;
+    channel.send('Document:removeObject', this.object);
+  }
+
   update() {
-    if (this.page === null) return;
+    if (this.page == null) return;
     this.page.node.style.transform = 'translate(' + this.translate.x + 'px, ' + this.translate.y + 'px) scale(' + this.scale + ')';
     this.handler.node.style.transform = 'translate(' + this.translate.x + 'px, ' + this.translate.y + 'px)';
   }
 
   focus(object) {
-    if (this.handler === null) return;
+    if (this.handler == null) return;
+    this.object = object;
     this.handler.connect(object);
+    channel.send('Document:selectObject', this.object);
   }
 
   blur() {
-    if (this.handler === null) return;
+    if (this.handler == null) return;
+    this.object = null;
     this.handler.show(false);
   }
 
@@ -440,7 +469,7 @@ class Viewport extends Window {
     this.node.className = 'vs-viewport';
     this.node.tabIndex = '0';
 
-    this.node.addEventListener('keydown', event => {
+    window.addEventListener('keydown', event => {
       if (event.keyCode === 32) {
         event.preventDefault();
         if (this.grab === false) {
@@ -457,6 +486,10 @@ class Viewport extends Window {
       if (event.keyCode === 187) {
         this.zoomIn();
       }
+
+      if (event.keyCode === 46 || event.keyCode === 8) {
+        this.removeFocusedObject();
+      }
     });
 
     this.node.addEventListener('keyup', event => {
@@ -468,7 +501,7 @@ class Viewport extends Window {
     });
 
     this.node.addEventListener('mousemove', event => {
-      if (this.page === undefined) return;
+      if (this.page == null) return;
       if (this.drag === true) {
         let dx = event.clientX - this.dragStart.x;
         let dy = event.clientY - this.dragStart.y;
@@ -480,7 +513,7 @@ class Viewport extends Window {
     });
 
     this.node.addEventListener('mousedown', event => {
-      if (this.page === undefined) return;
+      if (this.page == null) return;
       if (this.grab === true) {
         this.node.style.cursor = 'grabbing';
         this.drag = true;
@@ -521,6 +554,14 @@ class Viewport extends Window {
 }
 
 class Property extends Window {
+  render() {
+    this.node = document.createElement('div');
+    this.node.className = 'vs-box';
+    this.node.innerHTML = ''
+      + '<div class="vs-titlebar">Property</div>'
+      + '<div class="vs-panel"></div>';
+    return this.node;
+  }
 }
 
 class ToolBox extends Window {
@@ -544,7 +585,9 @@ class Editor {
     this.menu = new Menu(this);
     this.navigator = new Navigator(this);
     this.viewport = new Viewport(this);
+
     this.toolbox = new ToolBox(this);
+    this.property = new Property(this);
   }
 
   render() {
@@ -558,6 +601,8 @@ class Editor {
     row.node.appendChild(this.navigator.render());
     row.node.appendChild(this.viewport.render());
     row.node.appendChild(this.toolbox.render());
+
+    this.toolbox.node.appendChild(this.property.render());
 
     return this.node;
   }

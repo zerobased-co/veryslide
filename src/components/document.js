@@ -11,6 +11,7 @@ class BaseObject {
     this.height = 0;
     this.name = '';
     this.node = null;
+    this.page = null;
     this.backgroundColor = '#ffffff';
   }
 
@@ -63,16 +64,18 @@ class Page extends BaseObject {
   constructor() {
     super();
     this.name = 'Page';
-    this.objects = new List(BaseObject);
+    this.objects = new List();
   }
 
   addObject(type) {
-    let object = new TextBox();
+    let object = this.objects.spawn(TextBox);
+    object.page = this;
     this.objects.append(object);
     return object;
   }
 
   removeObject(object) {
+    object.node.parentNode.removeChild(object.node);
     this.objects.remove(object);
   }
 
@@ -96,11 +99,11 @@ class Document {
   constructor() {
     this.width = 1024;
     this.height = 768;
-    this.pages = new List(Page);
+    this.pages = new List();
   }
 
   addPage() {
-    let page = this.pages.spawn(this);
+    let page = this.pages.spawn(Page);
     this.pages.append(page);
 
     page.width = this.width;

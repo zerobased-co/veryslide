@@ -42,7 +42,7 @@ class TextBox extends Shape {
 
     this.text = 'Text' + id;
     id += 1;
-    this.color = '#000000';
+    this.color = '#ffffff';
   }
 
   render() {

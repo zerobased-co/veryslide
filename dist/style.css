@@ -61,6 +61,15 @@ html, body {
   position: absolute;
 }
 
+.vs-page.snap {
+  background:
+		linear-gradient(90deg, #FFF 14px, transparent 0) center,
+		linear-gradient(#FFF 14px, transparent 0) center,
+		#ddd !important;
+  background-size: 16px 16px !important;
+  background-position: 1px 1px !important;
+}
+
 .vs-menu {
   background: white;
   display: flex;

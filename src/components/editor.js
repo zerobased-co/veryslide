@@ -73,6 +73,10 @@ class Button extends Window {
     return this.node;
   }
 
+  setTitle(text) {
+    this.node.innerHTML = text;
+  }
+
   click() {
     console.log('click');
   }
@@ -101,6 +105,11 @@ class Menu extends Window {
       channel.send('Viewport:move', [0, 0]);
     };
 
+    this.btnSnap = new Button(this);
+    this.btnSnap.title = 'Snap Off';
+    this.btnSnap.click = this.toggleSnap.bind(this);
+    channel.bind(this, 'Menu:toggleSnap', this.toggleSnap);
+
     this.btnAddTextBox = new Button(this);
     this.btnAddTextBox.title = 'Add a text';
     this.btnAddTextBox.click = event => {
@@ -114,6 +123,15 @@ class Menu extends Window {
     };
   }
 
+  toggleSnap() {
+    let snap = channel.send('Viewport:toggleSnap', null)[0];
+    if (snap) {
+      this.btnSnap.setTitle('Snap On');
+    } else {
+      this.btnSnap.setTitle('Snap Off');
+    }
+  }
+
   render() {
     this.node = document.createElement('div');
     this.node.className = 'vs-menu';
@@ -121,6 +139,7 @@ class Menu extends Window {
     this.node.appendChild(this.btnAddPage.render());
     this.node.appendChild(this.btnRemovePage.render());
     this.node.appendChild(this.btnZoom.render());
+    this.node.appendChild(this.btnSnap.render());
     this.node.appendChild(this.btnAddTextBox.render());
     this.node.appendChild(this.btnRemoveObject.render());
     return this.node;
@@ -213,6 +232,8 @@ class Handler extends Window {
     this.basePos = undefined;
     this.baseSize = undefined;
     this.currentDot = null;
+    this.snap = false;
+    this.snapSize = 16;
   }
 
   connect(object) {
@@ -293,10 +314,30 @@ class Handler extends Window {
           h *= 2;
         }
 
+        let _x = x;
+        let _y = y;
+        let _w = w;
+        let _h = h;
+
         x += this.basePos.x;
         y += this.basePos.y;
         w += this.baseSize.width;
         h += this.baseSize.height;
+
+        if (this.snap) {
+          if (_x != 0) {
+            x = parseInt(x / this.snapSize) * this.snapSize;
+          }
+          if (_y != 0) {
+            y = parseInt(y / this.snapSize) * this.snapSize;
+          }
+          if (_w != 0) {
+            w = parseInt(w / this.snapSize) * this.snapSize;
+          }
+          if (_h != 0) {
+            h = parseInt(h / this.snapSize) * this.snapSize;
+          }
+        }
 
         this.node.style.left = x + 'px';
         this.node.style.top = y + 'px';
@@ -375,6 +416,7 @@ class Viewport extends Window {
 
     this.scrollX = 0;
     this.scrollY = 0;
+    this.snap = false;
     this.grab = false;
     this.drag = false;
     this.dragStart = undefined;
@@ -390,6 +432,7 @@ class Viewport extends Window {
     channel.bind(this, 'Viewport:addObject', this.addObject);
     channel.bind(this, 'Viewport:focus', this.focus);
     channel.bind(this, 'Viewport:blur', this.blur);
+    channel.bind(this, 'Viewport:toggleSnap', this.toggleSnap);
   }
 
   clear() {
@@ -419,6 +462,20 @@ class Viewport extends Window {
     channel.send('Document:removeObject', this.object);
   }
 
+  toggleSnap() {
+    this.snap = !this.snap;
+    this.handler.snap = this.snap;
+
+    if (this.page) {
+      if (this.snap) {
+        this.page.node.classList.add('snap');
+      } else {
+        this.page.node.classList.remove('snap');
+      }
+    }
+    return this.snap;
+  }
+
   update() {
     if (this.page == null) return;
     this.page.node.style.transform = 'translate(' + this.translate.x + 'px, ' + this.translate.y + 'px) scale(' + this.scale + ')';
@@ -426,16 +483,15 @@ class Viewport extends Window {
   }
 
   focus(object) {
-    if (this.handler == null) return;
     this.object = object;
     this.handler.connect(object);
     channel.send('Document:selectObject', this.object);
   }
 
   blur() {
-    if (this.handler == null) return;
     this.object = null;
     this.handler.show(false);
+    channel.send('Document:selectObject', null);
   }
 
   move(args) {
@@ -485,6 +541,10 @@ class Viewport extends Window {
 
       if (event.keyCode === 187) {
         this.zoomIn();
+      }
+
+      if (event.keyCode === 83) {
+        channel.send('Menu:toggleSnap', null);
       }
 
       if (event.keyCode === 46 || event.keyCode === 8) {

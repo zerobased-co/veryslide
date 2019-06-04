@@ -455,6 +455,7 @@ class Viewport extends Window {
     this.update();
     this.setPageSnap();
     channel.send('Document:selectPage', page);
+    channel.send('Property:setPanelFor', page);
   }
 
   addObject(object) {
@@ -493,12 +494,16 @@ class Viewport extends Window {
     this.object = object;
     this.handler.connect(object);
     channel.send('Document:selectObject', this.object);
+    channel.send('Property:setPanelFor', this.object);
   }
 
   blur() {
     this.object = null;
     this.handler.show(false);
     channel.send('Document:selectObject', null);
+    if (this.page) {
+      channel.send('Property:setPanelFor', this.page.page);
+    }
   }
 
   move(args) {
@@ -511,19 +516,16 @@ class Viewport extends Window {
 
   zoom(scale) {
     this.scale = scale;
-    console.log('zoom', scale);
     this.update();
   }
 
   zoomOut() {
     this.scale = this.scale - 0.1;
-    console.log('zoom out', this.scale);
     this.update();
   }
 
   zoomIn() {
     this.scale = this.scale + 0.1;
-    console.log('zoom in', this.scale);
     this.update();
   }
 
@@ -624,13 +626,105 @@ class Viewport extends Window {
   }
 }
 
+class Panel extends Window {
+  constructor(...args) {
+    super(...args);
+    this.object = null;
+  }
+
+  setObject(object) {
+    this.object = object;
+  }
+
+  render() {
+    this.node = document.createElement('div');
+    this.node.className = 'vs-panel';
+    return this.node;
+  }
+}
+
+class PanelForDocument extends Panel {
+  render() {
+    super.render();
+    this.node.innerText = 'PanelForDoucment';
+    return this.node;
+  }
+}
+
+class PanelForPage extends Panel {
+  render() {
+    super.render();
+    this.node.innerText = 'PanelForPage';
+    return this.node;
+  }
+}
+
+class PanelForTextBox extends Panel {
+  render() {
+    super.render();
+    this.node.innerText = 'PanelForTextBox';
+    return this.node;
+  }
+}
+
+class TitleBar extends Window {
+  constructor(...args) {
+    super(...args);
+    this.title = '';
+  }
+
+  setTitle(title) {
+    this.title = title;
+    if (this.node != null) {
+      this.node.innerText = title;
+    }
+  }
+
+  render() {
+    this.node = document.createElement('div');
+    this.node.className = 'vs-titlebar';
+    this.node.innerText = this.title;
+    return this.node;
+  }
+}
+
 class Property extends Window {
+  constructor(...args) {
+    super(...args);
+    this.titlebar = new TitleBar(this);
+    this.titlebar.setTitle('Property');
+    this.panel = new Panel(this);
+    this.object = null;
+
+    channel.bind(this, 'Property:setPanelFor', this.setPanelFor);
+  }
+
+  setPanelFor(object) {
+    console.log('SetPanel', object.name, object);
+    this.panel.destruct();
+
+    switch(object.name) {
+      case 'TextBox':
+        this.panel = new PanelForTextBox(this);
+        break;
+      case 'Page':
+        this.panel = new PanelForPage(this);
+        break;
+      case 'Document':
+        this.panel = new PanelForDocument(this);
+        break;
+    }
+    this.panel.setObject(object);
+    this.titlebar.setTitle(object.name + ' Property');
+    this.node.appendChild(this.panel.render());
+    return this.panel;
+  }
+
   render() {
     this.node = document.createElement('div');
     this.node.className = 'vs-box';
-    this.node.innerHTML = ''
-      + '<div class="vs-titlebar">Property</div>'
-      + '<div class="vs-panel"></div>';
+    this.node.appendChild(this.titlebar.render());
+    this.node.appendChild(this.panel.render());
     return this.node;
   }
 }

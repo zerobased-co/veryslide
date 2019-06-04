@@ -100,6 +100,7 @@ class Document {
     this.width = 1024;
     this.height = 768;
     this.pages = new List();
+    this.name = 'Document';
   }
 
   addPage() {

@@ -282,6 +282,7 @@ class Handler extends Window {
     var mousemove = function(event) {
       if (this.object == null) return;
       event.stopPropagation();
+      event.preventDefault();
 
       if (this.transform != null) {
         if (this.object.node.classList.contains('vs-transforming') === false) {
@@ -389,6 +390,7 @@ class Handler extends Window {
 
     this.node.addEventListener('mousedown', event => {
       if (this.object == null) return;
+      event.preventDefault();
       event.stopPropagation();
 
       this.dragStart = {
@@ -544,8 +546,9 @@ class Viewport extends Window {
     this.node.tabIndex = '0';
 
     window.addEventListener('keydown', event => {
+      event.preventDefault();
+
       if (event.keyCode === 32) {
-        event.preventDefault();
         if (this.grab === false) {
           this.node.style.cursor = 'grab';
           this.grab = true;
@@ -553,11 +556,11 @@ class Viewport extends Window {
         }
       }
 
-      if (event.keyCode === 189) {
+      if (event.keyCode === 173 || event.keyCode === 189) {
         this.zoomOut();
       }
 
-      if (event.keyCode === 187) {
+      if (event.keyCode === 61 || event.keyCode === 187) {
         this.zoomIn();
       }
 
@@ -575,14 +578,17 @@ class Viewport extends Window {
     });
 
     this.node.addEventListener('keyup', event => {
+      event.preventDefault();
+
       if (event.keyCode === 32) {
-        event.preventDefault();
         this.node.style.cursor = 'default';
         this.grab = false;
       }
     });
 
     this.node.addEventListener('mousemove', event => {
+      event.preventDefault();
+
       if (this.page == null) return;
       if (this.drag === true) {
         let dx = event.clientX - this.dragStart.x;
@@ -595,6 +601,8 @@ class Viewport extends Window {
     });
 
     this.node.addEventListener('mousedown', event => {
+      event.preventDefault();
+
       if (this.page == null) return;
       if (this.grab === true) {
         this.node.style.cursor = 'grabbing';

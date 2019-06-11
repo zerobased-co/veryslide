@@ -9,7 +9,7 @@ class BaseObject {
     this.y = 0;
     this.width = 0;
     this.height = 0;
-    this.name = '';
+    this.name = 'BaseObject';
     this.node = null;
     this.page = null;
     this.backgroundColor = '#ffffff';
@@ -17,6 +17,10 @@ class BaseObject {
 
   contain(x, y) {
     return (x >= this.x) && (x < this.x + this.width) && (y >= this.y) && (y < this.y + this.height);
+  }
+
+  record() {
+    this.content = this.node.innerHTML;
   }
 
   render() {
@@ -28,6 +32,7 @@ class BaseObject {
     this.node.style.top = this.y + 'px';
     this.node.style.width = this.width + 'px';
     this.node.style.height = this.height + 'px';
+    this.node.style.zIndex = this.order;
   }
 }
 
@@ -36,6 +41,7 @@ class Shape extends BaseObject {
     super();
     this.width = randomInt(100, 300);
     this.height = randomInt(100, 300);
+    this.backgroundColor = randomColor();
     this.name = 'Shape';
   }
 
@@ -50,10 +56,6 @@ class ImageList extends Shape {
     super();
     this.name = 'ImageList';
     this.content = null;
-  }
-
-  record() {
-    this.content = this.node.innerHTML;
   }
 
   render() {
@@ -74,7 +76,6 @@ class TextBox extends Shape {
     this.text = 'Text' + id;
     id += 1;
     this.color = '#ffffff';
-    this.backgroundColor = randomColor();
   }
 
   render() {
@@ -110,6 +111,13 @@ class Page extends BaseObject {
   removeObject(object) {
     object.node.parentNode.removeChild(object.node);
     this.objects.remove(object);
+  }
+
+  reorder() {
+    for(var i = 0; i < this.objects.array.length; i++) {
+      let object = this.objects.array[i];
+      object.node.style.zIndex = object.order;
+    }
   }
 
   render() {

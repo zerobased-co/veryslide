@@ -239,6 +239,8 @@ class Handler extends Window {
   constructor(...args) {
     super(...args);
     this.object = null;
+    this.viewport = null;
+
     this.transform = null;
     this.dragStart = undefined;
     this.basePos = undefined;
@@ -246,6 +248,17 @@ class Handler extends Window {
     this.currentDot = null;
     this.snap = false;
     this.snapSize = 16;
+    
+    this.dotPreset = {
+      'n': 'translate(-50%, -50%)',
+      'e': 'translate(50%, -50%)',
+      'w': 'translate(-50%, -50%)',
+      's': 'translate(-50%, 50%)',
+      'nw': 'translate(-50%, -50%)',
+      'ne': 'translate(50%, -50%)',
+      'se': 'translate(50%, 50%)',
+      'sw': 'translate(-50%, 50%)',
+    };
   }
 
   connect(object) {
@@ -266,6 +279,154 @@ class Handler extends Window {
     }
   }
 
+  update() {
+    if (this.viewport == null) return;
+
+    let dots = this.node.getElementsByClassName('vs-dot');
+    for(var i = 0; i < dots.length; i++) {
+      let type = dots[i].innerHTML;
+      dots[i].style.transform = this.dotPreset[type] + ' scale(' + (1 / this.viewport.scale) + ')';
+    }
+  }
+
+  mousemove(event) {
+    if (this.object == null) return;
+
+    event.stopPropagation();
+    event.preventDefault();
+
+    if (this.transform != null) {
+      if (this.object.node.classList.contains('vs-transforming') === false) {
+        this.object.node.classList.add('vs-transforming');
+      }
+      if (this.node.classList.contains('vs-hidechildren') === false) {
+        this.node.classList.add('vs-hidechildren');
+      }
+
+      let dx = (event.clientX - this.dragStart.x) / this.viewport.scale;
+      let dy = (event.clientY - this.dragStart.y) / this.viewport.scale;
+
+      let x = 0;
+      let y = 0;
+      let w = 0;
+      let h = 0;
+
+      switch(this.transform) {
+        case 'move': x = dx; y = dy; break;
+        case 'e': w = dx; break;
+        case 'se': w = dx; h = dy; break;
+        case 's': h = dy; break;
+        case 'sw': x = dx; w = -dx; h = dy; break;
+        case 'w': x = dx; w = -dx; break;
+        case 'nw': x = dx; w = -dx; y = dy; h = -dy; break;
+        case 'n': y = dy; h = -dy; break;
+        case 'ne': w = dx; y = dy; h = -dy; break;
+      }
+
+      if (event.shiftKey) {
+        if (Math.abs(w) / (this.baseSize.width / this.baseSize.height) > Math.abs(h)) {
+          h = w * (this.baseSize.height / this.baseSize.width);
+        } else {
+          w = h * (this.baseSize.width / this.baseSize.height);
+        }
+      }
+
+      if (event.altKey) {
+        x -= w;
+        w *= 2;
+        y -= h;
+        h *= 2;
+      }
+
+      let _x = x;
+      let _y = y;
+      let _w = w;
+      let _h = h;
+
+      x += this.basePos.x;
+      y += this.basePos.y;
+      w += this.baseSize.width;
+      h += this.baseSize.height;
+
+      if (this.snap) {
+        if (_x != 0) {
+          x = parseInt(x / this.snapSize) * this.snapSize;
+        }
+        if (_y != 0) {
+          y = parseInt(y / this.snapSize) * this.snapSize;
+        }
+        if (_w != 0) {
+          w = parseInt(w / this.snapSize) * this.snapSize;
+        }
+        if (_h != 0) {
+          h = parseInt(h / this.snapSize) * this.snapSize;
+        }
+      }
+
+      this.node.style.left = x + 'px';
+      this.node.style.top = y + 'px';
+      this.object.node.style.left = x + 'px';
+      this.object.node.style.top = y + 'px';
+
+      this.node.style.width = w + 'px';
+      this.node.style.height = h + 'px';
+      this.object.node.style.width = w + 'px';
+      this.object.node.style.height = h + 'px';
+
+      this.object.x = x;
+      this.object.y = y;
+      this.object.width = w;
+      this.object.height = h;
+    }
+  }
+
+  mouseup(event) {
+    if (this.object == null) return;
+    event.stopPropagation();
+
+    if (this.transform != null) {
+      this.node.classList.remove('vs-hidechildren');
+      this.object.node.classList.remove('vs-transforming');
+      this.transform = null;
+    }
+    
+    if (this.currentDot != null) {
+      this.currentDot.classList.remove('vs-showme');
+      this.currentDot = null;
+    }
+
+    window.removeEventListener('mousemove', this.mousemove.bind(this));
+    window.removeEventListener('mouseup', this.mouseup.bind(this));
+  }
+
+  mousedown(event) {
+    if (this.object == null) return;
+
+    this.dragStart = {
+      x: event.clientX,
+      y: event.clientY,
+    };
+    this.basePos = {
+      x: this.object.x,
+      y: this.object.y,
+    };
+    this.baseSize = {
+      width: this.object.width,
+      height: this.object.height,
+    };
+
+    if (event.target.classList.contains('vs-dot')) {
+      this.transform = event.target.innerText;
+      this.currentDot = event.target;
+      this.currentDot.classList.add('vs-showme');
+      event.stopPropagation();
+    } else {
+      this.transform = 'move';
+    }
+    window.addEventListener('mousemove', this.mousemove.bind(this));
+    window.addEventListener('mouseup', this.mouseup.bind(this));
+  }
+
   render() {
     this.node = document.createElement('div');
     this.node.className = 'vs-handler';
@@ -279,145 +440,7 @@ class Handler extends Window {
       + '<div class="vs-dot vs-dot-sw">sw</div>'
       + '<div class="vs-dot vs-dot-w">w</div>';
 
-    var mousemove = function(event) {
-      if (this.object == null) return;
-      event.stopPropagation();
-      event.preventDefault();
-
-      if (this.transform != null) {
-        if (this.object.node.classList.contains('vs-transforming') === false) {
-          this.object.node.classList.add('vs-transforming');
-        }
-        if (this.node.classList.contains('vs-hidechildren') === false) {
-          this.node.classList.add('vs-hidechildren');
-        }
-
-        let dx = event.clientX - this.dragStart.x;
-        let dy = event.clientY - this.dragStart.y;
-
-        let x = 0;
-        let y = 0;
-        let w = 0;
-        let h = 0;
-
-        switch(this.transform) {
-          case 'move': x = dx; y = dy; break;
-          case 'e': w = dx; break;
-          case 'se': w = dx; h = dy; break;
-          case 's': h = dy; break;
-          case 'sw': x = dx; w = -dx; h = dy; break;
-          case 'w': x = dx; w = -dx; break;
-          case 'nw': x = dx; w = -dx; y = dy; h = -dy; break;
-          case 'n': y = dy; h = -dy; break;
-          case 'ne': w = dx; y = dy; h = -dy; break;
-        }
-
-        if (event.shiftKey) {
-          if (Math.abs(w) / (this.baseSize.width / this.baseSize.height) > Math.abs(h)) {
-            h = w * (this.baseSize.height / this.baseSize.width);
-          } else {
-            w = h * (this.baseSize.width / this.baseSize.height);
-          }
-        }
-
-        if (event.altKey) {
-          x -= w;
-          w *= 2;
-          y -= h;
-          h *= 2;
-        }
-
-        let _x = x;
-        let _y = y;
-        let _w = w;
-        let _h = h;
-
-        x += this.basePos.x;
-        y += this.basePos.y;
-        w += this.baseSize.width;
-        h += this.baseSize.height;
-
-        if (this.snap) {
-          if (_x != 0) {
-            x = parseInt(x / this.snapSize) * this.snapSize;
-          }
-          if (_y != 0) {
-            y = parseInt(y / this.snapSize) * this.snapSize;
-          }
-          if (_w != 0) {
-            w = parseInt(w / this.snapSize) * this.snapSize;
-          }
-          if (_h != 0) {
-            h = parseInt(h / this.snapSize) * this.snapSize;
-          }
-        }
-
-        this.node.style.left = x + 'px';
-        this.node.style.top = y + 'px';
-        this.object.node.style.left = x + 'px';
-        this.object.node.style.top = y + 'px';
-
-        this.node.style.width = w + 'px';
-        this.node.style.height = h + 'px';
-        this.object.node.style.width = w + 'px';
-        this.object.node.style.height = h + 'px';
-
-        this.object.x = x;
-        this.object.y = y;
-        this.object.width = w;
-        this.object.height = h;
-      }
-    };
-
-    var mouseup = function(event) {
-      if (this.object == null) return;
-      event.stopPropagation();
-
-      if (this.transform != null) {
-        this.node.classList.remove('vs-hidechildren');
-        this.object.node.classList.remove('vs-transforming');
-        this.transform = null;
-      }
-      
-      if (this.currentDot != null) {
-        this.currentDot.classList.remove('vs-showme');
-        this.currentDot = null;
-      }
-
-      window.removeEventListener('mousemove', mousemove);
-      window.removeEventListener('mouseup', mouseup);
-    };
-
-    this.node.addEventListener('mousedown', event => {
-      if (this.object == null) return;
-      event.preventDefault();
-      event.stopPropagation();
-
-      this.dragStart = {
-        x: event.clientX,
-        y: event.clientY,
-      };
-      this.basePos = {
-        x: this.object.x,
-        y: this.object.y,
-      };
-      this.baseSize = {
-        width: this.object.width,
-        height: this.object.height,
-      };
-
-      if (event.target.classList.contains('vs-dot')) {
-        this.transform = event.target.innerText;
-        this.currentDot = event.target;
-        this.currentDot.classList.add('vs-showme');
-      } else {
-        this.transform = 'move';
-      }
-
-      window.addEventListener('mousemove', mousemove.bind(this));
-      window.addEventListener('mouseup', mouseup.bind(this));
-    });
-
+    this.node.addEventListener('mousedown', this.mousedown.bind(this));
     return this.node;
   }
 }
@@ -463,6 +486,8 @@ class Viewport extends Window {
     this.page = new Page(this);
     this.page.setup(page);
     this.node.append(this.page.render());
+    this.page.node.appendChild(this.handler.render());
+
     this.update();
     this.setPageSnap();
     channel.send('Document:selectPage', page);
@@ -498,7 +523,7 @@ class Viewport extends Window {
   update() {
     if (this.page == null) return;
     this.page.node.style.transform = 'translate(' + this.translate.x + 'px, ' + this.translate.y + 'px) scale(' + this.scale + ')';
-    this.handler.node.style.transform = 'translate(' + this.translate.x + 'px, ' + this.translate.y + 'px)';
+    this.handler.update();
   }
 
   focus(object) {
@@ -546,9 +571,9 @@ class Viewport extends Window {
     this.node.tabIndex = '0';
 
     window.addEventListener('keydown', event => {
-      event.preventDefault();
-
+      // space
       if (event.keyCode === 32) {
+        event.preventDefault();
         if (this.grab === false) {
           this.node.style.cursor = 'grab';
           this.grab = true;
@@ -556,31 +581,46 @@ class Viewport extends Window {
         }
       }
 
+      // -
       if (event.keyCode === 173 || event.keyCode === 189) {
         this.zoomOut();
       }
 
+      // +
       if (event.keyCode === 61 || event.keyCode === 187) {
         this.zoomIn();
       }
 
+      // s
       if (event.keyCode === 83) {
         channel.send('Menu:toggleSnap', null);
       }
 
+      // 0
       if (event.keyCode === 48) {
         channel.send('Menu:resetZoom', null);
       }
 
+      // delete
       if (event.keyCode === 46 || event.keyCode === 8) {
+        event.preventDefault();
         this.removeFocusedObject();
+      }
+
+      // [
+      if (event.keyCode === 219) {
+        channel.send('Document:orderBackward', this.object);
+      }
+
+      // ]
+      if (event.keyCode === 221) {
+        channel.send('Document:orderForward', this.object);
       }
     });
 
-    this.node.addEventListener('keyup', event => {
-      event.preventDefault();
-
+    window.addEventListener('keyup', event => {
       if (event.keyCode === 32) {
+        event.preventDefault();
         this.node.style.cursor = 'default';
         this.grab = false;
       }
@@ -612,11 +652,15 @@ class Viewport extends Window {
           y: event.clientY - this.translate.y,
         }
       } else {
-        let x = event.clientX - this.translate.x - this.node.offsetLeft;
-        let y = event.clientY - this.translate.y - this.node.offsetTop;
+        let rect = this.page.node.getBoundingClientRect();
+        let x = (event.clientX - rect.x) / this.scale;
+        let y = (event.clientY - rect.y) / this.scale;
+
         let pickedObject = this.page.findObject(x, y);
         if (pickedObject != null) {
           this.focus(pickedObject);
+          // pass event to handler for allowing drag instantly
+          this.handler.mousedown(event);
         } else {
           this.blur();
         }
@@ -636,8 +680,8 @@ class Viewport extends Window {
       this.drag = false;
     });
 
-    this.handler = new Handler();
-    this.node.appendChild(this.handler.render());
+    this.handler = new Handler(this);
+    this.handler.viewport = this;
 
     return this.node;
   }
@@ -656,6 +700,7 @@ class Panel extends Window {
   render() {
     this.node = document.createElement('div');
     this.node.className = 'vs-panel';
+    this.node.appendChild(document.createTextNode("Panel"));
     return this.node;
   }
 }
@@ -663,7 +708,7 @@ class Panel extends Window {
 class PanelForDocument extends Panel {
   render() {
     super.render();
-    this.node.innerText = 'PanelForDoucment';
+    this.node.appendChild(document.createTextNode("PanelForDoucment"));
     return this.node;
   }
 }
@@ -671,22 +716,59 @@ class PanelForDocument extends Panel {
 class PanelForPage extends Panel {
   render() {
     super.render();
-    this.node.innerText = 'PanelForPage';
+    this.node.appendChild(document.createTextNode("PanelForPage"));
     return this.node;
   }
 }
 
-class PanelForTextBox extends Panel {
+class PanelForShape extends Panel {
   render() {
     super.render();
-    this.node.innerText = 'PanelForTextBox';
+    this.node.appendChild(document.createTextNode("PanelForShape"));
+
+    this.btnOrderBack = new Button(this);
+    this.btnOrderBack.title = 'Back';
+    this.btnOrderBack.click = event => {
+      channel.send('Document:orderBack', this.object);
+    };
+
+    this.btnOrderFront = new Button(this);
+    this.btnOrderFront.title = 'Front';
+    this.btnOrderFront.click = event => {
+      channel.send('Document:orderFront', this.object);
+    };
+
+    this.btnOrderBackward = new Button(this);
+    this.btnOrderBackward.title = 'Backward';
+    this.btnOrderBackward.click = event => {
+      channel.send('Document:orderBackward', this.object);
+    };
+
+    this.btnOrderForward = new Button(this);
+    this.btnOrderForward.title = 'Forward';
+    this.btnOrderForward.click = event => {
+      channel.send('Document:orderForward', this.object);
+    };
+    this.node.appendChild(this.btnOrderBack.render());
+    this.node.appendChild(this.btnOrderFront.render());
+    this.node.appendChild(this.btnOrderBackward.render());
+    this.node.appendChild(this.btnOrderForward.render());
     return this.node;
   }
 }
 
-class PanelForImageList extends Panel {
+class PanelForTextBox extends PanelForShape {
   render() {
     super.render();
+    this.node.appendChild(document.createTextNode("PanelForTextBox"));
+    return this.node;
+  }
+}
+
+class PanelForImageList extends PanelForShape {
+  render() {
+    super.render();
+    this.node.appendChild(document.createTextNode("PanelForImageList"));
 
     var input = document.createElement('input');
     input.type = 'file';
@@ -772,7 +854,7 @@ class Property extends Window {
   }
 
   setPanelFor(object) {
-    console.log('SetPanel', object.name, object);
+    //console.log('SetPanel', object.name, object);
     this.panel.destruct();
 
     switch(object.name) {

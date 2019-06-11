@@ -50,6 +50,30 @@ class DocumentController {
 
       channel.send('Viewport:blur', null);
     });
+
+    channel.bind(this, 'Document:orderBack', (object) => {
+      if (this.page === null) return;
+      this.page.objects.makeHead(object);
+      this.page.reorder();
+    });
+
+    channel.bind(this, 'Document:orderFront', (object) => {
+      if (this.page === null) return;
+      this.page.objects.makeLast(object);
+      this.page.reorder();
+    });
+
+    channel.bind(this, 'Document:orderBackward', (object) => {
+      if (this.page === null) return;
+      this.page.objects.backward(object);
+      this.page.reorder();
+    });
+
+    channel.bind(this, 'Document:orderForward', (object) => {
+      if (this.page === null) return;
+      this.page.objects.forward(object);
+      this.page.reorder();
+    });
   }
 }
 

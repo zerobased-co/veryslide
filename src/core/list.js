@@ -57,12 +57,29 @@ class List {
     this.head = node;
     this.count++;
 
-    this.reorder(1);
+    this.reorder(0);
   }
 
-  reorder(from) {
-    for(var i = from; i < this.array.length; i++) {
+  reorder(from, to) {
+    if (to === undefined) {
+      to = this.array.length;
+    }
+
+    for(var i = from; i < to; i++) {
       this.array[i].order = i;
+    }
+  }
+
+  rearray() {
+    var node = this.head;
+    var order = 0;
+
+    while(node !== null) {
+      node.order = order;
+      this.array[order] = node;
+      
+      node = node.next;
+      order++;
     }
   }
 
@@ -94,6 +111,120 @@ class List {
 
   removeAll() {
     /* not implemented yet */
+  }
+
+  makeHead(node) {
+    if (this.head === node) return;
+    var target = this.head;
+
+    if (this.tail === node) {
+      this.tail = node.prev;
+    }
+    
+    if (node.next !== null) {
+      node.next.prev = node.prev;
+    }
+    node.prev.next = node.next;
+
+    target.prev = node;
+
+    node.prev = null;
+    node.next = target;
+    this.head = node;
+
+    this.rearray(node);
+
+    return node.order;
+  }
+
+  makeLast(node) {
+    if (this.tail === node) return;
+    var target = this.tail;
+
+    if (this.head === node) {
+      this.head = node.next;
+    }
+    
+    if (node.prev !== null) {
+      node.prev.next = node.next;
+    }
+    node.next.prev = node.prev;
+
+    target.next = node;
+
+    node.prev = target;
+    node.next = null;
+    this.tail = node;
+
+    this.rearray();
+
+    return node.order;
+  }
+
+  forward(node) {
+    if (node.next === null) return;
+    var target = node.next;
+    
+    if (node.prev !== null) {
+      node.prev.next = target;
+    }
+
+    var _next = target.next;
+    target.prev = node.prev;
+    target.next = node;
+    
+    node.prev = target;
+    node.next = _next;
+
+    var _order = node.order;
+    node.order = target.order;
+    target.order = _order;
+
+    this.array[node.order] = node;
+    this.array[target.order] = target;
+
+    if (this.tail === target) {
+      this.tail = node;
+    }
+
+    if (this.head === node) {
+      this.head = target;
+    }
+
+    return node.order;
+  }
+
+  backward(node) {
+    if (node.prev === null) return;
+    var target = node.prev;
+    
+    if (node.next !== null) {
+      node.next.prev = target;
+    }
+
+    var _prev = target.prev;
+    target.prev = node;
+    target.next = node.next;
+    
+    node.prev = _prev;
+    node.next = target;
+
+    var _order = node.order;
+    node.order = target.order;
+    target.order = _order;
+
+    this.array[node.order] = node;
+    this.array[target.order] = target;
+
+    if (this.head === target) {
+      this.head = node;
+    }
+
+    if (this.tail === node) {
+      this.tail = target;
+    }
+
+    return node.order;
   }
 }
 

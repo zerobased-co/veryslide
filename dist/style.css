@@ -147,22 +147,22 @@ html, body {
 .vs-dot {
   position: absolute;
   border: 1px solid rgba(0, 0, 0, 0.75);
-  border-radius: 5px;
+  border-radius: 50%;
   background: white;
   width: 9px;
   height: 9px;
   font-size: 0;
 }
 
-.vs-dot-n {top: -3px; left: calc(50% - 3px); cursor: row-resize;}
-.vs-dot-e {top: calc(50% - 3px); right: -5px; cursor: col-resize;}
-.vs-dot-w {top: calc(50% - 3px); left: -3px; cursor: col-resize;}
-.vs-dot-s {bottom: -5px; left: calc(50% - 3px); cursor: row-resize;}
+.vs-dot-n {top: 0; left: 50%; cursor: row-resize;}
+.vs-dot-e {top: 50%; right: 0; cursor: col-resize;}
+.vs-dot-w {top: 50%; left: 0; cursor: col-resize;}
+.vs-dot-s {bottom: 0; left: 50%; cursor: row-resize;}
 
-.vs-dot-nw {top: -3px; left: -3px; cursor: nwse-resize;}
-.vs-dot-ne {top: -3px; right: -5px; cursor: nesw-resize;}
-.vs-dot-se {bottom: -5px; right: -5px; cursor: nwse-resize;}
-.vs-dot-sw {bottom: -5px; left: -3px; cursor: nesw-resize;}
+.vs-dot-nw {top: 0; left: 0; cursor: nwse-resize;}
+.vs-dot-ne {top: 0; right: 0; cursor: nesw-resize;}
+.vs-dot-se {bottom: 0; right: 0; cursor: nwse-resize;}
+.vs-dot-sw {bottom: 0; left: 0; cursor: nesw-resize;}
 
 .vs-transforming {
   opacity: 0.5;
@@ -216,5 +216,5 @@ html, body {
 
 .vs-imagelistitem {
   width: auto;
-  margin: 0 10px;
+  margin: 5px;
 }

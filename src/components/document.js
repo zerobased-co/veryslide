@@ -12,7 +12,7 @@ class BaseObject {
     this.name = 'BaseObject';
     this.node = null;
     this.page = null;
-    this.backgroundColor = '#ffffff';
+    this.color = '#ffffff';
   }
 
   contain(x, y) {
@@ -23,11 +23,15 @@ class BaseObject {
     this.content = this.node.innerHTML;
   }
 
+  setColor(color) {
+    this.color = color;
+    this.node.style.backgroundColor = this.color;
+  }
+
   render() {
     this.node = document.createElement('div');
     this.node.className = 'vs-object';
-    this.node.style.backgroundColor = this.backgroundColor;
-    this.node.style.color = this.color;
+    this.node.style.backgroundColor = this.color;
     this.node.style.left = this.x + 'px';
     this.node.style.top = this.y + 'px';
     this.node.style.width = this.width + 'px';
@@ -41,7 +45,7 @@ class Shape extends BaseObject {
     super();
     this.width = randomInt(100, 300);
     this.height = randomInt(100, 300);
-    this.backgroundColor = randomColor();
+    this.color = randomColor();
     this.name = 'Shape';
   }
 
@@ -75,13 +79,24 @@ class TextBox extends Shape {
 
     this.text = 'Text' + id;
     id += 1;
-    this.color = '#ffffff';
+    this.textColor = '#ffffff';
+  }
+
+  setText(text) {
+    this.text = text;
+    this.node.innerText = this.text;
+  }
+
+  setTextColor(color) {
+    this.textColor = color;
+    this.node.style.color = this.textColor;
   }
 
   render() {
     super.render();
     this.node.classList.add('vs-textbox');
     this.node.innerText = this.text;
+    this.node.style.color = this.textColor;
     return this.node;
   }
 }
@@ -123,7 +138,7 @@ class Page extends BaseObject {
   render() {
     this.node = document.createElement('div');
     this.node.className = 'vs-page';
-    this.node.style.backgroundColor = this.backgroundColor;
+    this.node.style.backgroundColor = this.color;
     this.node.style.width = this.width + 'px';
     this.node.style.height = this.height + 'px';
 

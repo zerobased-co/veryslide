@@ -7,10 +7,15 @@ class Window {
   construct(parent) {
     this.parent = parent;
     this.node = null;
+    this.title = '';
   }
 
   destruct() {
     this.node.parentNode.removeChild(this.node);
+  }
+
+  setTitle(title) {
+    this.title = title;
   }
 
   render() {
@@ -71,16 +76,53 @@ class Button extends Window {
     this.node = document.createElement('div');
     this.node.className = 'vs-button';
     this.node.innerHTML = this.title;
-    this.node.addEventListener('click', this.click);
+    this.node.addEventListener('click', this.onClick.bind(this));
     return this.node;
   }
 
   setTitle(text) {
+    super.setTitle(text);
     this.node.innerHTML = text;
   }
 
-  click() {
-    console.log('click');
+  onClick(event) {
+  }
+}
+
+class Text extends Window {
+  constructor(...args) {
+    super(...args);
+  }
+
+  render() {
+    this.node = document.createElement('p');
+    this.node.innerHTML = this.title;
+    this.node.className = 'vs-text';
+    return this.node;
+  }
+}
+
+class InputText extends Window {
+  constructor(...args) {
+    super(...args);
+    this.value = null;
+  }
+
+  render() {
+    this.node = document.createElement('input');
+    this.node.type = 'text';
+    this.node.value = this.value;
+    this.node.className = 'vs-inputtext';
+    this.node.addEventListener('input', this.input.bind(this));
+    return this.node;
+  }
+
+  input(event) {
+    this.value = this.node.value;
+    this.onChange(this.value);
+  }
+
+  onChange(value) {
   }
 }
 
@@ -90,41 +132,41 @@ class Menu extends Window {
 
     this.btnAddPage = new Button(this);
     this.btnAddPage.title = 'Add a page';
-    this.btnAddPage.click = event => {
+    this.btnAddPage.onClick = event => {
       channel.send('Document:addPage', null);
     };
 
     this.btnRemovePage = new Button(this);
     this.btnRemovePage.title = 'Remove page';
-    this.btnRemovePage.click = event => {
+    this.btnRemovePage.onClick = event => {
       channel.send('Document:removePage', null);
     };
 
     this.btnZoom = new Button(this);
     this.btnZoom.title = 'Reset zoom';
-    this.btnZoom.click = this.resetZoom.bind(this);
+    this.btnZoom.onClick = this.resetZoom.bind(this);
     channel.bind(this, 'Menu:resetZoom', this.resetZoom);
 
     this.btnSnap = new Button(this);
     this.btnSnap.title = 'Snap Off';
-    this.btnSnap.click = this.toggleSnap.bind(this);
+    this.btnSnap.onClick = this.toggleSnap.bind(this);
     channel.bind(this, 'Menu:toggleSnap', this.toggleSnap);
 
     this.btnAddTextBox = new Button(this);
     this.btnAddTextBox.title = 'New TextBox';
-    this.btnAddTextBox.click = event => {
+    this.btnAddTextBox.onClick = event => {
       channel.send('Document:addObject', 'TextBox');
     };
 
     this.btnAddImageList = new Button(this);
     this.btnAddImageList.title = 'New ImageList';
-    this.btnAddImageList.click = event => {
+    this.btnAddImageList.onClick = event => {
       channel.send('Document:addObject', 'ImageList');
     };
 
     this.btnRemoveObject = new Button(this);
     this.btnRemoveObject.title = 'Remove object';
-    this.btnRemoveObject.click = event => {
+    this.btnRemoveObject.onClick = event => {
       channel.send('Document:removeObject', null);
     };
   }
@@ -571,6 +613,10 @@ class Viewport extends Window {
     this.node.tabIndex = '0';
 
     window.addEventListener('keydown', event => {
+      if (event.target !== document.body) {
+        return;
+      }
+
       // space
       if (event.keyCode === 32) {
         event.preventDefault();
@@ -603,7 +649,6 @@ class Viewport extends Window {
 
       // delete
       if (event.keyCode === 46 || event.keyCode === 8) {
-        event.preventDefault();
         this.removeFocusedObject();
       }
 
@@ -728,31 +773,39 @@ class PanelForShape extends Panel {
 
     this.btnOrderBack = new Button(this);
     this.btnOrderBack.title = 'Back';
-    this.btnOrderBack.click = event => {
+    this.btnOrderBack.onClick = event => {
       channel.send('Document:orderBack', this.object);
     };
 
     this.btnOrderFront = new Button(this);
     this.btnOrderFront.title = 'Front';
-    this.btnOrderFront.click = event => {
+    this.btnOrderFront.onClick = event => {
       channel.send('Document:orderFront', this.object);
     };
 
     this.btnOrderBackward = new Button(this);
     this.btnOrderBackward.title = 'Backward';
-    this.btnOrderBackward.click = event => {
+    this.btnOrderBackward.onClick = event => {
       channel.send('Document:orderBackward', this.object);
     };
 
     this.btnOrderForward = new Button(this);
     this.btnOrderForward.title = 'Forward';
-    this.btnOrderForward.click = event => {
+    this.btnOrderForward.onClick = event => {
       channel.send('Document:orderForward', this.object);
     };
+
+    this.inputColor = new InputText(this);
+    this.inputColor.value = this.object.color;
+    this.inputColor.onChange = value => {
+      this.object.setColor(value);
+    };
+
     this.node.appendChild(this.btnOrderBack.render());
     this.node.appendChild(this.btnOrderFront.render());
     this.node.appendChild(this.btnOrderBackward.render());
     this.node.appendChild(this.btnOrderForward.render());
+    this.node.appendChild(this.inputColor.render());
     return this.node;
   }
 }
@@ -761,6 +814,21 @@ class PanelForTextBox extends PanelForShape {
   render() {
     super.render();
     this.node.appendChild(document.createTextNode("PanelForTextBox"));
+
+    this.inputTextColor = new InputText(this);
+    this.inputTextColor.value = this.object.textColor;
+    this.inputTextColor.onChange = value => {
+      this.object.setTextColor(value);
+    };
+
+    this.inputText = new InputText(this);
+    this.inputText.value = this.object.text;
+    this.inputText.onChange = value => {
+      this.object.setText(value);
+    };
+
+    this.node.appendChild(this.inputTextColor.render());
+    this.node.appendChild(this.inputText.render());
     return this.node;
   }
 }

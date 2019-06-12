@@ -202,8 +202,7 @@ html, body {
   height: 300px;
 }
 
-.vs-textbox {
-}
+.vs-textbox {overflow: hidden;word-wrap: break-word;word-break: break-all;}
 
 .vs-imagelist {
   border: 1px solid black;

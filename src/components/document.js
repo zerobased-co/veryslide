@@ -1,105 +1,7 @@
 import List from '../core/List';
-import { randomColor, randomInt } from '../core/Util';
-
-let id = 0;
-
-class BaseObject {
-  constructor() {
-    this.x = 0;
-    this.y = 0;
-    this.width = 0;
-    this.height = 0;
-    this.name = 'BaseObject';
-    this.node = null;
-    this.page = null;
-    this.color = '#ffffff';
-  }
-
-  contain(x, y) {
-    return (x >= this.x) && (x < this.x + this.width) && (y >= this.y) && (y < this.y + this.height);
-  }
-
-  record() {
-    this.content = this.node.innerHTML;
-  }
-
-  setColor(color) {
-    this.color = color;
-    this.node.style.backgroundColor = this.color;
-  }
-
-  render() {
-    this.node = document.createElement('div');
-    this.node.className = 'vs-object';
-    this.node.style.backgroundColor = this.color;
-    this.node.style.left = this.x + 'px';
-    this.node.style.top = this.y + 'px';
-    this.node.style.width = this.width + 'px';
-    this.node.style.height = this.height + 'px';
-    this.node.style.zIndex = this.order;
-  }
-}
-
-class Shape extends BaseObject {
-  constructor() {
-    super();
-    this.width = randomInt(100, 300);
-    this.height = randomInt(100, 300);
-    this.color = randomColor();
-    this.name = 'Shape';
-  }
-
-  render() {
-    super.render();
-    return this.node;
-  }
-}
-
-class ImageList extends Shape {
-  constructor() {
-    super();
-    this.name = 'ImageList';
-    this.content = null;
-  }
-
-  render() {
-    super.render();
-    this.node.classList.add('vs-imagelist');
-    if (this.content) {
-      this.node.innerHTML = this.content;
-    }
-    return this.node;
-  }
-}
-
-class TextBox extends Shape {
-  constructor() {
-    super();
-    this.name = 'TextBox';
-
-    this.text = 'Text' + id;
-    id += 1;
-    this.textColor = '#ffffff';
-  }
-
-  setText(text) {
-    this.text = text;
-    this.node.innerText = this.text;
-  }
-
-  setTextColor(color) {
-    this.textColor = color;
-    this.node.style.color = this.textColor;
-  }
-
-  render() {
-    super.render();
-    this.node.classList.add('vs-textbox');
-    this.node.innerText = this.text;
-    this.node.style.color = this.textColor;
-    return this.node;
-  }
-}
+import BaseObject from './objects/BaseObject';
+import TextBox from './objects/TextBox';
+import ImageList from './objects/ImageList';
 
 class Page extends BaseObject {
   constructor() {
@@ -136,11 +38,8 @@ class Page extends BaseObject {
   }
 
   render() {
-    this.node = document.createElement('div');
-    this.node.className = 'vs-page';
-    this.node.style.backgroundColor = this.color;
-    this.node.style.width = this.width + 'px';
-    this.node.style.height = this.height + 'px';
+    super.render();
+    this.node.classList.add('vs-page');
 
     for(var i = 0; i < this.objects.array.length; i++) {
       let object = this.objects.array[i];

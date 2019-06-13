@@ -1,170 +1,45 @@
 import { parse } from 'papaparse';
+import ui from './ui/UI';
+import PageList from './PageList';
+import Handler from './Handler';
 import List from '../core/List';
 import channel from '../core/Channel';
 import { randomInt } from '../core/Util';
 
-class Window {
-  construct(parent) {
-    this.parent = parent;
-    this.node = null;
-    this.title = '';
-  }
 
-  destruct() {
-    this.node.parentNode.removeChild(this.node);
-  }
-
-  setTitle(title) {
-    this.title = title;
-  }
-
-  render() {
-    this.node = document.createElement('div');
-    return this.node;
-  }
-}
-
-class PageList extends Window {
-  constructor(...args) {
-    super(...args);
-    this.pagethumbs = new List();
-    channel.bind(this, 'PageList:addPage', this.addPage);
-    channel.bind(this, 'PageList:selectPage', this.selectPage);
-    channel.bind(this, 'PageList:removePage', this.removePage);
-  }
-
-  addPage(pageInfo) {
-    let pagethumb = this.pagethumbs.spawn(PageThumb);
-    pagethumb.pageInfo = pageInfo;
-    this.pagethumbs.append(pagethumb);
-
-    this.node.append(pagethumb.render());
-    pagethumb.node.scrollIntoView();
-    pagethumb.select();
-  }
-
-  selectPage(pageInfo) {
-    let pagethumb = this.pagethumbs.findby((item) => {
-      return item.pageInfo.order == pageInfo.order;
-    });
-
-    if (pagethumb !== null) {
-      pagethumb.select();
-    }
-  }
-
-  removePage(pageInfo) {
-    let pagethumb = this.pagethumbs.findby((item) => {
-      return item.pageInfo.order == pageInfo.order;
-    });
-
-    if (pagethumb !== null) {
-      let nextthumb = this.pagethumbs.remove(pagethumb);
-      pagethumb.destruct();
-    }
-  }
-
-  render() {
-    this.node = document.createElement('div');
-    this.node.className = 'vs-pagelist';
-    return this.node;
-  }
-}
-
-class Button extends Window {
-  render() {
-    this.node = document.createElement('div');
-    this.node.className = 'vs-button';
-    this.node.innerHTML = this.title;
-    this.node.addEventListener('click', this.onClick.bind(this));
-    return this.node;
-  }
-
-  setTitle(text) {
-    super.setTitle(text);
-    this.node.innerHTML = text;
-  }
-
-  onClick(event) {
-  }
-}
-
-class Text extends Window {
-  constructor(...args) {
-    super(...args);
-  }
-
-  render() {
-    this.node = document.createElement('p');
-    this.node.innerHTML = this.title;
-    this.node.className = 'vs-text';
-    return this.node;
-  }
-}
-
-class InputText extends Window {
-  constructor(...args) {
-    super(...args);
-    this.value = null;
-  }
-
-  render() {
-    this.node = document.createElement('input');
-    this.node.type = 'text';
-    this.node.value = this.value;
-    this.node.className = 'vs-inputtext';
-    this.node.addEventListener('input', this.input.bind(this));
-    return this.node;
-  }
-
-  input(event) {
-    this.value = this.node.value;
-    this.onChange(this.value);
-  }
-
-  onChange(value) {
-  }
-}
-
-class Menu extends Window {
+class Menu extends ui.Window {
   constructor(...args) {
     super(...args);
 
-    this.btnAddPage = new Button(this);
-    this.btnAddPage.title = 'Add a page';
-    this.btnAddPage.onClick = event => {
+    this.btnAddPage = ui.newButton(this, 'Add a page', (event) => {
       channel.send('Document:addPage', null);
-    };
+    });
 
-    this.btnRemovePage = new Button(this);
-    this.btnRemovePage.title = 'Remove page';
-    this.btnRemovePage.onClick = event => {
+    this.btnRemovePage = ui.newButton(this, 'Remove page', (event) => {
       channel.send('Document:removePage', null);
-    };
+    });
 
-    this.btnZoom = new Button(this);
-    this.btnZoom.title = 'Reset zoom';
-    this.btnZoom.onClick = this.resetZoom.bind(this);
+    this.btnZoom = ui.newButton(this, 'Reset zoom', this.resetZoom.bind(this));
     channel.bind(this, 'Menu:resetZoom', this.resetZoom);
 
-    this.btnSnap = new Button(this);
+    this.btnSnap = new ui.Button(this);
     this.btnSnap.title = 'Snap Off';
     this.btnSnap.onClick = this.toggleSnap.bind(this);
     channel.bind(this, 'Menu:toggleSnap', this.toggleSnap);
 
-    this.btnAddTextBox = new Button(this);
+    this.btnAddTextBox = new ui.Button(this);
     this.btnAddTextBox.title = 'New TextBox';
     this.btnAddTextBox.onClick = event => {
       channel.send('Document:addObject', 'TextBox');
     };
 
-    this.btnAddImageList = new Button(this);
+    this.btnAddImageList = new ui.Button(this);
     this.btnAddImageList.title = 'New ImageList';
     this.btnAddImageList.onClick = event => {
       channel.send('Document:addObject', 'ImageList');
     };
 
-    this.btnRemoveObject = new Button(this);
+    this.btnRemoveObject = new ui.Button(this);
     this.btnRemoveObject.title = 'Remove object';
     this.btnRemoveObject.onClick = event => {
       channel.send('Document:removeObject', null);
@@ -200,42 +75,7 @@ class Menu extends Window {
   }
 }
 
-class PageThumb extends Window {
-  constructor(...args) {
-    super(...args);
-    this.pageInfo = null;
-
-    channel.bind(this, 'PageThumb:deselect', value => {
-      this.deselect();
-    });
-  }
-
-  select() {
-    channel.send('PageThumb:deselect', null);
-    this.node.classList.toggle('focus');
-    channel.send('Viewport:selectPage', this.pageInfo);
-  }
-
-  deselect() {
-    this.node.classList.remove('focus');
-  }
-
-  destruct() {
-    super.destruct();
-    channel.unbind(this);
-  }
-
-  render() {
-    this.node = document.createElement('div');
-    this.node.className = 'vs-pagethumb';
-    this.node.addEventListener('click', event => {
-      this.select();
-    });
-    return this.node;
-  }
-}
-
-class Navigator extends Window {
+class Navigator extends ui.Window {
   constructor(...args) {
     super(...args);
     this.pagelist = new PageList(this);
@@ -250,7 +90,7 @@ class Navigator extends Window {
   }
 }
 
-class Page extends Window {
+class Page extends ui.Window {
   constructor(...args) {
     super(...args);
     this.page = null;
@@ -277,217 +117,8 @@ class Page extends Window {
   }
 }
 
-class Handler extends Window {
-  constructor(...args) {
-    super(...args);
-    this.object = null;
-    this.viewport = null;
 
-    this.transform = null;
-    this.dragStart = undefined;
-    this.basePos = undefined;
-    this.baseSize = undefined;
-    this.currentDot = null;
-    this.snap = false;
-    this.snapSize = 16;
-    
-    this.dotPreset = {
-      'n': 'translate(-50%, -50%)',
-      'e': 'translate(50%, -50%)',
-      'w': 'translate(-50%, -50%)',
-      's': 'translate(-50%, 50%)',
-      'nw': 'translate(-50%, -50%)',
-      'ne': 'translate(50%, -50%)',
-      'se': 'translate(50%, 50%)',
-      'sw': 'translate(-50%, 50%)',
-    };
-  }
-
-  connect(object) {
-    this.object = object;
-    this.show(true);
-
-    this.node.style.left = object.x + 'px';
-    this.node.style.top = object.y + 'px';
-    this.node.style.width = object.width + 'px';
-    this.node.style.height = object.height + 'px';
-  }
-
-  show(isShow) {
-    if (isShow) {
-      this.node.style.visibility = 'visible';
-    } else {
-      this.node.style.visibility = 'hidden';
-    }
-  }
-
-  update() {
-    if (this.viewport == null) return;
-
-    let dots = this.node.getElementsByClassName('vs-dot');
-    for(var i = 0; i < dots.length; i++) {
-      let type = dots[i].innerHTML;
-      dots[i].style.transform = this.dotPreset[type] + ' scale(' + (1 / this.viewport.scale) + ')';
-    }
-  }
-
-  mousemove(event) {
-    if (this.object == null) return;
-
-    event.stopPropagation();
-    event.preventDefault();
-
-    if (this.transform != null) {
-      if (this.object.node.classList.contains('vs-transforming') === false) {
-        this.object.node.classList.add('vs-transforming');
-      }
-      if (this.node.classList.contains('vs-hidechildren') === false) {
-        this.node.classList.add('vs-hidechildren');
-      }
-
-      let dx = (event.clientX - this.dragStart.x) / this.viewport.scale;
-      let dy = (event.clientY - this.dragStart.y) / this.viewport.scale;
-
-      let x = 0;
-      let y = 0;
-      let w = 0;
-      let h = 0;
-
-      switch(this.transform) {
-        case 'move': x = dx; y = dy; break;
-        case 'e': w = dx; break;
-        case 'se': w = dx; h = dy; break;
-        case 's': h = dy; break;
-        case 'sw': x = dx; w = -dx; h = dy; break;
-        case 'w': x = dx; w = -dx; break;
-        case 'nw': x = dx; w = -dx; y = dy; h = -dy; break;
-        case 'n': y = dy; h = -dy; break;
-        case 'ne': w = dx; y = dy; h = -dy; break;
-      }
-
-      if (event.shiftKey) {
-        if (Math.abs(w) / (this.baseSize.width / this.baseSize.height) > Math.abs(h)) {
-          h = w * (this.baseSize.height / this.baseSize.width);
-        } else {
-          w = h * (this.baseSize.width / this.baseSize.height);
-        }
-      }
-
-      if (event.altKey) {
-        x -= w;
-        w *= 2;
-        y -= h;
-        h *= 2;
-      }
-
-      let _x = x;
-      let _y = y;
-      let _w = w;
-      let _h = h;
-
-      x += this.basePos.x;
-      y += this.basePos.y;
-      w += this.baseSize.width;
-      h += this.baseSize.height;
-
-      if (this.snap) {
-        if (_x != 0) {
-          x = parseInt(x / this.snapSize) * this.snapSize;
-        }
-        if (_y != 0) {
-          y = parseInt(y / this.snapSize) * this.snapSize;
-        }
-        if (_w != 0) {
-          w = parseInt(w / this.snapSize) * this.snapSize;
-        }
-        if (_h != 0) {
-          h = parseInt(h / this.snapSize) * this.snapSize;
-        }
-      }
-
-      this.node.style.left = x + 'px';
-      this.node.style.top = y + 'px';
-      this.object.node.style.left = x + 'px';
-      this.object.node.style.top = y + 'px';
-
-      this.node.style.width = w + 'px';
-      this.node.style.height = h + 'px';
-      this.object.node.style.width = w + 'px';
-      this.object.node.style.height = h + 'px';
-
-      this.object.x = x;
-      this.object.y = y;
-      this.object.width = w;
-      this.object.height = h;
-    }
-  }
-
-  mouseup(event) {
-    if (this.object == null) return;
-    event.stopPropagation();
-
-    if (this.transform != null) {
-      this.node.classList.remove('vs-hidechildren');
-      this.object.node.classList.remove('vs-transforming');
-      this.transform = null;
-    }
-    
-    if (this.currentDot != null) {
-      this.currentDot.classList.remove('vs-showme');
-      this.currentDot = null;
-    }
-
-    window.removeEventListener('mousemove', this.mousemove.bind(this));
-    window.removeEventListener('mouseup', this.mouseup.bind(this));
-  }
-
-  mousedown(event) {
-    if (this.object == null) return;
-
-    this.dragStart = {
-      x: event.clientX,
-      y: event.clientY,
-    };
-    this.basePos = {
-      x: this.object.x,
-      y: this.object.y,
-    };
-    this.baseSize = {
-      width: this.object.width,
-      height: this.object.height,
-    };
-
-    if (event.target.classList.contains('vs-dot')) {
-      this.transform = event.target.innerText;
-      this.currentDot = event.target;
-      this.currentDot.classList.add('vs-showme');
-      event.stopPropagation();
-    } else {
-      this.transform = 'move';
-    }
-    window.addEventListener('mousemove', this.mousemove.bind(this));
-    window.addEventListener('mouseup', this.mouseup.bind(this));
-  }
-
-  render() {
-    this.node = document.createElement('div');
-    this.node.className = 'vs-handler';
-    this.node.innerHTML = ''
-      + '<div class="vs-dot vs-dot-nw">nw</div>'
-      + '<div class="vs-dot vs-dot-n">n</div>'
-      + '<div class="vs-dot vs-dot-ne">ne</div>'
-      + '<div class="vs-dot vs-dot-e">e</div>'
-      + '<div class="vs-dot vs-dot-se">se</div>'
-      + '<div class="vs-dot vs-dot-s">s</div>'
-      + '<div class="vs-dot vs-dot-sw">sw</div>'
-      + '<div class="vs-dot vs-dot-w">w</div>';
-
-    this.node.addEventListener('mousedown', this.mousedown.bind(this));
-    return this.node;
-  }
-}
-
-class Viewport extends Window {
+class Viewport extends ui.Window {
   constructor(...args) {
     super(...args);
     this.page = null;
@@ -732,25 +363,7 @@ class Viewport extends Window {
   }
 }
 
-class Panel extends Window {
-  constructor(...args) {
-    super(...args);
-    this.object = null;
-  }
-
-  setObject(object) {
-    this.object = object;
-  }
-
-  render() {
-    this.node = document.createElement('div');
-    this.node.className = 'vs-panel';
-    this.node.appendChild(document.createTextNode("Panel"));
-    return this.node;
-  }
-}
-
-class PanelForDocument extends Panel {
+class PanelForDocument extends ui.Panel {
   render() {
     super.render();
     this.node.appendChild(document.createTextNode("PanelForDoucment"));
@@ -758,7 +371,7 @@ class PanelForDocument extends Panel {
   }
 }
 
-class PanelForPage extends Panel {
+class PanelForPage extends ui.Panel {
   render() {
     super.render();
     this.node.appendChild(document.createTextNode("PanelForPage"));
@@ -766,36 +379,36 @@ class PanelForPage extends Panel {
   }
 }
 
-class PanelForShape extends Panel {
+class PanelForShape extends ui.Panel {
   render() {
     super.render();
     this.node.appendChild(document.createTextNode("PanelForShape"));
 
-    this.btnOrderBack = new Button(this);
+    this.btnOrderBack = new ui.Button(this);
     this.btnOrderBack.title = 'Back';
     this.btnOrderBack.onClick = event => {
       channel.send('Document:orderBack', this.object);
     };
 
-    this.btnOrderFront = new Button(this);
+    this.btnOrderFront = new ui.Button(this);
     this.btnOrderFront.title = 'Front';
     this.btnOrderFront.onClick = event => {
       channel.send('Document:orderFront', this.object);
     };
 
-    this.btnOrderBackward = new Button(this);
+    this.btnOrderBackward = new ui.Button(this);
     this.btnOrderBackward.title = 'Backward';
     this.btnOrderBackward.onClick = event => {
       channel.send('Document:orderBackward', this.object);
     };
 
-    this.btnOrderForward = new Button(this);
+    this.btnOrderForward = new ui.Button(this);
     this.btnOrderForward.title = 'Forward';
     this.btnOrderForward.onClick = event => {
       channel.send('Document:orderForward', this.object);
     };
 
-    this.inputColor = new InputText(this);
+    this.inputColor = new ui.InputText(this);
     this.inputColor.value = this.object.color;
     this.inputColor.onChange = value => {
       this.object.setColor(value);
@@ -815,13 +428,13 @@ class PanelForTextBox extends PanelForShape {
     super.render();
     this.node.appendChild(document.createTextNode("PanelForTextBox"));
 
-    this.inputTextColor = new InputText(this);
+    this.inputTextColor = new ui.InputText(this);
     this.inputTextColor.value = this.object.textColor;
     this.inputTextColor.onChange = value => {
       this.object.setTextColor(value);
     };
 
-    this.inputText = new InputText(this);
+    this.inputText = new ui.InputText(this);
     this.inputText.value = this.object.text;
     this.inputText.onChange = value => {
       this.object.setText(value);
@@ -889,33 +502,12 @@ class PanelForImageList extends PanelForShape {
   }
 }
 
-class TitleBar extends Window {
+class Property extends ui.Window {
   constructor(...args) {
     super(...args);
-    this.title = '';
-  }
-
-  setTitle(title) {
-    this.title = title;
-    if (this.node != null) {
-      this.node.innerText = title;
-    }
-  }
-
-  render() {
-    this.node = document.createElement('div');
-    this.node.className = 'vs-titlebar';
-    this.node.innerText = this.title;
-    return this.node;
-  }
-}
-
-class Property extends Window {
-  constructor(...args) {
-    super(...args);
-    this.titlebar = new TitleBar(this);
+    this.titlebar = new ui.TitleBar(this);
     this.titlebar.setTitle('Property');
-    this.panel = new Panel(this);
+    this.panel = new ui.Panel(this);
     this.object = null;
 
     channel.bind(this, 'Property:setPanelFor', this.setPanelFor);
@@ -946,7 +538,7 @@ class Property extends Window {
   }
 
   render() {
-    this.node = document.createElement('div');
+    super.render();
     this.node.className = 'vs-box';
     this.node.appendChild(this.titlebar.render());
     this.node.appendChild(this.panel.render());
@@ -954,24 +546,17 @@ class Property extends Window {
   }
 }
 
-class ToolBox extends Window {
+class ToolBox extends ui.Window {
   render() {
-    this.node = document.createElement('div');
+    super.render();
     this.node.className = 'vs-toolbox';
     return this.node;
   }
 }
 
-class Row extends Window {
-  render() {
-    this.node = document.createElement('div');
-    this.node.className = 'vs-row';
-    return this.node;
-  }
-}
-
-class Editor {
-  constructor() {
+class Editor extends ui.Window{
+  constructor(...args) {
+    super(...args);
     this.menu = new Menu(this);
     this.navigator = new Navigator(this);
     this.viewport = new Viewport(this);
@@ -981,11 +566,11 @@ class Editor {
   }
 
   render() {
-    this.node = document.createElement('div');
+    super.render();
     this.node.className = 'vs-editor';
     this.node.appendChild(this.menu.render());
 
-    let row = new Row(this);
+    let row = new ui.Row(this);
     this.node.appendChild(row.render());
 
     row.node.appendChild(this.navigator.render());

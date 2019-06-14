@@ -1,3 +1,4 @@
+import './Editor.less';
 import { parse } from 'papaparse';
 import ui from './ui/UI';
 import PageList from './PageList';
@@ -476,7 +477,6 @@ class PanelForImageList extends PanelForShape {
           console.log(data);
 
           let node = document.createElement('img');
-          node.className = 'vs-imagelistitem';
           node.src = 'static/logo/' + data['UID'] + '.png';
           node.style.maxHeight = item_height + 'px';
           node.style.maxWidth = (item_height * 1.25) + 'px';

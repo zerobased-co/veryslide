@@ -1,0 +1,57 @@
+.vs-row {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+}
+
+.vs-col {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.vs-button {
+  width: 100px;
+  height: 30px;
+  margin: 10px;
+  font-size: 0.8em;
+
+  border: 1px solid #ccc;
+  border-radius: 3px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #efefef;
+  font-weight: 400;
+  user-select: none;
+
+  transition: all 0.1s ease-out;
+
+  &:hover {
+    background: white;
+    cursor: pointer;
+    box-shadow: 0 0 5px 2px #ddd;
+  }
+
+  &:active {
+    transform: scale(0.95, 0.95);
+    box-shadow: 0 0 5px 0px #eee;
+  }
+}
+
+.vs-panel {
+  background: #E1E2E4;
+  height: 300px;
+}
+
+.vs-titlebar {
+  width: 100%;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #E1E2E4;
+  font-size: 0.8em;
+  border-bottom: 1px solid #ccc;
+}

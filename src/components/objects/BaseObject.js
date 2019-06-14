@@ -1,15 +1,18 @@
+import './BaseObject.less';
+
 class BaseObject {
   constructor() {
+    this.node = null;
+    this.content = null;
+    this.page = null;
+    this.name = 'BaseObject';
+
     this.x = 0;
     this.y = 0;
     this.width = 0;
     this.height = 0;
-    this.name = 'BaseObject';
-    this.node = null;
-    this.page = null;
     this.color = '#ffffff';
     this.order = 0;
-    this.content = null;
   }
 
   contain(x, y) {
@@ -28,6 +31,7 @@ class BaseObject {
   render() {
     this.node = document.createElement('div');
     this.node.className = 'vs-object';
+
     this.node.style.backgroundColor = this.color;
     this.node.style.left = this.x + 'px';
     this.node.style.top = this.y + 'px';

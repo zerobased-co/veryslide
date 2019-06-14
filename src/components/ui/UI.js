@@ -1,3 +1,4 @@
+import './UI.less';
 import Window, { Row, Col } from './Window';
 import Panel from './Panel';
 import Button from './Button';

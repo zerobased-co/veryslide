@@ -1,3 +1,4 @@
+import './TextBox.less';
 import Box from './Box';
 
 class TextBox extends Box {

@@ -9,16 +9,36 @@ module.exports = {
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        use: ['babel-loader']
-      }
-    ]
+        use: [
+          'babel-loader'
+        ],
+      },
+      {
+        test: /\.less$/,
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true,
+            },
+          },
+          {
+            loader: 'less-loader',
+            options: {
+              sourceMap: true,
+            },
+          },
+        ],
+      },
+    ],
   },
   resolve: {
     extensions: ['*', '.js', '.jsx']
   },
   output: {
     filename: 'veryslide.js',
-    path: path.resolve(__dirname, 'dist')
+    path: path.resolve(__dirname, 'dist'),
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
@@ -27,6 +47,5 @@ module.exports = {
   devServer: {
     contentBase: './dist',
     hot: true,
-  }
-
+  },
 };

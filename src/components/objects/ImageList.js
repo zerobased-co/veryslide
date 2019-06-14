@@ -1,3 +1,4 @@
+import './ImageList.less';
 import Box from './Box';
 
 class ImageList extends Box {

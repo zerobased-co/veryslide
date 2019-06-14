@@ -1,3 +1,4 @@
+import './Box.less';
 import BaseObject from './BaseObject';
 import { randomColor, randomInt } from '../../core/Util';
 

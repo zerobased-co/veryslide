@@ -1,5 +1,6 @@
 import './Editor.scss';
 import { parse } from 'papaparse';
+import { ColorPicker } from 'codemirror-colorpicker'
 import ui from './ui/UI';
 import View from './ui/View';
 import Panel from './ui/Panel';
@@ -379,7 +380,7 @@ class Viewport extends View {
 class PanelForDocument extends Panel {
   render() {
     super.render();
-    this.node.appendChild(document.createTextNode("PanelForDoucment"));
+    this.node.appendChild(ui.createText(this, 'PanelForDocument').render());
     return this.node;
   }
 }
@@ -387,15 +388,15 @@ class PanelForDocument extends Panel {
 class PanelForPage extends Panel {
   render() {
     super.render();
-    this.node.appendChild(document.createTextNode("PanelForPage"));
+    this.node.appendChild(ui.createText(this, 'PanelForPage').render());
     return this.node;
   }
 }
 
-class PanelForShape extends Panel {
+class PanelForBox extends Panel {
   render() {
     super.render();
-    this.node.appendChild(document.createTextNode("PanelForShape"));
+    this.node.appendChild(ui.createText(this, 'PanelForBox').render());
 
     this.btnOrderBack = ui.createButton(this, 'Back', () => {
       channel.send('Document:orderBack', this.object);
@@ -413,31 +414,33 @@ class PanelForShape extends Panel {
       channel.send('Document:orderForward', this.object);
     });
 
-    this.inputColor = new ui.InputText();
-    this.inputColor.value = this.object.color;
-    this.inputColor.onChange = value => {
-      this.object.color = value;
-    };
+    this.btnColor = new ui.ColorButton({
+      color: this.object.color,
+      onChange: value => {
+        this.object.color = value;
+      },
+    });
 
     this.node.appendChild(this.btnOrderBack.render());
     this.node.appendChild(this.btnOrderFront.render());
     this.node.appendChild(this.btnOrderBackward.render());
     this.node.appendChild(this.btnOrderForward.render());
-    this.node.appendChild(this.inputColor.render());
+    this.node.appendChild(this.btnColor.render());
     return this.node;
   }
 }
 
-class PanelForTextBox extends PanelForShape {
+class PanelForTextBox extends PanelForBox {
   render() {
     super.render();
-    this.node.appendChild(document.createTextNode("PanelForTextBox"));
+    this.node.appendChild(ui.createText(this, 'PanelForTextBox').render());
 
-    this.inputTextColor = new ui.InputText();
-    this.inputTextColor.value = this.object.textColor;
-    this.inputTextColor.onChange = value => {
-      this.object.textColor = value;
-    };
+    this.btnTextColor = new ui.ColorButton({
+      color: this.object.textColor,
+      onChange: value => {
+        this.object.textColor = value;
+      },
+    });
 
     this.inputText = new ui.InputText();
     this.inputText.value = this.object.text;
@@ -457,7 +460,7 @@ class PanelForTextBox extends PanelForShape {
       this.object.size = value;
     };
 
-    this.node.appendChild(this.inputTextColor.render());
+    this.node.appendChild(this.btnTextColor.render());
     this.node.appendChild(this.inputText.render());
     this.node.appendChild(this.bold.render());
     this.node.appendChild(this.size.render());
@@ -465,10 +468,10 @@ class PanelForTextBox extends PanelForShape {
   }
 }
 
-class PanelForImageList extends PanelForShape {
+class PanelForImageList extends PanelForBox {
   render() {
     super.render();
-    this.node.appendChild(document.createTextNode("PanelForImageList"));
+    this.node.appendChild(ui.createText(this, 'PanelForImageList').render());
 
     var input = document.createElement('input');
     input.type = 'file';

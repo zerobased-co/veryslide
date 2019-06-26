@@ -13,7 +13,6 @@ class Panel extends View {
   render() {
     this.node = document.createElement('div');
     this.node.className = 'vs-panel';
-    this.node.appendChild(document.createTextNode("Panel"));
     return this.node;
   }
 }

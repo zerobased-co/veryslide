@@ -6,6 +6,7 @@ import TitleBar from './TitleBar';
 import Text from './Text';
 import InputText from './InputText';
 import CheckBox from './CheckBox';
+import ColorButton from './ColorButton';
 
 class UI {
   constructor() {
@@ -19,9 +20,13 @@ class UI {
     this.Text = Text;
     this.InputText = InputText;
     this.CheckBox = CheckBox;
+    this.ColorButton = ColorButton;
   }
 
   /* shortcuts */
+  createText(parent, title) {
+    return new Text({parent, title});
+  }
   createButton(parent, title, onClick) {
     return new Button({parent, title, onClick});
   }

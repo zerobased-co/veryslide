@@ -1,8 +1,17 @@
 import View from './View';
 
-class Text extends Window {
-  constructor(...args) {
-    super(...args);
+class Text extends View {
+  constructor(state) {
+    super({
+      className: 'vs-text',
+      title: 'Text',
+    }.update(state));
+  }
+
+  on_title(text) {
+    if (this.node != null) {
+      this.node.innerHTML = this.title;
+    }
   }
 
   render() {

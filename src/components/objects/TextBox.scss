@@ -6,4 +6,9 @@
   overflow: hidden;
   word-wrap: break-word;
   word-break: break-all;
+  white-space: pre-wrap;
+
+  &:read-write:focus {
+    outline: none;
+  }
 }

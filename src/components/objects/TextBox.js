@@ -11,6 +11,20 @@ class TextBox extends Box {
     }.update(state));
   }
 
+  editable() {
+    this.node.contentEditable = 'true';
+    this.node.focus();
+    document.execCommand('selectAll', false, null);
+  }
+
+  blur() {
+    this.node.contentEditable = 'false';
+    this.node.blur();
+
+    // copy text from node
+    this.text = this.node.innerText;
+  }
+
   on_text(text) {
     this.node.innerText = this.text;
   }

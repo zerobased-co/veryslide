@@ -194,7 +194,22 @@ class Viewport extends View {
     channel.send('Property:setPanelFor', this.object);
   }
 
+  editable(object) {
+    this.blur();
+    this.object = object;
+    if (object.editable != null) {
+      object.editable();
+    }
+  }
+
   blur() {
+    // get back the focus
+    this.node.focus();
+
+    if (this.object && this.object.blur != null) {
+      this.object.blur();
+    }
+
     this.object = null;
     this.handler.show(false);
     channel.send('Document:selectObject', null);
@@ -232,7 +247,7 @@ class Viewport extends View {
     this.node.tabIndex = '0';
 
     window.addEventListener('keydown', event => {
-      if (event.target !== document.body) {
+      if (event.target !== document.body && event.target !== this.node) {
         return;
       }
 
@@ -305,10 +320,11 @@ class Viewport extends View {
     });
 
     this.node.addEventListener('mousedown', event => {
-      event.preventDefault();
 
       if (this.page == null) return;
       if (this.grab === true) {
+        event.preventDefault();
+
         this.node.style.cursor = 'grabbing';
         this.drag = true;
         this.dragStart = {
@@ -322,9 +338,18 @@ class Viewport extends View {
 
         let pickedObject = this.page.findObject(x, y);
         if (pickedObject != null) {
-          this.focus(pickedObject);
-          // pass event to handler for allowing drag instantly
-          this.handler.mousedown(event);
+          if (event.detail >= 2) {
+            // edit if available
+            event.preventDefault();
+            this.editable(pickedObject);
+          } else {
+            if (pickedObject != this.object) {
+              event.preventDefault();
+              this.focus(pickedObject);
+              // pass event to handler for allowing drag instantly
+              this.handler.mousedown(event);
+            }
+          }
         } else {
           this.blur();
         }

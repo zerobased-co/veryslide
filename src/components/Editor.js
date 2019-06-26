@@ -436,7 +436,7 @@ class PanelForTextBox extends PanelForShape {
     this.inputTextColor = new ui.InputText();
     this.inputTextColor.value = this.object.textColor;
     this.inputTextColor.onChange = value => {
-      this.object.setTextColor(value);
+      this.object.textColor = value;
     };
 
     this.inputText = new ui.InputText();
@@ -445,8 +445,22 @@ class PanelForTextBox extends PanelForShape {
       this.object.text = value;
     };
 
+    this.bold = new ui.CheckBox({checked: this.object.bold});
+    this.bold.title = 'Bold';
+    this.bold.onChange = value => {
+      this.object.bold = value;
+    };
+
+    this.size = new ui.InputText();
+    this.size.value = this.object.size;
+    this.size.onChange = value => {
+      this.object.size = value;
+    };
+
     this.node.appendChild(this.inputTextColor.render());
     this.node.appendChild(this.inputText.render());
+    this.node.appendChild(this.bold.render());
+    this.node.appendChild(this.size.render());
     return this.node;
   }
 }

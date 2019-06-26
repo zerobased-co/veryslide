@@ -31,11 +31,11 @@ class Channel {
       });
     } else {
       // unbind from all
-      for (const key in this.listeners) {
+      Object.keys(this.listeners).forEach(key => {
         this.listeners[key] = this.listeners[key].filter(function(elem) {
           return elem['listener'] !== listener;
         });
-      }
+      });
     }
   }
 

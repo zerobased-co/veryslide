@@ -88,13 +88,13 @@ class Page extends View {
   }
 
   findObject(x, y) {
-    for(var i = this.page.objects.array.length - 1; i >= 0; i--) {
-      let object = this.page.objects.array[i];
+    let found = null;
+    this.page.objects.iter((object) => {
       if (object.contain(x, y) === true) {
-        return object;
+        found = object;
       }
-    }
-    return null;
+    });
+    return found;
   }
 
   render() {
@@ -453,7 +453,6 @@ class PanelForImageList extends PanelForShape {
       reader.onload = readerEvent => {
         var csv = readerEvent.target.result; // this is the content!
         var results = parse(csv, {header: true});
-        console.log(results);
 
         var item_height = randomInt(40, 60);
         var item_count = randomInt(10, 100);
@@ -502,7 +501,6 @@ class Property extends View {
   }
 
   setPanelFor(object) {
-    //console.log('SetPanel', object.name, object);
     this.panel.destruct();
 
     switch(object.name) {

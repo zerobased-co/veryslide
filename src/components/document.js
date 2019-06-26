@@ -31,21 +31,18 @@ class Page extends BaseObject {
   }
 
   reorder() {
-    for(var i = 0; i < this.objects.array.length; i++) {
-      let object = this.objects.array[i];
+    this.objects.iter((object) => {
       object.node.style.zIndex = object.order;
-    }
+    });
   }
 
   render() {
     super.render();
     this.node.classList.add('vs-page');
 
-    for(var i = 0; i < this.objects.array.length; i++) {
-      let object = this.objects.array[i];
+    this.objects.iter((object) => {
       this.node.append(object.render());
-    }
-
+    });
     return this.node;
   }
 }

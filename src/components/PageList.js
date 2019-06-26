@@ -64,6 +64,7 @@ class PageList extends View {
 
     if (pagethumb !== null) {
       pagethumb.select();
+      pagethumb.node.scrollIntoView();
     }
   }
 

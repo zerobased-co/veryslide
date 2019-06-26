@@ -34,7 +34,7 @@ class View extends State {
 class Horizon extends View {
   render() {
     super.render();
-    this.node.classList.add('vs-horizon');
+    this.node.className = 'vs-horizon';
     return this.node;
   }
 }
@@ -42,7 +42,7 @@ class Horizon extends View {
 class Vertical extends View {
   render() {
     super.render();
-    this.node.classList.add('vs-vertical');
+    this.node.className = 'vs-vertical';
     return this.node;
   }
 }

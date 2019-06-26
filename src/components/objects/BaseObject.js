@@ -1,5 +1,5 @@
 import State from '../../core/State.js';
-import './BaseObject.less';
+import './BaseObject.scss';
 
 class Node extends State {
   constructor(state) {

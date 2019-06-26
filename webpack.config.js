@@ -7,14 +7,14 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.js$/,
         exclude: /node_modules/,
         use: [
           'babel-loader'
         ],
       },
       {
-        test: /\.less$/,
+        test: /\.(sa|sc|c)ss$/,
         use: [
           'style-loader',
           {
@@ -24,7 +24,7 @@ module.exports = {
             },
           },
           {
-            loader: 'less-loader',
+            loader: 'sass-loader',
             options: {
               sourceMap: true,
             },

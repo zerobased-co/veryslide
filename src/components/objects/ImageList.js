@@ -1,11 +1,11 @@
-import './ImageList.less';
+import './ImageList.scss';
 import Box from './Box';
 
 class ImageList extends Box {
   constructor(state) {
     super({
       name: 'ImageList',
-      class: 'vs-object vs-imagelist',
+      class: 'vs-imagelist',
     }.update(state));
   }
 }

@@ -1,4 +1,4 @@
-import './Editor.less';
+import './Editor.scss';
 import { parse } from 'papaparse';
 import ui from './ui/UI';
 import View from './ui/View';
@@ -525,7 +525,7 @@ class Property extends View {
 
   render() {
     super.render();
-    this.node.className = 'vs-box';
+    this.node.className = 'vs-property';
     this.node.appendChild(this.titlebar.render());
     this.node.appendChild(this.panel.render());
     return this.node;

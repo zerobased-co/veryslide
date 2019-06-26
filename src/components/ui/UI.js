@@ -1,4 +1,4 @@
-import './UI.less';
+import './UI.scss';
 import View, { Vertical, Horizon } from './View';
 import Panel from './Panel';
 import Button from './Button';

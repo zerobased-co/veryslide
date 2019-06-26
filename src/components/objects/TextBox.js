@@ -1,11 +1,11 @@
-import './TextBox.less';
+import './TextBox.scss';
 import Box from './Box';
 
 class TextBox extends Box {
   constructor(state) {
     super({
       name: 'TextBox',
-      class: 'vs-object vs-textbox',
+      class: 'vs-textbox',
       text: 'Text',
       textColor: '#ffffff',
     }.update(state));

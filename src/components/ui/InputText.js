@@ -1,8 +1,8 @@
 import View from './View';
 
 class InputText extends View {
-  constructor(...args) {
-    super(...args);
+  constructor(state) {
+    super(state);
     this.value = null;
   }
 
@@ -21,6 +21,7 @@ class InputText extends View {
   }
 
   onChange(value) {
+    console.log('onChange', this);
   }
 }
 

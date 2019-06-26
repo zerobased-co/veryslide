@@ -372,29 +372,21 @@ class PanelForShape extends Panel {
     super.render();
     this.node.appendChild(document.createTextNode("PanelForShape"));
 
-    this.btnOrderBack = new ui.Button();
-    this.btnOrderBack.title = 'Back';
-    this.btnOrderBack.click = event => {
+    this.btnOrderBack = ui.createButton(this, 'Back', () => {
       channel.send('Document:orderBack', this.object);
-    };
+    });
 
-    this.btnOrderFront = new ui.Button();
-    this.btnOrderFront.title = 'Front';
-    this.btnOrderFront.click = event => {
+    this.btnOrderFront = ui.createButton(this, 'Front', () => {
       channel.send('Document:orderFront', this.object);
-    };
+    });
 
-    this.btnOrderBackward = new ui.Button();
-    this.btnOrderBackward.title = 'Backward';
-    this.btnOrderBackward.click = event => {
+    this.btnOrderBackward = ui.createButton(this, 'Backward', () => {
       channel.send('Document:orderBackward', this.object);
-    };
+    });
 
-    this.btnOrderForward = new ui.Button();
-    this.btnOrderForward.title = 'Forward';
-    this.btnOrderForward.click = event => {
+    this.btnOrderForward = ui.createButton(this, 'Forward', () => {
       channel.send('Document:orderForward', this.object);
-    };
+    });
 
     this.inputColor = new ui.InputText();
     this.inputColor.value = this.object.color;

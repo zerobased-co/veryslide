@@ -130,13 +130,8 @@ class Handler extends View {
 
       this.node.style.left = x + 'px';
       this.node.style.top = y + 'px';
-      this.object.node.style.left = x + 'px';
-      this.object.node.style.top = y + 'px';
-
       this.node.style.width = w + 'px';
       this.node.style.height = h + 'px';
-      this.object.node.style.width = w + 'px';
-      this.object.node.style.height = h + 'px';
 
       this.object.x = x;
       this.object.y = y;

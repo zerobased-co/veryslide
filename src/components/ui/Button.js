@@ -7,8 +7,8 @@ class Button extends View {
     }.update(state));
   }
 
-  click(event) {
-    console.log('clicked', this);
+  onClick(event) {
+    console.log('onClick', this);
   }
 
   on_title(text) {
@@ -20,7 +20,7 @@ class Button extends View {
   render() {
     super.render();
     this.node.innerHTML = this.title;
-    this.node.addEventListener('click', this.click);
+    this.node.addEventListener('click', this.onClick);
     return this.node;
   }
 }

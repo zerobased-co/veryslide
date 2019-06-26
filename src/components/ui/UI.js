@@ -8,6 +8,7 @@ import InputText from './InputText';
 
 class UI {
   constructor() {
+    /* connote UI classes for convenience*/
     this.View = View;
     this.Vertical = Vertical;
     this.Horizon = Horizon;
@@ -19,8 +20,8 @@ class UI {
   }
 
   /* shortcuts */
-  createButton(parent, title, click) {
-    return new Button({parent: parent, title: title, click: click});
+  createButton(parent, title, onClick) {
+    return new Button({parent, title, onClick});
   }
 }
 

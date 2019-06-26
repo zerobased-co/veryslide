@@ -29,17 +29,17 @@
   font-weight: 400;
   user-select: none;
 
-  transition: all 0.1s ease-out;
-
   &:hover {
     background: white;
     cursor: pointer;
     box-shadow: 0 0 5px 2px #ddd;
+    transition: all 0.1s ease-out;
   }
 
   &:active {
     transform: scale(0.95, 0.95);
     box-shadow: 0 0 5px 0px #eee;
+    transition: all 0.1s ease-out;
   }
 }
 

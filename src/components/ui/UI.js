@@ -1,5 +1,5 @@
 import './UI.less';
-import Window, { Row, Col } from './Window';
+import View, { Vertical, Horizon } from './View';
 import Panel from './Panel';
 import Button from './Button';
 import TitleBar from './TitleBar';
@@ -8,21 +8,19 @@ import InputText from './InputText';
 
 class UI {
   constructor() {
-    this.Window = Window;
-    this.Row = Row;
-    this.Col = Col;
-    this.TitleBar = TitleBar;
+    this.View = View;
+    this.Vertical = Vertical;
+    this.Horizon = Horizon;
     this.Panel = Panel;
     this.Button = Button;
+    this.TitleBar = TitleBar;
     this.Text = Text;
     this.InputText = InputText;
   }
 
-  newButton(parent, title, callback) {
-    let button = new Button(parent);
-    button.setTitle(title);
-    button.onClick = callback;
-    return button;
+  /* shortcuts */
+  createButton(parent, title, click) {
+    return new Button({parent: parent, title: title, click: click});
   }
 }
 

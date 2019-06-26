@@ -1,6 +1,6 @@
-import Window from './ui/Window'
+import View from './ui/View'
 
-class Handler extends Window {
+class Handler extends View {
   constructor(...args) {
     super(...args);
     this.object = null;
@@ -195,15 +195,14 @@ class Handler extends Window {
   render() {
     this.node = document.createElement('div');
     this.node.className = 'vs-handler';
-    this.node.innerHTML = ''
-      + '<div class="vs-dot vs-dot-nw">nw</div>'
-      + '<div class="vs-dot vs-dot-n">n</div>'
-      + '<div class="vs-dot vs-dot-ne">ne</div>'
-      + '<div class="vs-dot vs-dot-e">e</div>'
-      + '<div class="vs-dot vs-dot-se">se</div>'
-      + '<div class="vs-dot vs-dot-s">s</div>'
-      + '<div class="vs-dot vs-dot-sw">sw</div>'
-      + '<div class="vs-dot vs-dot-w">w</div>';
+
+    // Add 8 handler dots
+    for (const [key, value] of Object.entries(this.dotPreset)) {
+      let dot = document.createElement('div');
+      dot.className = 'vs-dot ' + key;
+      dot.innerText = key;
+      this.node.appendChild(dot);
+    }
 
     this.node.addEventListener('mousedown', this.mousedown.bind(this));
     return this.node;

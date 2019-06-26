@@ -1,22 +1,27 @@
-import Window from './Window.js';
+import View from './View.js';
 
-class Button extends Window {
-  render() {
-    super.render();
-    this.node.className = 'vs-button';
-    this.node.innerHTML = this.title;
-    this.node.addEventListener('click', this.onClick.bind(this));
-    return this.node;
+class Button extends View {
+  constructor(state) {
+    super({
+      className: 'vs-button',
+    }.update(state));
   }
 
-  setTitle(text) {
-    super.setTitle(text);
+  click(event) {
+    console.log('clicked', this);
+  }
+
+  on_title(text) {
     if (this.node != null) {
       this.node.innerHTML = text;
     }
   }
 
-  onClick(event) {
+  render() {
+    super.render();
+    this.node.innerHTML = this.title;
+    this.node.addEventListener('click', this.click);
+    return this.node;
   }
 }
 

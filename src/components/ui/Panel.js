@@ -1,6 +1,6 @@
-import Window from './Window';
+import View from './View';
 
-class Panel extends Window {
+class Panel extends View {
   constructor(...args) {
     super(...args);
     this.object = null;

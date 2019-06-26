@@ -1,6 +1,6 @@
-import Window from './Window';
+import View from './View';
 
-class InputText extends Window {
+class InputText extends View {
   constructor(...args) {
     super(...args);
     this.value = null;

@@ -47,15 +47,15 @@
   border: 1px solid gray;
   box-shadow: 0 0 5px 3px #aaa;
   position: absolute;
-}
 
-.vs-page.snap {
-  background:
-		linear-gradient(90deg, #FFF 14px, transparent 0) center,
-		linear-gradient(#FFF 14px, transparent 0) center,
-		#ddd !important;
-  background-size: 16px 16px !important;
-  background-position: 1px 1px !important;
+  &.snap {
+    background:
+      linear-gradient(90deg, #FFF 14px, transparent 0) center,
+      linear-gradient(#FFF 14px, transparent 0) center,
+      #ddd !important;
+    background-size: 16px 16px !important;
+    background-position: 1px 1px !important;
+  }
 }
 
 .vs-menu {
@@ -97,17 +97,16 @@
   width: 9px;
   height: 9px;
   font-size: 0;
+
+  &.n {top: 0; left: 50%; cursor: row-resize;}
+  &.e {top: 50%; right: 0; cursor: col-resize;}
+  &.w {top: 50%; left: 0; cursor: col-resize;}
+  &.s {bottom: 0; left: 50%; cursor: row-resize;}
+  &.nw {top: 0; left: 0; cursor: nwse-resize;}
+  &.ne {top: 0; right: 0; cursor: nesw-resize;}
+  &.se {bottom: 0; right: 0; cursor: nwse-resize;}
+  &.sw {bottom: 0; left: 0; cursor: nesw-resize;}
 }
-
-.vs-dot-n {top: 0; left: 50%; cursor: row-resize;}
-.vs-dot-e {top: 50%; right: 0; cursor: col-resize;}
-.vs-dot-w {top: 50%; left: 0; cursor: col-resize;}
-.vs-dot-s {bottom: 0; left: 50%; cursor: row-resize;}
-
-.vs-dot-nw {top: 0; left: 0; cursor: nwse-resize;}
-.vs-dot-ne {top: 0; right: 0; cursor: nesw-resize;}
-.vs-dot-se {bottom: 0; right: 0; cursor: nwse-resize;}
-.vs-dot-sw {bottom: 0; left: 0; cursor: nesw-resize;}
 
 .vs-transforming {
   opacity: 0.5;

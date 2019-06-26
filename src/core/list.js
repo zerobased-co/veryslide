@@ -19,6 +19,12 @@ class List {
     return this.array[index];
   }
 
+  iter(func) {
+    for(var i = 0; i < this.array.length; i++) {
+      func(this.array[i]);
+    }
+  }
+
   findby(func) {
     for(var i = 0; i < this.array.length; i++) {
       if (func(this.array[i]) === true) {

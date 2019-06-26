@@ -1,10 +1,10 @@
-import Window, { TitleBar } from './ui/Window';
+import View, { TitleBar } from './ui/View';
 import List from '../core/List';
 import channel from '../core/Channel';
 
-class PageThumb extends Window {
-  constructor(...args) {
-    super(...args);
+class PageThumb extends View {
+  constructor(state) {
+    super(state);
     this.pageInfo = null;
 
     channel.bind(this, 'PageThumb:deselect', value => {
@@ -37,9 +37,10 @@ class PageThumb extends Window {
   }
 }
 
-class PageList extends Window {
-  constructor(...args) {
-    super(...args);
+class PageList extends View {
+  constructor(state) {
+    super(state);
+
     this.pagethumbs = new List();
     channel.bind(this, 'PageList:addPage', this.addPage);
     channel.bind(this, 'PageList:selectPage', this.selectPage);

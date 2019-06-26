@@ -1,6 +1,8 @@
 import './Editor.less';
 import { parse } from 'papaparse';
 import ui from './ui/UI';
+import View from './ui/View';
+import Panel from './ui/Panel';
 import PageList from './PageList';
 import Handler from './Handler';
 import List from '../core/List';
@@ -8,43 +10,41 @@ import channel from '../core/Channel';
 import { randomInt } from '../core/Util';
 
 
-class Menu extends ui.Window {
-  constructor(...args) {
-    super(...args);
+class Menu extends View {
+  constructor(state) {
+    super({
+      className: 'vs-menu',
+    }.update(state));
 
-    this.btnAddPage = ui.newButton(this, 'Add a page', (event) => {
+    this.btnAddPage = ui.createButton(this, 'Add a page', () => {
       channel.send('Document:addPage', null);
     });
 
-    this.btnRemovePage = ui.newButton(this, 'Remove page', (event) => {
+    this.btnRemovePage = ui.createButton(this, 'Remove page', () => {
       channel.send('Document:removePage', null);
     });
 
-    this.btnZoom = ui.newButton(this, 'Reset zoom', this.resetZoom.bind(this));
+    this.btnZoom = ui.createButton(this, 'Reset zoom', () => {
+      this.resetZoom();
+    });
     channel.bind(this, 'Menu:resetZoom', this.resetZoom);
 
-    this.btnSnap = new ui.Button(this);
-    this.btnSnap.title = 'Snap Off';
-    this.btnSnap.onClick = this.toggleSnap.bind(this);
+    this.btnSnap = ui.createButton(this, 'Snap Off', () => {
+      this.toggleSnap();
+    });
     channel.bind(this, 'Menu:toggleSnap', this.toggleSnap);
 
-    this.btnAddTextBox = new ui.Button(this);
-    this.btnAddTextBox.title = 'New TextBox';
-    this.btnAddTextBox.onClick = event => {
+    this.btnAddTextBox = ui.createButton(this, 'New TextBox', () => {
       channel.send('Document:addObject', 'TextBox');
-    };
+    });
 
-    this.btnAddImageList = new ui.Button(this);
-    this.btnAddImageList.title = 'New ImageList';
-    this.btnAddImageList.onClick = event => {
+    this.btnAddImageList = ui.createButton(this, 'New ImageList', () => {
       channel.send('Document:addObject', 'ImageList');
-    };
+    });
 
-    this.btnRemoveObject = new ui.Button(this);
-    this.btnRemoveObject.title = 'Remove object';
-    this.btnRemoveObject.onClick = event => {
+    this.btnRemoveObject = ui.createButton(this, 'Remove object', () => {
       channel.send('Document:removeObject', null);
-    };
+    });
   }
 
   resetZoom() {
@@ -55,31 +55,17 @@ class Menu extends ui.Window {
   toggleSnap() {
     let snap = channel.send('Viewport:toggleSnap', null)[0];
     if (snap) {
-      this.btnSnap.setTitle('Snap On');
+      this.btnSnap.title = 'Snap On';
     } else {
-      this.btnSnap.setTitle('Snap Off');
+      this.btnSnap.title = 'Snap Off';
     }
-  }
-
-  render() {
-    this.node = document.createElement('div');
-    this.node.className = 'vs-menu';
-
-    this.node.appendChild(this.btnAddPage.render());
-    this.node.appendChild(this.btnRemovePage.render());
-    this.node.appendChild(this.btnZoom.render());
-    this.node.appendChild(this.btnSnap.render());
-    this.node.appendChild(this.btnAddTextBox.render());
-    this.node.appendChild(this.btnAddImageList.render());
-    this.node.appendChild(this.btnRemoveObject.render());
-    return this.node;
   }
 }
 
-class Navigator extends ui.Window {
-  constructor(...args) {
-    super(...args);
-    this.pagelist = new PageList(this);
+class Navigator extends View {
+  constructor(state) {
+    super(state);
+    this.pagelist = new PageList();
   }
 
   render() {
@@ -91,9 +77,9 @@ class Navigator extends ui.Window {
   }
 }
 
-class Page extends ui.Window {
-  constructor(...args) {
-    super(...args);
+class Page extends View {
+  constructor(state) {
+    super(state);
     this.page = null;
   }
 
@@ -119,9 +105,10 @@ class Page extends ui.Window {
 }
 
 
-class Viewport extends ui.Window {
-  constructor(...args) {
-    super(...args);
+class Viewport extends View {
+  constructor(state) {
+    super(state);
+
     this.page = null;
     this.object = null;
 
@@ -157,7 +144,7 @@ class Viewport extends ui.Window {
 
   selectPage(page) {
     this.clear();
-    this.page = new Page(this);
+    this.page = new Page();
     this.page.setup(page);
     this.node.append(this.page.render());
     this.page.node.appendChild(this.handler.render());
@@ -357,14 +344,14 @@ class Viewport extends ui.Window {
       this.drag = false;
     });
 
-    this.handler = new Handler(this);
+    this.handler = new Handler();
     this.handler.viewport = this;
 
     return this.node;
   }
 }
 
-class PanelForDocument extends ui.Panel {
+class PanelForDocument extends Panel {
   render() {
     super.render();
     this.node.appendChild(document.createTextNode("PanelForDoucment"));
@@ -372,7 +359,7 @@ class PanelForDocument extends ui.Panel {
   }
 }
 
-class PanelForPage extends ui.Panel {
+class PanelForPage extends Panel {
   render() {
     super.render();
     this.node.appendChild(document.createTextNode("PanelForPage"));
@@ -380,36 +367,36 @@ class PanelForPage extends ui.Panel {
   }
 }
 
-class PanelForShape extends ui.Panel {
+class PanelForShape extends Panel {
   render() {
     super.render();
     this.node.appendChild(document.createTextNode("PanelForShape"));
 
-    this.btnOrderBack = new ui.Button(this);
+    this.btnOrderBack = new ui.Button();
     this.btnOrderBack.title = 'Back';
-    this.btnOrderBack.onClick = event => {
+    this.btnOrderBack.click = event => {
       channel.send('Document:orderBack', this.object);
     };
 
-    this.btnOrderFront = new ui.Button(this);
+    this.btnOrderFront = new ui.Button();
     this.btnOrderFront.title = 'Front';
-    this.btnOrderFront.onClick = event => {
+    this.btnOrderFront.click = event => {
       channel.send('Document:orderFront', this.object);
     };
 
-    this.btnOrderBackward = new ui.Button(this);
+    this.btnOrderBackward = new ui.Button();
     this.btnOrderBackward.title = 'Backward';
-    this.btnOrderBackward.onClick = event => {
+    this.btnOrderBackward.click = event => {
       channel.send('Document:orderBackward', this.object);
     };
 
-    this.btnOrderForward = new ui.Button(this);
+    this.btnOrderForward = new ui.Button();
     this.btnOrderForward.title = 'Forward';
-    this.btnOrderForward.onClick = event => {
+    this.btnOrderForward.click = event => {
       channel.send('Document:orderForward', this.object);
     };
 
-    this.inputColor = new ui.InputText(this);
+    this.inputColor = new ui.InputText();
     this.inputColor.value = this.object.color;
     this.inputColor.onChange = value => {
       this.object.setColor(value);
@@ -429,13 +416,13 @@ class PanelForTextBox extends PanelForShape {
     super.render();
     this.node.appendChild(document.createTextNode("PanelForTextBox"));
 
-    this.inputTextColor = new ui.InputText(this);
+    this.inputTextColor = new ui.InputText();
     this.inputTextColor.value = this.object.textColor;
     this.inputTextColor.onChange = value => {
       this.object.setTextColor(value);
     };
 
-    this.inputText = new ui.InputText(this);
+    this.inputText = new ui.InputText();
     this.inputText.value = this.object.text;
     this.inputText.onChange = value => {
       this.object.setText(value);
@@ -502,12 +489,13 @@ class PanelForImageList extends PanelForShape {
   }
 }
 
-class Property extends ui.Window {
-  constructor(...args) {
-    super(...args);
-    this.titlebar = new ui.TitleBar(this);
-    this.titlebar.setTitle('Property');
-    this.panel = new ui.Panel(this);
+class Property extends View {
+  constructor(state) {
+    super(state);
+
+    this.titlebar = new ui.TitleBar();
+    this.titlebar.title = 'Property';
+    this.panel = new ui.Panel();
     this.object = null;
 
     channel.bind(this, 'Property:setPanelFor', this.setPanelFor);
@@ -519,20 +507,20 @@ class Property extends ui.Window {
 
     switch(object.name) {
       case 'ImageList':
-        this.panel = new PanelForImageList(this);
+        this.panel = new PanelForImageList();
         break;
       case 'TextBox':
-        this.panel = new PanelForTextBox(this);
+        this.panel = new PanelForTextBox();
         break;
       case 'Page':
-        this.panel = new PanelForPage(this);
+        this.panel = new PanelForPage();
         break;
       case 'Document':
-        this.panel = new PanelForDocument(this);
+        this.panel = new PanelForDocument();
         break;
     }
     this.panel.setObject(object);
-    this.titlebar.setTitle(object.name + ' Property');
+    this.titlebar.title = object.name + ' Property';
     this.node.appendChild(this.panel.render());
     return this.panel;
   }
@@ -546,7 +534,7 @@ class Property extends ui.Window {
   }
 }
 
-class ToolBox extends ui.Window {
+class ToolBox extends View {
   render() {
     super.render();
     this.node.className = 'vs-toolbox';
@@ -554,15 +542,15 @@ class ToolBox extends ui.Window {
   }
 }
 
-class Editor extends ui.Window{
-  constructor(...args) {
-    super(...args);
-    this.menu = new Menu(this);
-    this.navigator = new Navigator(this);
-    this.viewport = new Viewport(this);
+class Editor extends View {
+  constructor(state) {
+    super(state);
 
-    this.toolbox = new ToolBox(this);
-    this.property = new Property(this);
+    this.menu = new Menu();
+    this.navigator = new Navigator();
+    this.viewport = new Viewport();
+    this.toolbox = new ToolBox();
+    this.property = new Property();
   }
 
   render() {
@@ -570,7 +558,7 @@ class Editor extends ui.Window{
     this.node.className = 'vs-editor';
     this.node.appendChild(this.menu.render());
 
-    let row = new ui.Row(this);
+    let row = new ui.Horizon();
     this.node.appendChild(row.render());
 
     row.node.appendChild(this.navigator.render());

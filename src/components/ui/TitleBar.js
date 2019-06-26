@@ -1,22 +1,21 @@
-import Window from './Window';
+import View from './View';
 
-class TitleBar extends Window {
-  constructor(...args) {
-    super(...args);
-    this.title = '';
+class TitleBar extends View {
+  constructor(state) {
+    super({
+      className: 'vs-titlebar',
+    }.update(state));
   }
 
-  setTitle(title) {
-    super.setTitle(title);
+  on_title(text) {
     if (this.node != null) {
-      this.node.innerText = title;
+      this.node.innerHTML = text;
     }
   }
 
   render() {
     super.render();
-    this.node.className = 'vs-titlebar';
-    this.node.innerText = this.title;
+    this.node.innerHTML = this.title;
     return this.node;
   }
 }

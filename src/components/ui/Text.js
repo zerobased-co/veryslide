@@ -1,4 +1,4 @@
-import Window from './Window';
+import View from './View';
 
 class Text extends Window {
   constructor(...args) {

@@ -10,6 +10,7 @@ class TextBox extends Box {
       textColor: '#ffffff',
       size: 14,
       bold: false,
+      italic: false,
     }.update(state));
   }
 
@@ -44,6 +45,14 @@ class TextBox extends Box {
       this.node.style.fontWeight = 700;
     } else {
       this.node.style.fontWeight = 400;
+    }
+  }
+
+  on_italic(italic) {
+    if (italic) {
+      this.node.style.fontStyle = 'italic';
+    } else {
+      this.node.style.fontStyle = 'normal';
     }
   }
 }

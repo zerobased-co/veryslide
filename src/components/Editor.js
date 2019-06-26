@@ -454,6 +454,12 @@ class PanelForTextBox extends PanelForBox {
       this.object.bold = value;
     };
 
+    this.italic = new ui.CheckBox({checked: this.object.italic});
+    this.italic.title = 'Italic';
+    this.italic.onChange = value => {
+      this.object.italic = value;
+    };
+
     this.size = new ui.InputText();
     this.size.value = this.object.size;
     this.size.onChange = value => {
@@ -463,6 +469,7 @@ class PanelForTextBox extends PanelForBox {
     this.node.appendChild(this.btnTextColor.render());
     this.node.appendChild(this.inputText.render());
     this.node.appendChild(this.bold.render());
+    this.node.appendChild(this.italic.render());
     this.node.appendChild(this.size.render());
     return this.node;
   }

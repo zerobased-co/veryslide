@@ -399,7 +399,7 @@ class PanelForShape extends Panel {
     this.inputColor = new ui.InputText();
     this.inputColor.value = this.object.color;
     this.inputColor.onChange = value => {
-      this.object.setColor(value);
+      this.object.color = value;
     };
 
     this.node.appendChild(this.btnOrderBack.render());
@@ -425,7 +425,7 @@ class PanelForTextBox extends PanelForShape {
     this.inputText = new ui.InputText();
     this.inputText.value = this.object.text;
     this.inputText.onChange = value => {
-      this.object.setText(value);
+      this.object.text = value;
     };
 
     this.node.appendChild(this.inputTextColor.render());

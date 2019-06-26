@@ -1,18 +1,45 @@
+import State from '../../core/State.js';
 import './BaseObject.less';
 
-class BaseObject {
-  constructor() {
-    this.node = null;
+class Node extends State {
+  constructor(state) {
+    super({
+      name: 'Node',
+    }.update(state));
+
+    this.node = document.createElement('div');
+    this.updateNode();
+  }
+
+  on_class(className) {
+    this.node.className = className;
+  }
+
+  updateNode() {
+    for (const [key, value] of Object.entries(this.state)) {
+      let func = this['on_' + key];
+      if (func != null) {
+        func.bind(this)(value);
+      }
+    }
+  }
+}
+
+class BaseObject extends Node {
+  constructor(state) {
+    super({
+      name: 'BaseObject',
+      class: 'vs-object',
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+      color: '#ffffff',
+      order: 0,
+    }.update(state));
+
     this.content = null;
     this.page = null;
-    this.name = 'BaseObject';
-
-    this.x = 0;
-    this.y = 0;
-    this.width = 0;
-    this.height = 0;
-    this.color = '#ffffff';
-    this.order = 0;
   }
 
   contain(x, y) {
@@ -23,25 +50,35 @@ class BaseObject {
     this.content = this.node.innerHTML;
   }
 
-  setColor(color) {
-    this.color = color;
+  on_x(x) {
+    this.node.style.left = x + 'px';
+  }
+
+  on_y(y) {
+    this.node.style.top = y + 'px';
+  }
+
+  on_width(width) {
+    this.node.style.width = width + 'px';
+  }
+
+  on_height(height) {
+    this.node.style.height = height + 'px';
+  }
+
+  on_order(order) {
+    this.node.style.zIndex = order;
+  }
+
+  on_color(color) {
     this.node.style.backgroundColor = this.color;
   }
 
   render() {
-    this.node = document.createElement('div');
-    this.node.className = 'vs-object';
-
-    this.node.style.backgroundColor = this.color;
-    this.node.style.left = this.x + 'px';
-    this.node.style.top = this.y + 'px';
-    this.node.style.width = this.width + 'px';
-    this.node.style.height = this.height + 'px';
-    this.node.style.zIndex = this.order;
-
     if (this.content) {
       this.node.innerHTML = this.content;
     }
+    return this.node;
   }
 }
 

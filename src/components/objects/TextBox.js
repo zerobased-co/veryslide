@@ -2,29 +2,21 @@ import './TextBox.less';
 import Box from './Box';
 
 class TextBox extends Box {
-  constructor() {
-    super();
-    this.name = 'TextBox';
-    this.text = 'Text';
-    this.textColor = '#ffffff';
+  constructor(state) {
+    super({
+      name: 'TextBox',
+      class: 'vs-object vs-textbox',
+      text: 'Text',
+      textColor: '#ffffff',
+    }.update(state));
   }
 
-  setText(text) {
-    this.text = text;
+  on_text(text) {
     this.node.innerText = this.text;
   }
 
-  setTextColor(color) {
-    this.textColor = color;
+  on_textColor(color) {
     this.node.style.color = this.textColor;
-  }
-
-  render() {
-    super.render();
-    this.node.classList.add('vs-textbox');
-    this.node.innerText = this.text;
-    this.node.style.color = this.textColor;
-    return this.node;
   }
 }
 

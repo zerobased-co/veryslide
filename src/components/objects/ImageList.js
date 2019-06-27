@@ -4,7 +4,7 @@ import Box from './Box';
 class ImageList extends Box {
   constructor(state) {
     super({
-      name: 'ImageList',
+      type: 'ImageList',
       className: 'vs-imagelist',
       color: '#FFFFFF',
       borderStyle: 'solid',

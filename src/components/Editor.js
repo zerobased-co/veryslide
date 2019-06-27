@@ -196,6 +196,14 @@ class Viewport extends View {
     super.render();
     this.node.tabIndex = '0';
 
+    window.addEventListener('copy', event => {
+      channel.send('Document:copy');
+    });
+
+    window.addEventListener('paste', event => {
+      channel.send('Document:paste');
+    });
+
     window.addEventListener('keydown', event => {
       if (event.target !== document.body && event.target !== this.node) {
         return;
@@ -576,7 +584,7 @@ class Property extends View {
   setPanelFor(object) {
     this.panel.clear();
 
-    switch(object.name) {
+    switch(object.type) {
       case 'ImageList':
         this.panel = new PanelForImageList({object});
         break;
@@ -593,7 +601,7 @@ class Property extends View {
         this.panel = new PanelForDocument({object});
         break;
     }
-    this.titlebar.title = object.name + ' Property';
+    this.titlebar.title = object.type + ' Property';
     this.appendChild(this.panel);
     return this.panel;
   }

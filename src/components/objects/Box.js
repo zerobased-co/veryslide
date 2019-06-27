@@ -5,7 +5,7 @@ import { randomColor, randomInt } from '../../core/Util';
 class Box extends BaseObject {
   constructor(state) {
     super({
-      name: 'Box',
+      type: 'Box',
       className: 'vs-box',
       width: randomInt(100, 300),
       height: randomInt(100, 300),

@@ -5,7 +5,7 @@ import BaseObject from './BaseObject';
 class ImageBox extends BaseObject {
   constructor(state) {
     super({
-      name: 'ImageBox',
+      type: 'ImageBox',
       className: 'vs-imagebox',
       width: 100,
       height: 100,

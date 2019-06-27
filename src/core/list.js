@@ -14,10 +14,6 @@ class List {
   
   spawn(type, ...args) {
     let node = new type(...args);
-    node.prev = null;
-    node.next = null;
-    node.order = null;
-    node.parent = this;
     return node;
   }
   
@@ -41,6 +37,11 @@ class List {
   }
 
   append(node) {
+    node.prev = null;
+    node.next = null;
+    node.order = null;
+    node.parent = this;
+
     if (this.tail !== null) {
       this.tail.next = node;
     }
@@ -56,6 +57,11 @@ class List {
   }
 
   prepend(node) {
+    node.prev = null;
+    node.next = null;
+    node.order = null;
+    node.parent = this;
+
     if (this.head !== null) {
       this.head.prev = node;
     }

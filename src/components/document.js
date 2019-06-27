@@ -7,7 +7,7 @@ import ImageList from './objects/ImageList';
 class Page extends BaseObject {
   constructor(state) {
     super({
-      name: 'Page',
+      type: 'Page',
       className: 'vs-page',
       objects: new List(),
     }.update(state));
@@ -34,6 +34,13 @@ class Page extends BaseObject {
     this.node.append(object.node);
     this.invalidate = true;
     return object;
+  }
+
+  appendObject(object) {
+    object.page = this;
+    this.objects.append(object);
+    this.node.append(object.node);
+    this.invalidate = true;
   }
 
   findObject(x, y) {
@@ -73,7 +80,7 @@ class Document {
     this.width = 1440;
     this.height = 960;
     this.pages = new List();
-    this.name = 'Document';
+    this.type = 'Document';
   }
 
   addPage() {
@@ -86,10 +93,14 @@ class Document {
     return page;
   }
 
+  appendPage(page) {
+    this.pages.append(page);
+  }
+
   removePage(page) {
     let nextpage = this.pages.remove(page);
     return nextpage;
   }
 }
 
-export default Document
+export { Document as default, Page }

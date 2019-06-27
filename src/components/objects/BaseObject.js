@@ -4,7 +4,7 @@ import './BaseObject.scss';
 class Node extends State {
   constructor(state) {
     super({
-      name: 'Node',
+      type: 'Node',
       className: 'vs-node',
     }.update(state));
 
@@ -25,7 +25,7 @@ class Node extends State {
 class BaseObject extends Node {
   constructor(state) {
     super({
-      name: 'BaseObject',
+      type: 'BaseObject',
       className: 'vs-object',
       x: 0,
       y: 0,

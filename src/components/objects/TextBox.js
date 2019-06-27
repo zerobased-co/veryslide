@@ -4,7 +4,7 @@ import Box from './Box';
 class TextBox extends Box {
   constructor(state) {
     super({
-      name: 'TextBox',
+      type: 'TextBox',
       className: 'vs-textbox',
       fontFamily: 'sans-serif',
       text: 'Text',

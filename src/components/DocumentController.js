@@ -7,7 +7,7 @@ class DocumentController {
     this.page = null;
     this.object = null;
 
-    channel.bind(this, 'Document:addPage', (value) => {
+    channel.bind(this, 'Document:addPage', () => {
       const newPage = this.doc.addPage();
       channel.send('PageList:addPage', newPage);
     });
@@ -17,7 +17,7 @@ class DocumentController {
       this.object = null;
     });
 
-    channel.bind(this, 'Document:removePage', (value) => {
+    channel.bind(this, 'Document:removePage', () => {
       if (this.page === null) return;
 
       channel.send('PageList:removePage', this.page);
@@ -43,7 +43,7 @@ class DocumentController {
       this.object = object;
     });
 
-    channel.bind(this, 'Document:removeObject', (value) => {
+    channel.bind(this, 'Document:removeObject', () => {
       if (this.object === null) return;
       this.page.removeObject(this.object);
       this.object = null;

@@ -8,7 +8,7 @@ class Button extends View {
     }.update(state));
   }
 
-  onClick(event) {
+  onClick(/*event*/) {
     console.log('onClick', this);
   }
 

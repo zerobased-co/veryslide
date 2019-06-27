@@ -9,9 +9,7 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: [
-          'babel-loader'
-        ],
+        loader: 'babel-loader',
       },
       {
         test: /\.(sa|sc|c)ss$/,

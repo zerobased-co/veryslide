@@ -10,7 +10,7 @@ class Text extends View {
 
   on_title(text) {
     if (this.node != null) {
-      this.node.innerHTML = this.title;
+      this.node.innerHTML = text;
     }
   }
 

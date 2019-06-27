@@ -15,13 +15,13 @@ class InputText extends View {
     return this.node;
   }
 
-  input(event) {
+  input(/*event*/) {
     this.value = this.node.value;
     this.onChange(this.value);
   }
 
   onChange(value) {
-    console.log('onChange', this);
+    console.log('onChange', value, this);
   }
 }
 

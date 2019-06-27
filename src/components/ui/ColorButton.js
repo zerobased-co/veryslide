@@ -18,7 +18,7 @@ class ColorButton extends View {
   }
 
   onChange(color) {
-    console.log('onChange', this);
+    console.log('onChange', color, this);
   }
 
   showPicker(event) {

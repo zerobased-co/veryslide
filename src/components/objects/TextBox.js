@@ -31,16 +31,16 @@ class TextBox extends Box {
     this.text = this.node.innerText;
   }
 
-  on_size(text) {
-    this.node.style.fontSize = this.size + 'px';
+  on_size(size) {
+    this.node.style.fontSize = size + 'px';
   }
 
   on_text(text) {
-    this.node.innerText = this.text;
+    this.node.innerText = text;
   }
 
   on_textColor(color) {
-    this.node.style.color = this.textColor;
+    this.node.style.color = color;
   }
 
   on_bold(bold) {

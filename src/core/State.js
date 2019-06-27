@@ -10,7 +10,7 @@ class State {
     this.state = state;
 
     if (state != null) {
-      for (const [key, value] of Object.entries(state)) {
+      Object.getOwnPropertyNames(state).forEach(key => {
         Object.defineProperty(this, key, {
           get: function() {
             let func = this['_' + key];
@@ -25,7 +25,7 @@ class State {
             this.updateState(key);
           }
         });
-      }
+      });
     }
   }
 

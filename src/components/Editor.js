@@ -1,12 +1,10 @@
 import './Editor.scss';
 import { parse } from 'papaparse';
-import { ColorPicker } from 'codemirror-colorpicker'
 import ui from './ui/UI';
 import View from './ui/View';
 import Panel from './ui/Panel';
 import PageList from './PageList';
 import Handler from './Handler';
-import List from '../core/List';
 import channel from '../core/Channel';
 import { randomInt } from '../core/Util';
 
@@ -359,14 +357,14 @@ class Viewport extends View {
       }
     });
 
-    this.node.addEventListener('mouseup', event => {
+    this.node.addEventListener('mouseup', () => {
       if (this.grab === true) {
         this.node.style.cursor = 'grab';
         this.drag = false;
       }
     });
 
-    this.node.addEventListener('mouseleave', event => {
+    this.node.addEventListener('mouseleave', () => {
       this.node.style.cursor = 'default';
       this.grab = false;
       this.drag = false;

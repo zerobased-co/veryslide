@@ -1,5 +1,6 @@
 import List from './List.js';
 
+/*
 class Message {
   constructor(type, value, callback) {
     this.type = type;
@@ -7,6 +8,7 @@ class Message {
     this.callback = callback;
   }
 }
+*/
 
 class Channel {
   constructor() {
@@ -39,12 +41,12 @@ class Channel {
     }
   }
 
-  post(type, value, callback) {
   /*
+  post(type, value, callback) {
     msg = new Message(type, value, callback);
     this.messages.append(msg);
-  */
   }
+  */
 
   send(type, value) {
     //console.log('Send', type, value);

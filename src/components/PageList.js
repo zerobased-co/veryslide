@@ -1,4 +1,4 @@
-import View, { TitleBar } from './ui/View';
+import View from './ui/View';
 import List from '../core/List';
 import channel from '../core/Channel';
 
@@ -7,7 +7,7 @@ class PageThumb extends View {
     super(state);
     this.pageInfo = null;
 
-    channel.bind(this, 'PageThumb:deselect', value => {
+    channel.bind(this, 'PageThumb:deselect', () => {
       this.deselect();
     });
   }
@@ -30,7 +30,7 @@ class PageThumb extends View {
   render() {
     this.node = document.createElement('div');
     this.node.className = 'vs-pagethumb';
-    this.node.addEventListener('click', event => {
+    this.node.addEventListener('click', () => {
       this.select();
     });
     return this.node;
@@ -74,7 +74,7 @@ class PageList extends View {
     });
 
     if (pagethumb !== null) {
-      let nextthumb = this.pagethumbs.remove(pagethumb);
+      this.pagethumbs.remove(pagethumb);
       pagethumb.destruct();
     }
   }

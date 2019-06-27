@@ -67,7 +67,7 @@ class BaseObject extends Node {
   }
 
   on_color(color) {
-    this.node.style.backgroundColor = this.color;
+    this.node.style.backgroundColor = color;
   }
 
   render() {

@@ -8,8 +8,8 @@ class CheckBox extends View {
     }.update(state));
   }
 
-  onChange(event) {
-    console.log('onChange', this);
+  onChange(checked) {
+    console.log('onChange', checked, this);
   }
 
   on_checked(checked) {
@@ -24,7 +24,7 @@ class CheckBox extends View {
     }
   }
 
-  change(event) {
+  change(/*event*/) {
     this.onChange(this.input.checked);
   }
 

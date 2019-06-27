@@ -194,12 +194,12 @@ class Handler extends View {
     node.className = 'vs-handler';
 
     // Add 8 handler dots
-    for (const [key, value] of Object.entries(this.dotPreset)) {
+    Object.getOwnPropertyNames(this.dotPreset).forEach(key => {
       let dot = document.createElement('div');
       dot.className = 'vs-dot ' + key;
       dot.innerText = key;
       node.appendChild(dot);
-    }
+    });
 
     node.addEventListener('mousedown', this.mousedown.bind(this));
     return node;

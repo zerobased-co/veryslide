@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack-dev-server --config ./webpack.config.js --mode development",
-    "build": "webpack",
+    "build": "webpack --config ./webpack.config.js --mode production",
     "lint": "eslint src"
   },
   "keywords": [],
@@ -29,7 +29,6 @@
   "dependencies": {
     "codemirror": "^5.48.0",
     "codemirror-colorpicker": "^1.9.51",
-    "eslint-cli": "^1.1.1",
     "papaparse": "^5.0.0"
   }
 }

@@ -4,10 +4,12 @@ import TextBox from './objects/TextBox';
 import ImageList from './objects/ImageList';
 
 class Page extends BaseObject {
-  constructor() {
-    super();
-    this.name = 'Page';
-    this.objects = new List();
+  constructor(state) {
+    super({
+      name: 'Page',
+      class: 'vs-page',
+      objects: new List(),
+    }.update(state));
   }
 
   addObject(type) {
@@ -37,13 +39,11 @@ class Page extends BaseObject {
   }
 
   render() {
-    super.render();
-    this.node.classList.add('vs-page');
-
+    let node = super.render();
     this.objects.iter((object) => {
-      this.node.append(object.render());
+      node.append(object.render());
     });
-    return this.node;
+    return node;
   }
 }
 

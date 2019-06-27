@@ -13,18 +13,34 @@ class State {
       for (const [key, value] of Object.entries(state)) {
         Object.defineProperty(this, key, {
           get: function() {
-            return this.state[key];
+            let func = this['_' + key];
+            if (func != null) {
+              return func.bind(this)();
+            } else {
+              return this.state[key];
+            }
           },
           set: function(value) {
             this.state[key] = value;
-
-            // find callback and call it
-            let func = this['on_' + key];
-            if (func != null) {
-              return func.bind(this)(value);
-            }
+            this.updateState(key);
           }
         });
+      }
+    }
+  }
+
+  updateState(key) { // if key is null, then update all states
+    if (key != null) {
+      let func = this['on_' + key];
+      if (func != null) {
+        func.bind(this)(this.state[key]);
+      }
+    } else {
+      for (const [key, value] of Object.entries(this.state)) {
+        let func = this['on_' + key];
+        if (func != null) {
+          func.bind(this)(value);
+        }
       }
     }
   }

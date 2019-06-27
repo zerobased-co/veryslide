@@ -24,6 +24,8 @@ class Handler extends View {
       'se': 'translate(50%, 50%)',
       'sw': 'translate(-50%, 50%)',
     };
+
+    this.node = this.render();
   }
 
   connect(object) {
@@ -188,19 +190,19 @@ class Handler extends View {
   }
 
   render() {
-    this.node = document.createElement('div');
-    this.node.className = 'vs-handler';
+    let node = document.createElement('div');
+    node.className = 'vs-handler';
 
     // Add 8 handler dots
     for (const [key, value] of Object.entries(this.dotPreset)) {
       let dot = document.createElement('div');
       dot.className = 'vs-dot ' + key;
       dot.innerText = key;
-      this.node.appendChild(dot);
+      node.appendChild(dot);
     }
 
-    this.node.addEventListener('mousedown', this.mousedown.bind(this));
-    return this.node;
+    node.addEventListener('mousedown', this.mousedown.bind(this));
+    return node;
   }
 }
 

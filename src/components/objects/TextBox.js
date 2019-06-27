@@ -11,6 +11,8 @@ class TextBox extends Box {
       size: 14,
       bold: false,
       italic: false,
+      align: 'center',
+      verticalAlign: 'center',
     }.update(state));
   }
 
@@ -54,6 +56,26 @@ class TextBox extends Box {
       this.node.style.fontStyle = 'italic';
     } else {
       this.node.style.fontStyle = 'normal';
+    }
+  }
+
+  on_align(align) {
+    if (align == 'left') {
+      this.node.style.justifyContent = 'flex-start';
+    } else if (align == 'right') {
+      this.node.style.justifyContent = 'flex-end';
+    } else if (align == 'center') {
+      this.node.style.justifyContent = 'center';
+    }
+  }
+
+  on_verticalAlign(align) {
+    if (align == 'top') {
+      this.node.style.alignItems = 'flex-start';
+    } else if (align == 'bottom') {
+      this.node.style.alignItems = 'flex-end';
+    } else if (align == 'middle') {
+      this.node.style.alignItems = 'center';
     }
   }
 }

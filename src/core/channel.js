@@ -10,7 +10,7 @@ class Message {
 
 class Channel {
   constructor() {
-    this.messages = new List(Message);
+    this.messages = new List();
     this.listeners = new Object();
   }
 

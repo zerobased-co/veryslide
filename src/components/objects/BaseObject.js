@@ -7,21 +7,17 @@ class Node extends State {
       name: 'Node',
     }.update(state));
 
-    this.node = document.createElement('div');
-    this.updateNode();
+    this.node = this.render();
+    this.updateState();
   }
 
   on_class(className) {
     this.node.className = className;
   }
-
-  updateNode() {
-    for (const [key, value] of Object.entries(this.state)) {
-      let func = this['on_' + key];
-      if (func != null) {
-        func.bind(this)(value);
-      }
-    }
+  
+  render() {
+    let node = document.createElement('div');
+    return node;
   }
 }
 
@@ -75,10 +71,11 @@ class BaseObject extends Node {
   }
 
   render() {
+    let node = super.render();
     if (this.content) {
-      this.node.innerHTML = this.content;
+      node.innerHTML = this.content;
     }
-    return this.node;
+    return node;
   }
 }
 

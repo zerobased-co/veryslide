@@ -1,9 +1,15 @@
 class List {
-  constructor() {
+  constructor(children) {
     this.head = null;
     this.tail = null;
     this.array = new Array();
     this.count = 0;
+
+    if (children != null) {
+      for(var i = 0; i < children.length; i++) {
+        this.append(children[i]);
+      }
+    }
   }
   
   spawn(type, ...args) {

@@ -4,6 +4,7 @@ class Button extends View {
   constructor(state) {
     super({
       className: 'vs-button',
+      title: '',
     }.update(state));
   }
 
@@ -12,9 +13,7 @@ class Button extends View {
   }
 
   on_title(text) {
-    if (this.node != null) {
-      this.node.innerHTML = text;
-    }
+    this.node.innerHTML = text;
   }
 
   render() {

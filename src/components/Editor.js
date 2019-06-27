@@ -46,6 +46,8 @@ class Menu extends View {
     this.btnRemoveObject = ui.createButton(this, 'Remove object', () => {
       channel.send('Document:removeObject', null);
     });
+
+    this.render();
   }
 
   resetZoom() {
@@ -65,16 +67,16 @@ class Menu extends View {
 
 class Navigator extends View {
   constructor(state) {
-    super(state);
-    this.pagelist = new PageList();
+    super({
+      pageList: new PageList(),
+    }.update(state));
   }
 
   render() {
-    this.node = document.createElement('div');
-    this.node.className = 'vs-navigator';
-
-    this.node.appendChild(this.pagelist.render());
-    return this.node;
+    let node = document.createElement('div');
+    node.className = 'vs-navigator';
+    node.appendChild(this.pageList.render());
+    return node;
   }
 }
 
@@ -99,7 +101,7 @@ class Page extends View {
   }
 
   render() {
-    this.node = this.page.render();
+    this.node = this.page.node;
     //this.node.innerHTML = this.page.order;
     return this.node;
   }
@@ -148,7 +150,7 @@ class Viewport extends View {
     this.page = new Page();
     this.page.setup(page);
     this.node.append(this.page.render());
-    this.page.node.appendChild(this.handler.render());
+    this.page.node.appendChild(this.handler.node);
 
     this.update();
     this.setPageSnap();
@@ -157,7 +159,7 @@ class Viewport extends View {
   }
 
   addObject(object) {
-    this.page.node.append(object.render());
+    this.page.node.append(object.node);
   }
 
   removeFocusedObject() {
@@ -466,11 +468,20 @@ class PanelForTextBox extends PanelForBox {
       this.object.size = value;
     };
 
+    this.align = new ui.Select({
+      options: [['left', 'Left'], ['center', 'Center'], ['right', 'Right']],
+      value: this.object.align,
+    });
+    this.align.onChange = value => {
+      this.object.align = value;
+    };
+
     this.node.appendChild(this.btnTextColor.render());
     this.node.appendChild(this.inputText.render());
     this.node.appendChild(this.bold.render());
     this.node.appendChild(this.italic.render());
     this.node.appendChild(this.size.render());
+    this.node.appendChild(this.align.render());
     return this.node;
   }
 }
@@ -583,7 +594,9 @@ class ToolBox extends View {
 
 class Editor extends View {
   constructor(state) {
-    super(state);
+    super({
+      className: 'vs-editor',
+    }.update(state));
 
     this.menu = new Menu();
     this.navigator = new Navigator();
@@ -594,18 +607,16 @@ class Editor extends View {
 
   render() {
     super.render();
-    this.node.className = 'vs-editor';
-    this.node.appendChild(this.menu.render());
+    this.appendChild(this.menu);
 
     let row = new ui.Horizon();
-    this.node.appendChild(row.render());
+    this.appendChild(row);
 
-    row.node.appendChild(this.navigator.render());
-    row.node.appendChild(this.viewport.render());
-    row.node.appendChild(this.toolbox.render());
+    row.appendChild(this.navigator);
+    row.appendChild(this.viewport);
+    row.appendChild(this.toolbox);
 
-    this.toolbox.node.appendChild(this.property.render());
-
+    this.toolbox.appendChild(this.property);
     return this.node;
   }
 }

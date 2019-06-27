@@ -7,6 +7,7 @@ import Text from './Text';
 import InputText from './InputText';
 import CheckBox from './CheckBox';
 import ColorButton from './ColorButton';
+import Select from './Select';
 
 class UI {
   constructor() {
@@ -21,6 +22,7 @@ class UI {
     this.InputText = InputText;
     this.CheckBox = CheckBox;
     this.ColorButton = ColorButton;
+    this.Select = Select;
   }
 
   /* shortcuts */

@@ -1,6 +1,7 @@
 import View from './ui/View'
 import channel from '../core/Channel';
     
+const minSize = 24;
 const dotPreset = {
   'n': 'translate(-50%, -50%)',
   'e': 'translate(50%, -50%)',
@@ -133,6 +134,9 @@ class Handler extends View {
           h = parseInt(h / this.snapSize) * this.snapSize;
         }
       }
+
+      w = Math.max(w, minSize);
+      h = Math.max(h, minSize);
 
       this.node.style.left = x + 'px';
       this.node.style.top = y + 'px';

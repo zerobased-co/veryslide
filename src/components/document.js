@@ -70,8 +70,8 @@ class Page extends BaseObject {
 
 class Document {
   constructor() {
-    this.width = 1024;
-    this.height = 768;
+    this.width = 1440;
+    this.height = 960;
     this.pages = new List();
     this.name = 'Document';
   }

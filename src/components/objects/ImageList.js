@@ -5,7 +5,7 @@ class ImageList extends Box {
   constructor(state) {
     super({
       name: 'ImageList',
-      class: 'vs-imagelist',
+      className: 'vs-imagelist',
     }.update(state));
   }
 }

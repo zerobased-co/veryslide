@@ -6,6 +6,7 @@ import Panel from './ui/Panel';
 import PageList from './PageList';
 import Handler from './Handler';
 import channel from '../core/Channel';
+import List from '../core/List';
 import { randomInt } from '../core/Util';
 
 
@@ -15,35 +16,18 @@ class Menu extends View {
       className: 'vs-menu',
     }.update(state));
 
-    this.btnAddPage = ui.createButton(this, 'Add a page', () => {
-      channel.send('Document:addPage', null);
-    });
+    [
+      ui.createButton(this, 'Add a page',    () => { channel.send('Document:addPage'); }),
+      ui.createButton(this, 'Remove page',   () => { channel.send('Document:removePage'); }),
+      ui.createButton(this, 'Reset zoom',    () => { this.resetZoom(); }),
+      ui.createButton(this, 'Snap Off',      () => { this.toggleSnap(); }),
+      ui.createButton(this, 'New TextBox',   () => { channel.send('Document:addObject', 'TextBox'); }),
+      ui.createButton(this, 'New ImageList', () => { channel.send('Document:addObject', 'ImageList'); }),
+      ui.createButton(this, 'Remove object', () => { channel.send('Document:removeObject'); }),
+    ].forEach(item => this.appendChild(item));
 
-    this.btnRemovePage = ui.createButton(this, 'Remove page', () => {
-      channel.send('Document:removePage', null);
-    });
-
-    this.btnZoom = ui.createButton(this, 'Reset zoom', () => {
-      this.resetZoom();
-    });
     channel.bind(this, 'Menu:resetZoom', this.resetZoom);
-
-    this.btnSnap = ui.createButton(this, 'Snap Off', () => {
-      this.toggleSnap();
-    });
     channel.bind(this, 'Menu:toggleSnap', this.toggleSnap);
-
-    this.btnAddTextBox = ui.createButton(this, 'New TextBox', () => {
-      channel.send('Document:addObject', 'TextBox');
-    });
-
-    this.btnAddImageList = ui.createButton(this, 'New ImageList', () => {
-      channel.send('Document:addObject', 'ImageList');
-    });
-
-    this.btnRemoveObject = ui.createButton(this, 'Remove object', () => {
-      channel.send('Document:removeObject', null);
-    });
 
     this.render();
   }
@@ -66,15 +50,9 @@ class Menu extends View {
 class Navigator extends View {
   constructor(state) {
     super({
-      pageList: new PageList(),
+      className: 'vs-navigator',
+      children: new List([new PageList()]),
     }.update(state));
-  }
-
-  render() {
-    let node = document.createElement('div');
-    node.className = 'vs-navigator';
-    node.appendChild(this.pageList.render());
-    return node;
   }
 }
 
@@ -100,7 +78,6 @@ class Page extends View {
 
   render() {
     this.node = this.page.node;
-    //this.node.innerHTML = this.page.order;
     return this.node;
   }
 }
@@ -380,7 +357,7 @@ class Viewport extends View {
 class PanelForDocument extends Panel {
   render() {
     super.render();
-    this.node.appendChild(ui.createText(this, 'PanelForDocument').render());
+    this.appendChild(ui.createText(this, 'PanelForDocument'));
     return this.node;
   }
 }
@@ -388,7 +365,7 @@ class PanelForDocument extends Panel {
 class PanelForPage extends Panel {
   render() {
     super.render();
-    this.node.appendChild(ui.createText(this, 'PanelForPage').render());
+    this.appendChild(ui.createText(this, 'PanelForPage'));
     return this.node;
   }
 }
@@ -396,36 +373,17 @@ class PanelForPage extends Panel {
 class PanelForBox extends Panel {
   render() {
     super.render();
-    this.node.appendChild(ui.createText(this, 'PanelForBox').render());
-
-    this.btnOrderBack = ui.createButton(this, 'Back', () => {
-      channel.send('Document:orderBack', this.object);
-    });
-
-    this.btnOrderFront = ui.createButton(this, 'Front', () => {
-      channel.send('Document:orderFront', this.object);
-    });
-
-    this.btnOrderBackward = ui.createButton(this, 'Backward', () => {
-      channel.send('Document:orderBackward', this.object);
-    });
-
-    this.btnOrderForward = ui.createButton(this, 'Forward', () => {
-      channel.send('Document:orderForward', this.object);
-    });
-
-    this.btnColor = new ui.ColorButton({
-      color: this.object.color,
-      onChange: value => {
-        this.object.color = value;
-      },
-    });
-
-    this.node.appendChild(this.btnOrderBack.render());
-    this.node.appendChild(this.btnOrderFront.render());
-    this.node.appendChild(this.btnOrderBackward.render());
-    this.node.appendChild(this.btnOrderForward.render());
-    this.node.appendChild(this.btnColor.render());
+    [
+      ui.createText  (this, 'PanelForBox'),
+      ui.createButton(this, 'Back',       () => { channel.send('Document:orderBack', this.object); }),
+      ui.createButton(this, 'Front',      () => { channel.send('Document:orderFront', this.object); }),
+      ui.createButton(this, 'Backward',   () => { channel.send('Document:orderBackward', this.object); }),
+      ui.createButton(this, 'Forward',    () => { channel.send('Document:orderForward', this.object); }),
+      new ui.ColorButton({ 
+        color: this.object.color,
+        onChange: value => { this.object.color = value; }, 
+      }),
+    ].forEach(item => this.appendChild(item));
     return this.node;
   }
 }
@@ -433,53 +391,46 @@ class PanelForBox extends Panel {
 class PanelForTextBox extends PanelForBox {
   render() {
     super.render();
-    this.node.appendChild(ui.createText(this, 'PanelForTextBox').render());
 
-    this.btnTextColor = new ui.ColorButton({
-      color: this.object.textColor,
-      onChange: value => {
-        this.object.textColor = value;
-      },
-    });
+    [
+      ui.createText(this, 'PanelForTextBox'),
+      
+      new ui.ColorButton({
+        color: this.object.textColor,
+        onChange: value => { this.object.textColor = value },
+      }),
 
-    this.inputText = new ui.InputText();
-    this.inputText.value = this.object.text;
-    this.inputText.onChange = value => {
-      this.object.text = value;
-    };
+      new ui.InputText({
+        title: 'Title',
+        value: this.object.text, 
+        onChange: value => { this.object.text = value },
+      }),
 
-    this.bold = new ui.CheckBox({checked: this.object.bold});
-    this.bold.title = 'Bold';
-    this.bold.onChange = value => {
-      this.object.bold = value;
-    };
+      new ui.InputText({
+        title: 'Size',
+        value: this.object.size, 
+        onChange: value => { this.object.size = value },
+      }),
 
-    this.italic = new ui.CheckBox({checked: this.object.italic});
-    this.italic.title = 'Italic';
-    this.italic.onChange = value => {
-      this.object.italic = value;
-    };
+      new ui.CheckBox({
+        title: 'Bold',
+        checked: this.object.bold,
+        onChange: value => { this.object.bold = value },
+      }),
 
-    this.size = new ui.InputText();
-    this.size.value = this.object.size;
-    this.size.onChange = value => {
-      this.object.size = value;
-    };
+      new ui.CheckBox({
+        title: 'Italic',
+        checked: this.object.italic,
+        onChange: value => { this.object.italic = value },
+      }),
 
-    this.align = new ui.Select({
-      options: [['left', 'Left'], ['center', 'Center'], ['right', 'Right']],
-      value: this.object.align,
-    });
-    this.align.onChange = value => {
-      this.object.align = value;
-    };
+      new ui.Select({
+        options: [['left', 'Left'], ['center', 'Center'], ['right', 'Right']],
+        value: this.object.align,
+        onChange: value => { this.object.align = value },
+      }),
+    ].forEach(item => this.appendChild(item));
 
-    this.node.appendChild(this.btnTextColor.render());
-    this.node.appendChild(this.inputText.render());
-    this.node.appendChild(this.bold.render());
-    this.node.appendChild(this.italic.render());
-    this.node.appendChild(this.size.render());
-    this.node.appendChild(this.align.render());
     return this.node;
   }
 }
@@ -487,7 +438,7 @@ class PanelForTextBox extends PanelForBox {
 class PanelForImageList extends PanelForBox {
   render() {
     super.render();
-    this.node.appendChild(ui.createText(this, 'PanelForImageList').render());
+    this.appendChild(ui.createText(this, 'PanelForImageList'));
 
     var input = document.createElement('input');
     input.type = 'file';
@@ -551,7 +502,7 @@ class Property extends View {
   }
 
   setPanelFor(object) {
-    this.panel.destruct();
+    this.panel.clear();
 
     switch(object.name) {
       case 'ImageList':
@@ -567,7 +518,7 @@ class Property extends View {
         this.panel = new PanelForDocument();
         break;
     }
-    this.panel.setObject(object);
+    this.panel.object = object;
     this.titlebar.title = object.name + ' Property';
     this.node.appendChild(this.panel.render());
     return this.panel;

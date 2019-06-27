@@ -5,7 +5,7 @@ class TextBox extends Box {
   constructor(state) {
     super({
       name: 'TextBox',
-      class: 'vs-textbox',
+      className: 'vs-textbox',
       text: 'Text',
       textColor: '#ffffff',
       size: 14,

@@ -22,8 +22,8 @@ class PageThumb extends View {
     this.node.classList.remove('focus');
   }
 
-  destruct() {
-    super.destruct();
+  clear() {
+    super.clear();
     channel.unbind(this);
   }
 
@@ -75,7 +75,7 @@ class PageList extends View {
 
     if (pagethumb !== null) {
       this.pagethumbs.remove(pagethumb);
-      pagethumb.destruct();
+      pagethumb.clear();
     }
   }
 

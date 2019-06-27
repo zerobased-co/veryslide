@@ -5,13 +5,14 @@ class Node extends State {
   constructor(state) {
     super({
       name: 'Node',
+      className: 'vs-node',
     }.update(state));
 
     this.node = this.render();
     this.updateState();
   }
 
-  on_class(className) {
+  on_className(className) {
     this.node.className = className;
   }
   
@@ -25,7 +26,7 @@ class BaseObject extends Node {
   constructor(state) {
     super({
       name: 'BaseObject',
-      class: 'vs-object',
+      className: 'vs-object',
       x: 0,
       y: 0,
       width: 0,

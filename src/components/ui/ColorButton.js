@@ -15,6 +15,8 @@ class ColorButton extends View {
       type : 'ColorPicker',
       outputFormat : 'hex',
     });
+
+    this.node.addEventListener('click', this.showPicker.bind(this));
   }
 
   onChange(color) {
@@ -33,20 +35,9 @@ class ColorButton extends View {
   }
 
   on_color(color) {
-    if (this.node != null) {
-      this.node.style.backgroundColor = color;
-      this.node.innerText = color;
-      this.node.style.color = properTextColor(color);
-    }
-  }
-
-  render() {
-    super.render();
-    this.node.style.backgroundColor = this.color;
-    this.node.innerText = this.color;
-    this.node.style.color = properTextColor(this.color);
-    this.node.addEventListener('click', this.showPicker.bind(this));
-    return this.node;
+    this.node.style.backgroundColor = color;
+    this.node.innerText = color;
+    this.node.style.color = properTextColor(color);
   }
 }
 

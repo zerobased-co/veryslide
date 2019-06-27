@@ -7,7 +7,7 @@ class Page extends BaseObject {
   constructor(state) {
     super({
       name: 'Page',
-      class: 'vs-page',
+      className: 'vs-page',
       objects: new List(),
     }.update(state));
   }

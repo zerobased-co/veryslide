@@ -4,6 +4,7 @@ class CheckBox extends View {
   constructor(state) {
     super({
       className: 'vs-checkbox',
+      title: '',
       checked: false,
     }.update(state));
   }
@@ -13,13 +14,13 @@ class CheckBox extends View {
   }
 
   on_checked(checked) {
-    if (this.node != null) {
+    if (this.input != null) {
       this.input.checked = checked;
     }
   }
 
   on_title(title) {
-    if (this.node != null) {
+    if (this.label != null) {
       this.label.innerText = title;
     }
   }

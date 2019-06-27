@@ -14,10 +14,17 @@ class View extends State {
     if (this.parent != null) {
       this.parent.children.append(this);
     }
+
+    this.updateState();
   }
 
-  destruct() {
-    this.node.parentNode.removeChild(this.node);
+  clear() {
+    if (this.state['node'] != null) {
+      if (this.state['node'].parentNode != null) {
+        this.state['node'].parentNode.removeChild(this.state['node']);
+      }
+      this.state['node'] = null;
+    }
   }
 
   _node() {
@@ -28,16 +35,13 @@ class View extends State {
   }
 
   render() {
-    // Remove previous node
-    if (this.state['node'] != null) {
-      this.state['node'].parentNode.removeChild(this.state['node']);
-      this.state['node'] = null;
-    }
+    this.clear();
 
     this.node = document.createElement('div');
     this.node.className = this.className;
 
     this.children.iter((child) => {
+      child.parent = this;
       this.node.appendChild(child.node);
     });
     return this.node;
@@ -53,18 +57,18 @@ class View extends State {
 }
 
 class Horizon extends View {
-  render() {
-    super.render();
-    this.node.className = 'vs-horizon';
-    return this.node;
+  constructor(state) {
+    super({
+      className: 'vs-horizon'
+    }.update(state));
   }
 }
 
 class Vertical extends View {
-  render() {
-    super.render();
-    this.node.className = 'vs-vertical';
-    return this.node;
+  constructor(state) {
+    super({
+      className: 'vs-vertical'
+    }.update(state));
   }
 }
 

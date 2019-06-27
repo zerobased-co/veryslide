@@ -6,7 +6,7 @@ class Box extends BaseObject {
   constructor(state) {
     super({
       name: 'Box',
-      class: 'vs-box',
+      className: 'vs-box',
       width: randomInt(100, 300),
       height: randomInt(100, 300),
       color: randomColor(),

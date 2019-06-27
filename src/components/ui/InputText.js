@@ -2,17 +2,23 @@ import View from './View';
 
 class InputText extends View {
   constructor(state) {
-    super(state);
-    this.value = null;
+    super({
+      className: 'vs-inputtext',
+      value: '',
+    }.update(state));
   }
 
   render() {
+    this.clear();
+
     this.node = document.createElement('input');
     this.node.type = 'text';
-    this.node.value = this.value;
-    this.node.className = 'vs-inputtext';
     this.node.addEventListener('input', this.input.bind(this));
     return this.node;
+  }
+
+  on_value(text) {
+    this.node.value = text;
   }
 
   input(/*event*/) {

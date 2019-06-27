@@ -9,16 +9,7 @@ class Text extends View {
   }
 
   on_title(text) {
-    if (this.node != null) {
-      this.node.innerHTML = text;
-    }
-  }
-
-  render() {
-    this.node = document.createElement('p');
-    this.node.innerHTML = this.title;
-    this.node.className = 'vs-text';
-    return this.node;
+    this.node.innerHTML = text;
   }
 }
 

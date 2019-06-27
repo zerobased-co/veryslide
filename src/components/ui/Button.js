@@ -6,6 +6,8 @@ class Button extends View {
       className: 'vs-button',
       title: '',
     }.update(state));
+
+    this.node.addEventListener('click', this.onClick);
   }
 
   onClick(/*event*/) {
@@ -14,13 +16,6 @@ class Button extends View {
 
   on_title(text) {
     this.node.innerHTML = text;
-  }
-
-  render() {
-    super.render();
-    this.node.innerHTML = this.title;
-    this.node.addEventListener('click', this.onClick);
-    return this.node;
   }
 }
 

@@ -4,18 +4,63 @@ import channel from '../core/Channel';
 
 class PageThumb extends View {
   constructor(state) {
-    super(state);
-    this.pageInfo = null;
+    super({
+      className: 'vs-pagethumb',
+      width: 120,
+      height: 80,
+      page: null,
+      thumbnail: null,
+    }.update(state));
+
+    this.node.addEventListener('click', () => {
+      this.select();
+    });
 
     channel.bind(this, 'PageThumb:deselect', () => {
       this.deselect();
     });
   }
 
+  on_page(page) {
+    if (page != null) {
+      page.pagethumb = this;
+      this.height = this.width / (page.width / page.height);
+      this.updateThumbnail();
+    }
+  }
+
+  on_width(width) {
+    this.node.style.width = width + 'px';
+  }
+
+  on_height(height) {
+    this.node.style.height = height + 'px';
+  }
+
+  updateThumbnail() {
+    if (this.node == null) return;
+
+    // check invalidation
+    if (this.page.invalidate != true) return;
+    this.page.invalidate = false;
+
+    if (this.thumbnail != null) {
+      this.node.removeChild(this.thumbnail);
+    }
+
+    const scale = this.width / this.page.width;
+    this.thumbnail = this.page.node.cloneNode(true);
+    this.thumbnail.classList.remove('vs-page');
+    this.thumbnail.style.transform = 'scale(' + scale + ')';
+    this.thumbnail.style.transformOrigin = 'top left';
+    this.node.appendChild(this.thumbnail);
+  }
+
   select() {
-    channel.send('PageThumb:deselect', null);
+    channel.send('PageThumb:deselect');
     this.node.classList.toggle('focus');
-    channel.send('Viewport:selectPage', this.pageInfo);
+    this.updateThumbnail();
+    channel.send('Viewport:selectPage', this.page);
   }
 
   deselect() {
@@ -26,20 +71,13 @@ class PageThumb extends View {
     super.clear();
     channel.unbind(this);
   }
-
-  render() {
-    this.node = document.createElement('div');
-    this.node.className = 'vs-pagethumb';
-    this.node.addEventListener('click', () => {
-      this.select();
-    });
-    return this.node;
-  }
 }
 
 class PageList extends View {
   constructor(state) {
-    super(state);
+    super({
+      className: 'vs-pagelist',
+    }.update(state));
 
     this.pagethumbs = new List();
     channel.bind(this, 'PageList:addPage', this.addPage);
@@ -47,19 +85,20 @@ class PageList extends View {
     channel.bind(this, 'PageList:removePage', this.removePage);
   }
 
-  addPage(pageInfo) {
+  addPage(page) {
     let pagethumb = this.pagethumbs.spawn(PageThumb);
-    pagethumb.pageInfo = pageInfo;
-    this.pagethumbs.append(pagethumb);
+    pagethumb.page = page;
 
-    this.node.append(pagethumb.render());
+    this.pagethumbs.append(pagethumb);
+    this.appendChild(pagethumb);
+
     pagethumb.node.scrollIntoView();
     pagethumb.select();
   }
 
-  selectPage(pageInfo) {
+  selectPage(page) {
     let pagethumb = this.pagethumbs.findby((item) => {
-      return item.pageInfo.order == pageInfo.order;
+      return item.page.order == page.order;
     });
 
     if (pagethumb !== null) {
@@ -68,21 +107,15 @@ class PageList extends View {
     }
   }
 
-  removePage(pageInfo) {
+  removePage(page) {
     let pagethumb = this.pagethumbs.findby((item) => {
-      return item.pageInfo.order == pageInfo.order;
+      return item.page.order == page.order;
     });
 
     if (pagethumb !== null) {
       this.pagethumbs.remove(pagethumb);
       pagethumb.clear();
     }
-  }
-
-  render() {
-    this.node = document.createElement('div');
-    this.node.className = 'vs-pagelist';
-    return this.node;
   }
 }
 

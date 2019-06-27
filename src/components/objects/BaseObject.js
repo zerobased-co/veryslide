@@ -31,7 +31,7 @@ class BaseObject extends Node {
       y: 0,
       width: 0,
       height: 0,
-      color: '#ffffff',
+      color: '#FFFFFF',
       order: 0,
     }.update(state));
 
@@ -45,6 +45,12 @@ class BaseObject extends Node {
 
   record() {
     this.content = this.node.innerHTML;
+  }
+
+  on() {
+    if (this.page != null) {
+      this.page.invalidate = true;
+    }
   }
 
   on_x(x) {

@@ -21,8 +21,9 @@ class Menu extends View {
       ui.createButton(this, 'Remove page',   () => { channel.send('Document:removePage'); }),
       ui.createButton(this, 'Reset zoom',    () => { this.resetZoom(); }),
       this.btnSnap = 
-        ui.createButton(this, 'Snap Off',      () => { this.toggleSnap(); }),
+      ui.createButton(this, 'Snap Off',      () => { this.toggleSnap(); }),
       ui.createButton(this, 'New TextBox',   () => { channel.send('Document:addObject', 'TextBox'); }),
+      ui.createButton(this, 'New Image',     () => { channel.send('Document:addObject', 'ImageBox'); }),
       ui.createButton(this, 'New ImageList', () => { channel.send('Document:addObject', 'ImageList'); }),
       ui.createButton(this, 'Remove object', () => { channel.send('Document:removeObject'); }),
     ].forEach(item => this.appendChild(item));
@@ -39,7 +40,7 @@ class Menu extends View {
   }
 
   toggleSnap() {
-    let snap = channel.send('Viewport:toggleSnap', null)[0];
+    let snap = channel.send('Viewport:toggleSnap')[0];
     if (snap) {
       this.btnSnap.title = 'Snap On';
     } else {
@@ -80,10 +81,16 @@ class Viewport extends View {
     channel.bind(this, 'Viewport:clear', this.clear);
     channel.bind(this, 'Viewport:move', this.move);
     channel.bind(this, 'Viewport:zoom', this.zoom);
-    channel.bind(this, 'Viewport:addObject', this.addObject);
     channel.bind(this, 'Viewport:focus', this.focus);
     channel.bind(this, 'Viewport:blur', this.blur);
     channel.bind(this, 'Viewport:toggleSnap', this.toggleSnap);
+
+    setInterval(this.updateThumbnail.bind(this), 500)
+  }
+
+  updateThumbnail() {
+    if (this.page == null) return;
+    this.page.pagethumb.updateThumbnail();
   }
 
   clear() {
@@ -106,15 +113,6 @@ class Viewport extends View {
     this.setPageSnap();
     channel.send('Document:selectPage', page);
     channel.send('Property:setPanelFor', page);
-  }
-
-  addObject(object) {
-    this.page.node.append(object.node);
-  }
-
-  removeFocusedObject() {
-    if (this.object == null) return;
-    channel.send('Document:removeObject', this.object);
   }
   
   setPageSnap() {
@@ -235,7 +233,7 @@ class Viewport extends View {
 
       // delete
       if (event.keyCode === 46 || event.keyCode === 8) {
-        this.removeFocusedObject();
+        channel.send('Document:removeObject', this.object);
       }
 
       // [
@@ -359,9 +357,32 @@ class PanelForBox extends Panel {
       ui.createButton(this, 'Front',      () => { channel.send('Document:orderFront', this.object); }),
       ui.createButton(this, 'Backward',   () => { channel.send('Document:orderBackward', this.object); }),
       ui.createButton(this, 'Forward',    () => { channel.send('Document:orderForward', this.object); }),
+
+      ui.createText(this, 'Background Color'),
       new ui.ColorButton({ 
         color: this.object.color,
         onChange: value => { this.object.color = value; }, 
+      }),
+
+      ui.createText(this, 'Border'),
+      new ui.Select({
+        options: [['none', '----'], ['solid', 'Solid'], ['dashed', 'Dashed']],
+        value: this.object.borderStyle,
+        onChange: value => { this.object.borderStyle = value },
+      }),
+      new ui.InputText({
+        value: this.object.borderWidth, 
+        onChange: value => { this.object.borderWidth = value },
+      }),
+      new ui.ColorButton({ 
+        color: this.object.borderColor,
+        onChange: value => { this.object.borderColor = value; }, 
+      }),
+
+      ui.createText(this, 'Padding'),
+      new ui.InputText({
+        value: this.object.padding, 
+        onChange: value => { this.object.padding = value },
       }),
     ].forEach(item => this.appendChild(item));
     return this.node;
@@ -374,22 +395,29 @@ class PanelForTextBox extends PanelForBox {
 
     [
       ui.createText(this, 'PanelForTextBox'),
-      
-      new ui.ColorButton({
-        color: this.object.textColor,
-        onChange: value => { this.object.textColor = value },
-      }),
 
+      ui.createText(this, 'Text'),
       new ui.InputText({
-        title: 'Title',
         value: this.object.text, 
         onChange: value => { this.object.text = value },
       }),
 
+      ui.createText(this, 'Size'),
       new ui.InputText({
-        title: 'Size',
         value: this.object.size, 
         onChange: value => { this.object.size = value },
+      }),
+
+      ui.createText(this, 'Style'),
+      new ui.Select({
+        options: [['serif', 'Serif'], ['sans-serif', 'Sans serif'], ['monospace', 'Monospace']],
+        value: this.object.fontFamily,
+        onChange: value => { this.object.fontFamily = value },
+      }),
+
+      new ui.ColorButton({
+        color: this.object.textColor,
+        onChange: value => { this.object.textColor = value },
       }),
 
       new ui.CheckBox({
@@ -404,12 +432,36 @@ class PanelForTextBox extends PanelForBox {
         onChange: value => { this.object.italic = value },
       }),
 
+      ui.createText(this, 'Text Alignment'),
       new ui.Select({
         options: [['left', 'Left'], ['center', 'Center'], ['right', 'Right']],
         value: this.object.align,
         onChange: value => { this.object.align = value },
       }),
+
+      new ui.Select({
+        options: [['top', 'Top'], ['middle', 'Middle'], ['bottom', 'Bottom']],
+        value: this.object.verticalAlign,
+        onChange: value => { this.object.verticalAlign = value },
+      }),
     ].forEach(item => this.appendChild(item));
+
+    return this.node;
+  }
+}
+
+class PanelForImageBox extends Panel {
+  render() {
+    super.render();
+    this.appendChild(ui.createText(this, 'PanelForImageBox'));
+
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.addEventListener('change', event => {
+      var file = event.target.files[0];
+      this.object.file = file;
+    });
+    this.node.appendChild(input);
 
     return this.node;
   }
@@ -435,7 +487,6 @@ class PanelForImageList extends PanelForBox {
         var csv = readerEvent.target.result; // this is the content!
         var results = parse(csv, {header: true});
 
-        var item_height = randomInt(40, 60);
         var item_count = randomInt(10, 100);
         var item_start = randomInt(0, results.data.length - item_count);
 
@@ -445,8 +496,9 @@ class PanelForImageList extends PanelForBox {
 
           let node = document.createElement('img');
           node.src = 'static/logo/' + data['UID'] + '.png';
-          node.style.maxHeight = item_height + 'px';
-          node.style.maxWidth = (item_height * 1.25) + 'px';
+          node.style.maxHeight = this.object.itemMaxHeight + 'px';
+          node.style.maxWidth = this.object.itemMaxWidth + 'px';
+          node.style.margin = this.object.itemMargin + 'px';
           this.object.node.appendChild(node);
           this.object.record();
         }
@@ -465,6 +517,48 @@ class PanelForImageList extends PanelForBox {
       }
     });
     this.node.appendChild(input);
+    [
+      ui.createText(this, 'Align items'),
+      ui.createButton(this, 'Shuffle', () => { this.object.shuffle(); }),
+
+      ui.createText(this, 'Width'),
+      new ui.InputText({
+        value: this.object.itemMaxWidth, 
+        onChange: value => { this.object.itemMaxWidth = value },
+      }),
+
+      ui.createText(this, 'Height'),
+      new ui.InputText({
+        value: this.object.itemMaxHeight, 
+        onChange: value => { this.object.itemMaxHeight = value },
+      }),
+
+      ui.createText(this, 'Margin'),
+      new ui.InputText({
+        value: this.object.itemMargin, 
+        onChange: value => { this.object.itemMargin = value },
+      }),
+
+      new ui.Select({
+        options: [['row', 'Row'], ['column', 'Column']],
+        value: this.object.itemDirection,
+        onChange: value => { this.object.itemDirection = value },
+      }),
+
+      new ui.Select({
+        options: [
+          ['flex-start', 'Left'],
+          ['center', 'Center'],
+          ['flex-end', 'Right'],
+          ['space-between', 'Justify'],
+          ['space-around', 'Around'],
+          ['space-evenly', 'Evenly']
+        ],
+        value: this.object.itemAlign,
+        onChange: value => { this.object.itemAlign = value },
+      }),
+    ].forEach(item => this.appendChild(item));
+
     return this.node;
   }
 }
@@ -485,6 +579,9 @@ class Property extends View {
     switch(object.name) {
       case 'ImageList':
         this.panel = new PanelForImageList({object});
+        break;
+      case 'ImageBox':
+        this.panel = new PanelForImageBox({object});
         break;
       case 'TextBox':
         this.panel = new PanelForTextBox({object});

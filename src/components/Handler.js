@@ -1,4 +1,5 @@
 import View from './ui/View'
+import channel from '../core/Channel';
     
 const dotPreset = {
   'n': 'translate(-50%, -50%)',
@@ -27,6 +28,7 @@ class Handler extends View {
     this.snap = false;
     this.snapSize = 16;
 
+    channel.bind(this, 'Handler:connect', this.connect);
     this.node.addEventListener('mousedown', this.mousedown.bind(this));
   }
 

@@ -1,6 +1,7 @@
 import List from '../core/List';
 import BaseObject from './objects/BaseObject';
 import TextBox from './objects/TextBox';
+import ImageBox from './objects/ImageBox';
 import ImageList from './objects/ImageList';
 
 class Page extends BaseObject {
@@ -10,6 +11,9 @@ class Page extends BaseObject {
       className: 'vs-page',
       objects: new List(),
     }.update(state));
+
+    this.pagethumb = null;
+    this.invalidate = false;
   }
 
   addObject(type) {
@@ -18,12 +22,17 @@ class Page extends BaseObject {
       case 'TextBox':
         object = this.objects.spawn(TextBox);
         break;
+      case 'ImageBox':
+        object = this.objects.spawn(ImageBox);
+        break;
       case 'ImageList':
         object = this.objects.spawn(ImageList);
         break;
     }
     object.page = this;
     this.objects.append(object);
+    this.node.append(object.node);
+    this.invalidate = true;
     return object;
   }
 
@@ -40,12 +49,14 @@ class Page extends BaseObject {
   removeObject(object) {
     object.node.parentNode.removeChild(object.node);
     this.objects.remove(object);
+    this.invalidate = true;
   }
 
   reorder() {
     this.objects.iter((object) => {
       object.node.style.zIndex = object.order;
     });
+    this.invalidate = true;
   }
 
   render() {

@@ -1,0 +1,7 @@
+@import 'BaseObject';
+
+.vs-imagebox {
+  @extend .vs-object;
+
+  overflow: hidden;
+}

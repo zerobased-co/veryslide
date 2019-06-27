@@ -4,10 +4,10 @@ export function randomInt(min, max) {
 
 export function randomColor() {
   var colors = [
-    "#1abc9c", "#2ecc71", "#3498db", "#9b59b6",
-    "#34495e", "#16a085", "#27ae60", "#2980b9",
-    "#e74c3c", "#657f86", "#95a5a6", "#f39c12",
-    "#d35400", "#c0392b", "#bdc3c7", "#7f8c8d",
+    "#1ABC9C", "#2ECC71", "#3498DB", "#9B59B6",
+    "#34495E", "#16A085", "#27AE60", "#2980B9",
+    "#E74C3C", "#657F86", "#95A5A6", "#F39C12",
+    "#D35400", "#C0392B", "#BDC3C7", "#7F8C8D",
   ];
   return colors[randomInt(0, colors.length - 1)];
 }
@@ -27,4 +27,14 @@ export function properTextColor(color) {
   } else {
     return '#FFFFFF';
   }
+}
+
+export function debounce(func, delay) {
+  let inDebounce;
+  return function() {
+    const context = this;
+    const args = arguments;
+    clearTimeout(inDebounce);
+    inDebounce = setTimeout(() => func.apply(context, args), delay);
+  };
 }

@@ -44,10 +44,11 @@
   border: 1px solid #ccc;
   box-shadow: 0 0 5px 2px #ddd;
   transition: all 0.1s ease-out;
+  overflow: hidden;
 }
 
 .vs-pagethumb.focus {
-  border: 2px solid #FFC120;
+  outline: 2px solid #FFC120;
   box-shadow: 0 0 5px 3px #aaa;
 }
 

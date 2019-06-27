@@ -6,13 +6,14 @@ class TextBox extends Box {
     super({
       name: 'TextBox',
       className: 'vs-textbox',
+      fontFamily: 'sans-serif',
       text: 'Text',
-      textColor: '#ffffff',
+      textColor: '#FFFFFF',
       size: 14,
       bold: false,
       italic: false,
       align: 'center',
-      verticalAlign: 'center',
+      verticalAlign: 'middle',
     }.update(state));
   }
 
@@ -29,6 +30,10 @@ class TextBox extends Box {
 
     // copy text from node
     this.text = this.node.innerText;
+  }
+
+  on_fontFamily(font) {
+    this.node.style.fontFamily = font;
   }
 
   on_size(size) {

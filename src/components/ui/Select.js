@@ -4,44 +4,43 @@ class Select extends View {
   constructor(state) {
     super({
       className: 'vs-checkbox',
-      title: '',
       value: null,
       options: [],
     }.update(state));
   }
 
-  onChange(event) {
-    console.log('onChange', this);
+  onChange(value) {
+    console.log('onChange', value, this);
   }
 
   on_value(value) {
-    if (this.node != null) {
-    }
-  }
-
-  on_title(title) {
-    if (this.node != null) {
-      this.label.innerText = title;
-    }
+    this.select.value = value;
   }
 
   on_options(options) {
+    this.select.innerHTML = '';
+
+    options.forEach(option => {
+      let tag = document.createElement('option');
+      tag.value = option[0];
+      tag.innerText = option[1];
+      if (this.value == tag.value) {
+        tag.selected = true;
+      }
+      this.select.appendChild(tag);
+    });
   }
 
   change(event) {
-    this.onChange(this.input.checked);
+    this.onChange(this.select.value);
   }
 
   render() {
     super.render();
 
-    this.label = document.createElement('label');
-    this.label.innerText = this.title;
-    this.node.appendChild(this.label);
-
-    this.input = document.createElement('select');
-    this.input.addEventListener('change', this.change.bind(this));
-    this.node.appendChild(this.input);
+    this.select = document.createElement('select');
+    this.select.addEventListener('change', this.change.bind(this));
+    this.node.appendChild(this.select);
 
     return this.node;
   }

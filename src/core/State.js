@@ -43,6 +43,10 @@ class State {
         }
       }
     }
+
+    if (this['on'] != null) {
+      this['on'].bind(this)();
+    }
   }
 }
 

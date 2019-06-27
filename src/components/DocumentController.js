@@ -35,7 +35,6 @@ class DocumentController {
     channel.bind(this, 'Document:addObject', (value) => {
       if (this.page === null) return;
       let newObject = this.page.addObject(value);
-      channel.send('Viewport:addObject', newObject);
       channel.send('Viewport:focus', newObject);
     });
 
@@ -48,7 +47,7 @@ class DocumentController {
       this.page.removeObject(this.object);
       this.object = null;
 
-      channel.send('Viewport:blur', null);
+      channel.send('Viewport:blur');
     });
 
     channel.bind(this, 'Document:orderBack', (object) => {

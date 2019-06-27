@@ -1,5 +1,6 @@
 import View from './View.js';
 import { ColorPicker } from 'codemirror-colorpicker';
+import { properTextColor } from '../../core/Util';
 import 'codemirror-colorpicker/dist/codemirror-colorpicker.css';
 
 class ColorButton extends View {
@@ -12,6 +13,7 @@ class ColorButton extends View {
     this.colorPicker = new ColorPicker({
       color: this.color,
       type : 'ColorPicker',
+      outputFormat : 'hex',
     });
   }
 
@@ -34,6 +36,7 @@ class ColorButton extends View {
     if (this.node != null) {
       this.node.style.backgroundColor = color;
       this.node.innerText = color;
+      this.node.style.color = properTextColor(color);
     }
   }
 
@@ -41,6 +44,7 @@ class ColorButton extends View {
     super.render();
     this.node.style.backgroundColor = this.color;
     this.node.innerText = this.color;
+    this.node.style.color = properTextColor(this.color);
     this.node.addEventListener('click', this.showPicker.bind(this));
     return this.node;
   }

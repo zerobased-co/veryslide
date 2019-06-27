@@ -23,6 +23,7 @@ class TextBox extends Box {
   blur() {
     this.node.contentEditable = 'false';
     this.node.blur();
+    window.getSelection().removeAllRanges();
 
     // copy text from node
     this.text = this.node.innerText;

@@ -11,7 +11,7 @@ class Veryslide {
     this.editor = new Editor();
     this.documentController = new DocumentController(this.document, this.editor);
 
-    this.target.appendChild(this.editor.render());
+    this.target.appendChild(this.editor.node);
   }
 }
 

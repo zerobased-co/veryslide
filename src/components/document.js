@@ -27,6 +27,16 @@ class Page extends BaseObject {
     return object;
   }
 
+  findObject(x, y) {
+    let found = null;
+    this.objects.iter((object) => {
+      if (object.contain(x, y) === true) {
+        found = object;
+      }
+    });
+    return found;
+  }
+
   removeObject(object) {
     object.node.parentNode.removeChild(object.node);
     this.objects.remove(object);

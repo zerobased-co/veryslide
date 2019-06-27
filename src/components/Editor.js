@@ -20,7 +20,8 @@ class Menu extends View {
       ui.createButton(this, 'Add a page',    () => { channel.send('Document:addPage'); }),
       ui.createButton(this, 'Remove page',   () => { channel.send('Document:removePage'); }),
       ui.createButton(this, 'Reset zoom',    () => { this.resetZoom(); }),
-      ui.createButton(this, 'Snap Off',      () => { this.toggleSnap(); }),
+      this.btnSnap = 
+        ui.createButton(this, 'Snap Off',      () => { this.toggleSnap(); }),
       ui.createButton(this, 'New TextBox',   () => { channel.send('Document:addObject', 'TextBox'); }),
       ui.createButton(this, 'New ImageList', () => { channel.send('Document:addObject', 'ImageList'); }),
       ui.createButton(this, 'Remove object', () => { channel.send('Document:removeObject'); }),
@@ -51,41 +52,16 @@ class Navigator extends View {
   constructor(state) {
     super({
       className: 'vs-navigator',
-      children: new List([new PageList()]),
+      children: new List(new PageList()),
     }.update(state));
   }
 }
 
-class Page extends View {
-  constructor(state) {
-    super(state);
-    this.page = null;
-  }
-
-  setup(page) {
-    this.page = page;
-  }
-
-  findObject(x, y) {
-    let found = null;
-    this.page.objects.iter((object) => {
-      if (object.contain(x, y) === true) {
-        found = object;
-      }
-    });
-    return found;
-  }
-
-  render() {
-    this.node = this.page.node;
-    return this.node;
-  }
-}
-
-
 class Viewport extends View {
   constructor(state) {
-    super(state);
+    super({
+      className: 'vs-viewport',
+    }.update(state));
 
     this.page = null;
     this.object = null;
@@ -99,7 +75,6 @@ class Viewport extends View {
     this.translate = {x: 0, y: 0};
     this.scale = 1.0;
     //this.zoomLevel = [10, 25, 50, 75, 100, 200, 400];
-    this.handler = null;
 
     channel.bind(this, 'Viewport:selectPage', this.selectPage);
     channel.bind(this, 'Viewport:clear', this.clear);
@@ -122,12 +97,12 @@ class Viewport extends View {
 
   selectPage(page) {
     this.clear();
-    this.page = new Page();
-    this.page.setup(page);
-    this.node.append(this.page.render());
+    this.page = page;
+
+    this.node.append(this.page.node);
     this.page.node.appendChild(this.handler.node);
 
-    this.update();
+    this.updateTransform();
     this.setPageSnap();
     channel.send('Document:selectPage', page);
     channel.send('Property:setPanelFor', page);
@@ -159,10 +134,10 @@ class Viewport extends View {
     return this.snap;
   }
 
-  update() {
+  updateTransform() {
     if (this.page == null) return;
     this.page.node.style.transform = 'translate(' + this.translate.x + 'px, ' + this.translate.y + 'px) scale(' + this.scale + ')';
-    this.handler.update();
+    this.handler.updateTransform();
   }
 
   focus(object) {
@@ -192,7 +167,7 @@ class Viewport extends View {
     this.handler.show(false);
     channel.send('Document:selectObject', null);
     if (this.page) {
-      channel.send('Property:setPanelFor', this.page.page);
+      channel.send('Property:setPanelFor', this.page);
     }
   }
 
@@ -201,27 +176,26 @@ class Viewport extends View {
       x: args[0],
       y: args[1],
     };
-    this.update();
+    this.updateTransform();
   }
 
   zoom(scale) {
     this.scale = scale;
-    this.update();
+    this.updateTransform();
   }
 
   zoomOut() {
     this.scale = this.scale - 0.1;
-    this.update();
+    this.updateTransform();
   }
 
   zoomIn() {
     this.scale = this.scale + 0.1;
-    this.update();
+    this.updateTransform();
   }
 
   render() {
-    this.node = document.createElement('div');
-    this.node.className = 'vs-viewport';
+    super.render();
     this.node.tabIndex = '0';
 
     window.addEventListener('keydown', event => {
@@ -293,7 +267,7 @@ class Viewport extends View {
 
         this.translate.x = dx;
         this.translate.y = dy;
-        this.update();
+        this.updateTransform();
       }
     });
 
@@ -365,7 +339,13 @@ class PanelForDocument extends Panel {
 class PanelForPage extends Panel {
   render() {
     super.render();
-    this.appendChild(ui.createText(this, 'PanelForPage'));
+    [
+      ui.createText  (this, 'PanelForPage'),
+      new ui.ColorButton({ 
+        color: this.object.color,
+        onChange: value => { this.object.color = value; }, 
+      }),
+    ].forEach(item => this.appendChild(item));
     return this.node;
   }
 }
@@ -491,12 +471,10 @@ class PanelForImageList extends PanelForBox {
 
 class Property extends View {
   constructor(state) {
-    super(state);
-
-    this.titlebar = new ui.TitleBar();
-    this.titlebar.title = 'Property';
-    this.panel = new ui.Panel();
-    this.object = null;
+    super({
+      className: 'vs-property',
+      object: null,
+    }.update(state));
 
     channel.bind(this, 'Property:setPanelFor', this.setPanelFor);
   }
@@ -506,29 +484,32 @@ class Property extends View {
 
     switch(object.name) {
       case 'ImageList':
-        this.panel = new PanelForImageList();
+        this.panel = new PanelForImageList({object});
         break;
       case 'TextBox':
-        this.panel = new PanelForTextBox();
+        this.panel = new PanelForTextBox({object});
         break;
       case 'Page':
-        this.panel = new PanelForPage();
+        this.panel = new PanelForPage({object});
         break;
       case 'Document':
-        this.panel = new PanelForDocument();
+        this.panel = new PanelForDocument({object});
         break;
     }
-    this.panel.object = object;
     this.titlebar.title = object.name + ' Property';
-    this.node.appendChild(this.panel.render());
+    this.appendChild(this.panel);
     return this.panel;
   }
 
   render() {
     super.render();
-    this.node.className = 'vs-property';
-    this.node.appendChild(this.titlebar.render());
-    this.node.appendChild(this.panel.render());
+
+    this.titlebar = new ui.TitleBar();
+    this.titlebar.title = 'Property';
+    this.panel = new ui.Panel();
+
+    this.appendChild(this.titlebar);
+    this.appendChild(this.panel);
     return this.node;
   }
 }
@@ -546,26 +527,21 @@ class Editor extends View {
     super({
       className: 'vs-editor',
     }.update(state));
-
-    this.menu = new Menu();
-    this.navigator = new Navigator();
-    this.viewport = new Viewport();
-    this.toolbox = new ToolBox();
-    this.property = new Property();
   }
 
   render() {
     super.render();
-    this.appendChild(this.menu);
+    this.appendChild(new Menu());
 
     let row = new ui.Horizon();
     this.appendChild(row);
 
-    row.appendChild(this.navigator);
-    row.appendChild(this.viewport);
-    row.appendChild(this.toolbox);
+    row.appendChild(new Navigator());
+    row.appendChild(new Viewport());
+    row.appendChild(new ToolBox({children: new List(
+      new Property(),
+    )}));
 
-    this.toolbox.appendChild(this.property);
     return this.node;
   }
 }

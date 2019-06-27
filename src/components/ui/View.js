@@ -5,33 +5,25 @@ class View extends State {
   constructor(state) {
     super({
       className: 'vs-view',
-      node: null,
       parent: null,
       children: new List(),
     }.update(state));
 
-    this.node = null;
     if (this.parent != null) {
       this.parent.children.append(this);
     }
 
+    this.render();
     this.updateState();
   }
 
   clear() {
-    if (this.state['node'] != null) {
-      if (this.state['node'].parentNode != null) {
-        this.state['node'].parentNode.removeChild(this.state['node']);
+    if (this.node != null) {
+      if (this.node.parentNode != null) {
+        this.node.parentNode.removeChild(this.node);
       }
-      this.state['node'] = null;
+      this.node = null;
     }
-  }
-
-  _node() {
-    if (this.state['node'] == null) {
-      this.node = this.render();
-    }
-    return this.state['node'];
   }
 
   render() {
@@ -44,6 +36,7 @@ class View extends State {
       child.parent = this;
       this.node.appendChild(child.node);
     });
+
     return this.node;
   }
 

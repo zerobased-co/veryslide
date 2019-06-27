@@ -12,8 +12,8 @@ class ColorButton extends View {
 
     this.colorPicker = new ColorPicker({
       color: this.color,
-      type : 'ColorPicker',
       outputFormat : 'hex',
+      hideDelay: 2000,
     });
 
     this.node.addEventListener('click', this.showPicker.bind(this));

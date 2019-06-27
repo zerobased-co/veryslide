@@ -14,15 +14,11 @@ class CheckBox extends View {
   }
 
   on_checked(checked) {
-    if (this.input != null) {
-      this.input.checked = checked;
-    }
+    this.input.checked = checked;
   }
 
   on_title(title) {
-    if (this.label != null) {
-      this.label.innerText = title;
-    }
+    this.label.innerText = title;
   }
 
   change(/*event*/) {
@@ -34,12 +30,10 @@ class CheckBox extends View {
 
     this.input = document.createElement('input');
     this.input.type = 'checkbox';
-    this.input.checked = this.checked;
     this.input.addEventListener('change', this.change.bind(this));
     this.node.appendChild(this.input);
 
     this.label = document.createElement('label');
-    this.label.innerText = this.title;
     this.node.appendChild(this.label);
 
     return this.node;

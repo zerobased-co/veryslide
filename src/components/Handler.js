@@ -1,11 +1,24 @@
 import View from './ui/View'
+    
+const dotPreset = {
+  'n': 'translate(-50%, -50%)',
+  'e': 'translate(50%, -50%)',
+  'w': 'translate(-50%, -50%)',
+  's': 'translate(-50%, 50%)',
+  'nw': 'translate(-50%, -50%)',
+  'ne': 'translate(50%, -50%)',
+  'se': 'translate(50%, 50%)',
+  'sw': 'translate(-50%, 50%)',
+};
 
 class Handler extends View {
-  constructor(...args) {
-    super(...args);
+  constructor(state) {
+    super({
+      className: 'vs-handler',
+    }.update(state));
+
     this.object = null;
     this.viewport = null;
-
     this.transform = null;
     this.dragStart = undefined;
     this.basePos = undefined;
@@ -13,19 +26,8 @@ class Handler extends View {
     this.currentDot = null;
     this.snap = false;
     this.snapSize = 16;
-    
-    this.dotPreset = {
-      'n': 'translate(-50%, -50%)',
-      'e': 'translate(50%, -50%)',
-      'w': 'translate(-50%, -50%)',
-      's': 'translate(-50%, 50%)',
-      'nw': 'translate(-50%, -50%)',
-      'ne': 'translate(50%, -50%)',
-      'se': 'translate(50%, 50%)',
-      'sw': 'translate(-50%, 50%)',
-    };
 
-    this.node = this.render();
+    this.node.addEventListener('mousedown', this.mousedown.bind(this));
   }
 
   connect(object) {
@@ -46,13 +48,13 @@ class Handler extends View {
     }
   }
 
-  update() {
+  updateTransform() {
     if (this.viewport == null) return;
 
     let dots = this.node.getElementsByClassName('vs-dot');
     for(var i = 0; i < dots.length; i++) {
       let type = dots[i].innerHTML;
-      dots[i].style.transform = this.dotPreset[type] + ' scale(' + (1 / this.viewport.scale) + ')';
+      dots[i].style.transform = dotPreset[type] + ' scale(' + (1 / this.viewport.scale) + ')';
     }
   }
 
@@ -190,19 +192,16 @@ class Handler extends View {
   }
 
   render() {
-    let node = document.createElement('div');
-    node.className = 'vs-handler';
+    super.render();
 
     // Add 8 handler dots
-    Object.getOwnPropertyNames(this.dotPreset).forEach(key => {
+    Object.getOwnPropertyNames(dotPreset).forEach(key => {
       let dot = document.createElement('div');
       dot.className = 'vs-dot ' + key;
       dot.innerText = key;
-      node.appendChild(dot);
+      this.node.appendChild(dot);
     });
-
-    node.addEventListener('mousedown', this.mousedown.bind(this));
-    return node;
+    return this.node;
   }
 }
 

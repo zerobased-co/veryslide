@@ -1,13 +1,13 @@
 class List {
-  constructor(children) {
+  constructor(...args) {
     this.head = null;
     this.tail = null;
     this.array = new Array();
     this.count = 0;
 
-    if (children != null) {
-      for(var i = 0; i < children.length; i++) {
-        this.append(children[i]);
+    if (args != null) {
+      for(var i = 0; i < args.length; i++) {
+        this.append(args[i]);
       }
     }
   }

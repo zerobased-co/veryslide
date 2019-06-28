@@ -207,6 +207,9 @@ class Handler extends View {
       dot.innerText = key;
       this.node.appendChild(dot);
     });
+
+    // To be ignored
+    this.node.setAttribute('data-html2canvas-ignore', 'true');
     return this.node;
   }
 }

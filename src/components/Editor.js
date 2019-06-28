@@ -26,6 +26,7 @@ class Menu extends View {
       ui.createButton(this, 'New Image',     () => { channel.send('Document:addObject', 'ImageBox'); }),
       ui.createButton(this, 'New ImageList', () => { channel.send('Document:addObject', 'ImageList'); }),
       ui.createButton(this, 'Remove object', () => { channel.send('Document:removeObject'); }),
+      ui.createButton(this, 'Save',          () => { channel.send('Document:savePage'); }),
     ].forEach(item => this.appendChild(item));
 
     channel.bind(this, 'Menu:resetZoom', this.resetZoom);
@@ -125,8 +126,12 @@ class Viewport extends View {
     }
   }
 
-  toggleSnap() {
-    this.snap = !this.snap;
+  toggleSnap(show = null) {
+    if (show != null) {
+      this.snap = show;
+    } else {
+      this.snap = !this.snap;
+    }
     this.handler.snap = this.snap;
     this.setPageSnap();
     return this.snap;
@@ -241,6 +246,7 @@ class Viewport extends View {
 
       // delete
       if (event.keyCode === 46 || event.keyCode === 8) {
+        event.preventDefault();
         channel.send('Document:removeObject', this.object);
       }
 

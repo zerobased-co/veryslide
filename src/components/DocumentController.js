@@ -1,3 +1,4 @@
+import html2canvas from 'html2canvas';
 import channel from '../core/Channel';
 import { Page } from './Document';
 import TextBox from './objects/TextBox';
@@ -96,14 +97,12 @@ class DocumentController {
       let newObject = null;
 
       switch(this.clipboard.type) {
-      /*
         case 'ImageList':
           newObject = new ImageList(this.clipboard.state);
           break;
         case 'ImageBox':
-          this.panel = new PanelForImageBox({object});
+          newObject = new ImageBox(this.clipboard.state);
           break;
-          */
         case 'TextBox':
           newObject = new TextBox(this.clipboard.state);
           break;
@@ -134,6 +133,28 @@ class DocumentController {
           }
         }
       }
+    });
+
+    channel.bind(this, 'Document:savePage', () => {
+      if (this.page == null) return;
+
+      // TBD: we have to hide things before capturing
+
+      html2canvas(this.page.node, {
+        allowTaint: true,
+      }).then((canvas) => {
+        var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+
+        var link = document.createElement("a");
+        link.download = 'veryslide' + (this.page.order + 1) + '.png';
+        link.href = image;
+
+        document.body.appendChild(link);
+        link.click();
+
+        // Cleanup the DOM
+        document.body.removeChild(link);
+      });
     });
   }
 }

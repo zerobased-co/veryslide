@@ -6,11 +6,11 @@ class View extends State {
     super({
       className: 'vs-view',
       parent: null,
-      children: new List(),
+      children: [],
     }.update(state));
 
     if (this.parent != null) {
-      this.parent.children.append(this);
+      this.parent.children.push(this);
     }
 
     this.render();
@@ -32,9 +32,8 @@ class View extends State {
     this.node = document.createElement('div');
     this.node.className = this.className;
 
-    this.children.iter((child) => {
-      child.parent = this;
-      this.node.appendChild(child.node);
+    this.children.forEach((child) => {
+      this.appendChild(child);
     });
 
     return this.node;
@@ -43,9 +42,13 @@ class View extends State {
   appendChild(child) {
     // TODO: only View can be added as child
     // TODO: add children at once
-    child.parent = this;
-    this.children.append(child);
-    this.node.appendChild(child.node);
+    if (child.hasOwnProperty('state')) {
+      child.parent = this;
+      this.children.push(child);
+      this.node.appendChild(child.node);
+    } else {
+      this.node.appendChild(child);
+    }
   }
 }
 

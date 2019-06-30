@@ -9,20 +9,20 @@ class InputText extends View {
   }
 
   render() {
-    this.clear();
-
-    this.node = document.createElement('input');
-    this.node.type = 'text';
-    this.node.addEventListener('input', this.input.bind(this));
+    super.render();
+    this.input = document.createElement('input');
+    this.input.type = 'text';
+    this.input.addEventListener('input', this.handler.bind(this));
+    this.node.appendChild(this.input);
     return this.node;
   }
 
   on_value(text) {
-    this.node.value = text;
+    this.input.value = text;
   }
 
-  input(/*event*/) {
-    this.value = this.node.value;
+  handler(/*event*/) {
+    this.value = this.input.value;
     this.onChange(this.value);
   }
 

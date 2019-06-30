@@ -6,6 +6,7 @@ class Node extends State {
     super({
       type: 'Node',
       className: 'vs-node',
+      content: '',
     }.update(state));
 
     this.node = this.render();
@@ -35,7 +36,6 @@ class BaseObject extends Node {
       order: 0,
     }.update(state));
 
-    this.content = null;
     this.page = null;
   }
 
@@ -43,8 +43,16 @@ class BaseObject extends Node {
     return (x >= this.x) && (x < this.x + this.width) && (y >= this.y) && (y < this.y + this.height);
   }
 
+  clear() {
+    this.content = '';
+  }
+
   record() {
     this.content = this.node.innerHTML;
+  }
+
+  on_content(content) {
+    this.node.innerHTML = content;
   }
 
   on() {
@@ -75,14 +83,6 @@ class BaseObject extends Node {
 
   on_color(color) {
     this.node.style.backgroundColor = color;
-  }
-
-  render() {
-    let node = super.render();
-    if (this.content) {
-      node.innerHTML = this.content;
-    }
-    return node;
   }
 }
 

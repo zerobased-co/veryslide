@@ -1,3 +1,5 @@
+$button-radius: 5px;
+
 .vs-view {
 }
 
@@ -13,14 +15,44 @@
   flex: 1;
 }
 
+.vs-horizon + .vs-horizon {
+  margin-top: 4px;
+}
+
+.vs-hgroup {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  .vs-button {
+    &:active {
+      transform: scale(1.0, 0.95);
+    }
+  }
+  *:first-child {
+    border-radius: $button-radius 0 0 $button-radius;
+  }
+  *:last-child {
+    border-radius: 0 $button-radius $button-radius 0;
+  }
+  *:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+  *:not(:last-child) {
+    border-right: none;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}
+
 .vs-button {
-  width: 100px;
+  width: 80px;
   height: 30px;
-  margin: 10px;
   font-size: 0.8em;
 
   border: 1px solid #ccc;
-  border-radius: 3px;
+  border-radius: $button-radius;
 
   display: flex;
   align-items: center;
@@ -41,6 +73,38 @@
     box-shadow: 0 0 5px 0px #eee;
     transition: all 0.1s ease-out;
   }
+
+  &.small {
+    width: 64px;
+    font-size: 0.7em;
+  }
+}
+
+.vs-text {
+  font-size: 0.8em;
+}
+
+.vs-text-40 {
+  font-size: 0.8em;
+  width: 40px;
+  line-height: 30px;
+  height: 30px;
+  color: #444;
+  text-shadow: 1px 1px 0px #eee;
+}
+
+.vs-text-80 {
+  font-size: 0.8em;
+  width: 80px;
+  line-height: 30px;
+  height: 30px;
+  color: #444;
+  text-shadow: 1px 1px 0px #eee;
+}
+
+.vs-text-140 {
+  @extend .vs-text-80;
+  width: 140px;
 }
 
 .vs-panel {
@@ -62,4 +126,31 @@
 .vs-colorbutton {
   @extend .vs-button;
   cursor: pointer;
+}
+
+.vs-filter {
+}
+
+.vs-inputtext input[type='text'] {
+  border: 1px solid #ccc;
+  height: 30px;
+  width: 64px;
+  border-radius: $button-radius;
+}
+
+.vs-select select {
+  border: 1px solid #ccc;
+  height: 30px;
+  width: 64px;
+  border-radius: $button-radius;
+}
+
+.vs-checkbox {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.vs-checkbox label {
+  font-size: 0.8em;
 }

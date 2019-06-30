@@ -6,8 +6,6 @@ import Panel from './ui/Panel';
 import PageList from './PageList';
 import Handler from './Handler';
 import channel from '../core/Channel';
-import List from '../core/List';
-import { randomInt } from '../core/Util';
 
 
 class Menu extends View {
@@ -17,16 +15,32 @@ class Menu extends View {
     }.update(state));
 
     [
-      ui.createButton(this, 'Add a page',    () => { channel.send('Document:addPage'); }),
-      ui.createButton(this, 'Remove page',   () => { channel.send('Document:removePage'); }),
-      ui.createButton(this, 'Reset zoom',    () => { this.resetZoom(); }),
-      this.btnSnap = 
-      ui.createButton(this, 'Snap Off',      () => { this.toggleSnap(); }),
-      ui.createButton(this, 'New TextBox',   () => { channel.send('Document:addObject', 'TextBox'); }),
-      ui.createButton(this, 'New Image',     () => { channel.send('Document:addObject', 'ImageBox'); }),
-      ui.createButton(this, 'New ImageList', () => { channel.send('Document:addObject', 'ImageList'); }),
-      ui.createButton(this, 'Remove object', () => { channel.send('Document:removeObject'); }),
-      ui.createButton(this, 'Save',          () => { channel.send('Document:savePage'); }),
+      new ui.Text({'title': 'Page'}),
+      ui.HGroup(
+        ui.createButton('Add',    () => { channel.send('Document:addPage'); }),
+        ui.createButton('Remove',   () => { channel.send('Document:removePage'); }),
+      ),
+
+      new ui.Text({'title': 'Viewport'}),
+      ui.HGroup(
+        ui.createButton('Reset zoom',    () => { this.resetZoom(); }),
+        this.btnSnap = 
+        ui.createButton('Snap Off',      () => { this.toggleSnap(); }),
+      ),
+
+      new ui.Text({'title': 'Object'}),
+      ui.HGroup(
+        ui.createButton('TextBox',   () => { channel.send('Document:addObject', 'TextBox'); }),
+        ui.createButton('Image',     () => { channel.send('Document:addObject', 'ImageBox'); }),
+        ui.createButton('ImageList', () => { channel.send('Document:addObject', 'ImageList'); }),
+      ),
+      ui.createButton('Remove', () => { channel.send('Document:removeObject'); }),
+
+      new ui.Text({'title': 'Export'}),
+      ui.HGroup(
+        ui.createButton('Image', () => { channel.send('Document:savePage', 'image'); }),
+        ui.createButton('PDF',   () => { channel.send('Document:savePage', 'pdf'); }),
+      ),
     ].forEach(item => this.appendChild(item));
 
     channel.bind(this, 'Menu:resetZoom', this.resetZoom);
@@ -54,7 +68,7 @@ class Navigator extends View {
   constructor(state) {
     super({
       className: 'vs-navigator',
-      children: new List(new PageList()),
+      children: [new PageList()],
     }.update(state));
   }
 }
@@ -343,7 +357,7 @@ class Viewport extends View {
 class PanelForDocument extends Panel {
   render() {
     super.render();
-    this.appendChild(ui.createText(this, 'PanelForDocument'));
+    this.appendChild(ui.createText('PanelForDocument'));
     return this.node;
   }
 }
@@ -352,7 +366,7 @@ class PanelForPage extends Panel {
   render() {
     super.render();
     [
-      ui.createText  (this, 'PanelForPage'),
+      ui.createText('PanelForPage'),
       new ui.ColorButton({ 
         color: this.object.color,
         onChange: value => { this.object.color = value; }, 
@@ -366,38 +380,67 @@ class PanelForBox extends Panel {
   render() {
     super.render();
     [
-      ui.createText  (this, 'PanelForBox'),
-      ui.createButton(this, 'Back',       () => { channel.send('Document:orderBack', this.object); }),
-      ui.createButton(this, 'Front',      () => { channel.send('Document:orderFront', this.object); }),
-      ui.createButton(this, 'Backward',   () => { channel.send('Document:orderBackward', this.object); }),
-      ui.createButton(this, 'Forward',    () => { channel.send('Document:orderForward', this.object); }),
+      ui.H(
+        ui.createText('Object'),
+        ui.V(
+          ui.H(
+            ui.createText('Position'),
+            ui.createInputText(this.object, 'x'),
+            ui.createInputText(this.object, 'y'),
+          ),
+          ui.H(
+            ui.createText('Size'),
+            ui.createInputText(this.object, 'width'),
+            ui.createInputText(this.object, 'height'),
+          ),
+        ),
+      ),
+      ui.H(
+        ui.createText('Order'),
+        new ui.Vertical({children: [
+          ui.HGroup(
+            ui.createButton('Back',       () => { channel.send('Document:orderBack', this.object); }),
+            ui.createButton('Front',      () => { channel.send('Document:orderFront', this.object); }),
+          ),
+          ui.HGroup(
+            ui.createButton('Backward',   () => { channel.send('Document:orderBackward', this.object); }),
+            ui.createButton('Forward',    () => { channel.send('Document:orderForward', this.object); }),
+          ),
+        ]}),
+      ),
 
-      ui.createText(this, 'Background Color'),
-      new ui.ColorButton({ 
-        color: this.object.color,
-        onChange: value => { this.object.color = value; }, 
-      }),
+      ui.H(
+        ui.createText('Background'),
+        new ui.ColorButton({ 
+          color: this.object.color,
+          onChange: value => { this.object.color = value; }, 
+        }),
+      ),
 
-      ui.createText(this, 'Border'),
-      new ui.Select({
-        options: [['none', '----'], ['solid', 'Solid'], ['dashed', 'Dashed']],
-        value: this.object.borderStyle,
-        onChange: value => { this.object.borderStyle = value },
-      }),
-      new ui.InputText({
-        value: this.object.borderWidth, 
-        onChange: value => { this.object.borderWidth = value },
-      }),
-      new ui.ColorButton({ 
-        color: this.object.borderColor,
-        onChange: value => { this.object.borderColor = value; }, 
-      }),
+      ui.H(
+        ui.createText('Border'),
+        new ui.Select({
+          options: [['none', '----'], ['solid', 'Solid'], ['dashed', 'Dashed']],
+          value: this.object.borderStyle,
+          onChange: value => { this.object.borderStyle = value },
+        }),
+        new ui.InputText({
+          value: this.object.borderWidth, 
+          onChange: value => { this.object.borderWidth = value },
+        }),
+        new ui.ColorButton({ 
+          color: this.object.borderColor,
+          onChange: value => { this.object.borderColor = value; }, 
+        }),
+      ),
 
-      ui.createText(this, 'Padding'),
-      new ui.InputText({
-        value: this.object.padding, 
-        onChange: value => { this.object.padding = value },
-      }),
+      ui.H(
+        ui.createText('Padding'),
+        new ui.InputText({
+          value: this.object.padding, 
+          onChange: value => { this.object.padding = value },
+        }),
+      ),
     ].forEach(item => this.appendChild(item));
     return this.node;
   }
@@ -408,56 +451,58 @@ class PanelForTextBox extends PanelForBox {
     super.render();
 
     [
-      ui.createText(this, 'PanelForTextBox'),
+      ui.H(
+        ui.createText('Text'),
+        new ui.InputText({
+          value: this.object.text, 
+          onChange: value => { this.object.text = value },
+        }),
+      ),
 
-      ui.createText(this, 'Text'),
-      new ui.InputText({
-        value: this.object.text, 
-        onChange: value => { this.object.text = value },
-      }),
+      ui.H(
+        ui.createText('Font'),
+        new ui.InputText({
+          value: this.object.size, 
+          onChange: value => { this.object.size = value },
+        }),
+        new ui.Select({
+          options: [['serif', 'Serif'], ['sans-serif', 'Sans serif'], ['monospace', 'Monospace']],
+          value: this.object.fontFamily,
+          onChange: value => { this.object.fontFamily = value },
+        }),
+        new ui.ColorButton({
+          color: this.object.textColor,
+          onChange: value => { this.object.textColor = value },
+        }),
+      ),
 
-      ui.createText(this, 'Size'),
-      new ui.InputText({
-        value: this.object.size, 
-        onChange: value => { this.object.size = value },
-      }),
+      ui.H(
+        ui.createText('Style'),
+        new ui.CheckBox({
+          title: 'Bold',
+          checked: this.object.bold,
+          onChange: value => { this.object.bold = value },
+        }),
+        new ui.CheckBox({
+          title: 'Italic',
+          checked: this.object.italic,
+          onChange: value => { this.object.italic = value },
+        }),
+      ),
 
-      ui.createText(this, 'Style'),
-      new ui.Select({
-        options: [['serif', 'Serif'], ['sans-serif', 'Sans serif'], ['monospace', 'Monospace']],
-        value: this.object.fontFamily,
-        onChange: value => { this.object.fontFamily = value },
-      }),
-
-      new ui.ColorButton({
-        color: this.object.textColor,
-        onChange: value => { this.object.textColor = value },
-      }),
-
-      new ui.CheckBox({
-        title: 'Bold',
-        checked: this.object.bold,
-        onChange: value => { this.object.bold = value },
-      }),
-
-      new ui.CheckBox({
-        title: 'Italic',
-        checked: this.object.italic,
-        onChange: value => { this.object.italic = value },
-      }),
-
-      ui.createText(this, 'Text Alignment'),
-      new ui.Select({
-        options: [['left', 'Left'], ['center', 'Center'], ['right', 'Right']],
-        value: this.object.align,
-        onChange: value => { this.object.align = value },
-      }),
-
-      new ui.Select({
-        options: [['top', 'Top'], ['middle', 'Middle'], ['bottom', 'Bottom']],
-        value: this.object.verticalAlign,
-        onChange: value => { this.object.verticalAlign = value },
-      }),
+      ui.H(
+        ui.createText('Alignment'),
+        new ui.Select({
+          options: [['left', 'Left'], ['center', 'Center'], ['right', 'Right']],
+          value: this.object.align,
+          onChange: value => { this.object.align = value },
+        }),
+        new ui.Select({
+          options: [['top', 'Top'], ['middle', 'Middle'], ['bottom', 'Bottom']],
+          value: this.object.verticalAlign,
+          onChange: value => { this.object.verticalAlign = value },
+        }),
+      ),
     ].forEach(item => this.appendChild(item));
 
     return this.node;
@@ -467,7 +512,6 @@ class PanelForTextBox extends PanelForBox {
 class PanelForImageBox extends Panel {
   render() {
     super.render();
-    this.appendChild(ui.createText(this, 'PanelForImageBox'));
 
     var input = document.createElement('input');
     input.type = 'file';
@@ -484,11 +528,12 @@ class PanelForImageBox extends Panel {
 class PanelForImageList extends PanelForBox {
   render() {
     super.render();
-    this.appendChild(ui.createText(this, 'PanelForImageList'));
 
-    var input = document.createElement('input');
-    input.type = 'file';
-    input.addEventListener('change', event => {
+    var fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.addEventListener('change', event => {
+      this.object.clear();
+
       // getting a hold of the file reference
       var file = event.target.files[0];
 
@@ -501,75 +546,78 @@ class PanelForImageList extends PanelForBox {
         var csv = readerEvent.target.result; // this is the content!
         var results = parse(csv, {header: true});
 
-        var item_count = randomInt(10, 100);
-        var item_start = randomInt(0, results.data.length - item_count);
+        this.object.fields = results.meta.fields;
+        this.object.items = results.data;
 
-        for(var i = item_start; i < item_start + item_count; i++) {
-          var data = results.data[i];
-          console.log(data);
-
-          let node = document.createElement('img');
-          node.src = 'static/logo/' + data['UID'] + '.png';
-          node.style.maxHeight = this.object.itemMaxHeight + 'px';
-          node.style.maxWidth = this.object.itemMaxWidth + 'px';
-          node.style.margin = this.object.itemMargin + 'px';
-          this.object.node.appendChild(node);
-          this.object.record();
-        }
-
-        /*
-
-        item.height(item_height);
-        item.html(
-            "<div class='aligner' data-toggle='tooltip' title='" + data['Name'] + "'>"
-            + "<a target='_blank' href='" + data['Homepage'] + "'>"
-            + "<img src='" + data['Image URL'] + "' style='max-height:" + item_height + "px; max-width:" + (item_height * 2) + "px'>"
-            + "</a></div>");
-        item.data('name', data['Name (English)']);
-        content.append(item);
-        */
+        // refresh panel
+        channel.send('Property:setPanelFor', this.object);
       }
     });
-    this.node.appendChild(input);
+
     [
-      ui.createText(this, 'Align items'),
-      ui.createButton(this, 'Shuffle', () => { this.object.shuffle(); }),
+      new ui.TitleBar({title: 'List Property'}),
+      fileInput,
+      this.itemCount = ui.createText(this.object.items.length + ' Item(s)'),
 
-      ui.createText(this, 'Width'),
-      new ui.InputText({
-        value: this.object.itemMaxWidth, 
-        onChange: value => { this.object.itemMaxWidth = value },
-      }),
+      ui.H(
+        ui.createText('Control'),
+        ui.HGroup(
+          ui.createButton('Clear', () => { this.object.clear(); }),
+          ui.createButton('Shuffle', () => { this.object.shuffle(); }),
+          ui.createButton('Apply', () => { this.object.apply(); }),
+        ),
+      ),
 
-      ui.createText(this, 'Height'),
-      new ui.InputText({
-        value: this.object.itemMaxHeight, 
-        onChange: value => { this.object.itemMaxHeight = value },
-      }),
+      ui.H(
+        ui.createText('Icon'),
+        ui.V(
+          ui.H(
+            ui.createText('Size'),
+            new ui.InputText({
+              value: this.object.itemMaxWidth, 
+              onChange: value => { this.object.itemMaxWidth = value },
+            }),
+            new ui.InputText({
+              value: this.object.itemMaxHeight, 
+              onChange: value => { this.object.itemMaxHeight = value },
+            }),
+          ),
+          ui.H(
+            ui.createText('Margin'),
+            new ui.InputText({
+              value: this.object.itemMargin, 
+              onChange: value => { this.object.itemMargin = value },
+            }),
+          ),
+          ui.H(
+            ui.createText('Arrange'),
+            new ui.Select({
+              options: [['row', 'Row'], ['column', 'Column']],
+              value: this.object.itemDirection,
+              onChange: value => { this.object.itemDirection = value },
+            }),
 
-      ui.createText(this, 'Margin'),
-      new ui.InputText({
-        value: this.object.itemMargin, 
-        onChange: value => { this.object.itemMargin = value },
-      }),
+            new ui.Select({
+              options: [
+                ['flex-start', 'Left'],
+                ['center', 'Center'],
+                ['flex-end', 'Right'],
+                ['space-between', 'Justify'],
+                ['space-around', 'Around'],
+                ['space-evenly', 'Evenly']
+              ],
+              value: this.object.itemAlign,
+              onChange: value => { this.object.itemAlign = value },
+            }),
+          ),
+        ),
+      ),
 
-      new ui.Select({
-        options: [['row', 'Row'], ['column', 'Column']],
-        value: this.object.itemDirection,
-        onChange: value => { this.object.itemDirection = value },
-      }),
-
-      new ui.Select({
-        options: [
-          ['flex-start', 'Left'],
-          ['center', 'Center'],
-          ['flex-end', 'Right'],
-          ['space-between', 'Justify'],
-          ['space-around', 'Around'],
-          ['space-evenly', 'Evenly']
-        ],
-        value: this.object.itemAlign,
-        onChange: value => { this.object.itemAlign = value },
+      new ui.TitleBar({title: 'Filter'}),
+      new ui.Filter({
+        fields: this.object.fields,
+        items: this.object.items,
+        filter: this.object.filter
       }),
     ].forEach(item => this.appendChild(item));
 
@@ -649,9 +697,9 @@ class Editor extends View {
 
     row.appendChild(new Navigator());
     row.appendChild(new Viewport());
-    row.appendChild(new ToolBox({children: new List(
+    row.appendChild(new ToolBox({children: [
       new Property(),
-    )}));
+    ]}));
 
     return this.node;
   }

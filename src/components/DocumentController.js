@@ -1,4 +1,6 @@
 import html2canvas from 'html2canvas';
+import html2pdf from 'html2pdf.js';
+
 import channel from '../core/Channel';
 import { Page } from './Document';
 import TextBox from './objects/TextBox';
@@ -135,26 +137,29 @@ class DocumentController {
       }
     });
 
-    channel.bind(this, 'Document:savePage', () => {
+    channel.bind(this, 'Document:savePage', (format) => {
       if (this.page == null) return;
 
       // TBD: we have to hide things before capturing
+      if (format == 'image') {
+        html2canvas(this.page.node, {
+          allowTaint: true,
+        }).then((canvas) => {
+          var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
 
-      html2canvas(this.page.node, {
-        allowTaint: true,
-      }).then((canvas) => {
-        var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+          var link = document.createElement("a");
+          link.download = 'veryslide' + (this.page.order + 1) + '.png';
+          link.href = image;
 
-        var link = document.createElement("a");
-        link.download = 'veryslide' + (this.page.order + 1) + '.png';
-        link.href = image;
+          document.body.appendChild(link);
+          link.click();
 
-        document.body.appendChild(link);
-        link.click();
-
-        // Cleanup the DOM
-        document.body.removeChild(link);
-      });
+          // Cleanup the DOM
+          document.body.removeChild(link);
+        });
+      } else if (format == 'pdf') {
+        //var worker = html2pdf().from(this.page.node).save();
+      }
     });
   }
 }

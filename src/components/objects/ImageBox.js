@@ -29,6 +29,10 @@ class ImageBox extends BaseObject {
         this.width = image.width;
         this.height = image.height;
         channel.send('Handler:connect', this);
+        
+        // clear
+        this.file = null;
+        this.record();
       }
       img.src = reader.result;
     }, false);

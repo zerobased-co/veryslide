@@ -3,7 +3,7 @@ import View from './View.js';
 class Select extends View {
   constructor(state) {
     super({
-      className: 'vs-checkbox',
+      className: 'vs-select',
       value: null,
       options: [],
     }.update(state));

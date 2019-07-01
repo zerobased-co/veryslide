@@ -82,28 +82,25 @@ $button-radius: 5px;
 
 .vs-text {
   font-size: 0.8em;
+  height: 30px;
+  line-height: 30px;
+  text-shadow: 1px 1px 0px #eee;
+  color: #444;
+  overflow: hidden;
 }
 
 .vs-text-40 {
-  font-size: 0.8em;
+  @extend .vs-text;
   width: 40px;
-  line-height: 30px;
-  height: 30px;
-  color: #444;
-  text-shadow: 1px 1px 0px #eee;
 }
 
 .vs-text-80 {
-  font-size: 0.8em;
+  @extend .vs-text;
   width: 80px;
-  line-height: 30px;
-  height: 30px;
-  color: #444;
-  text-shadow: 1px 1px 0px #eee;
 }
 
 .vs-text-140 {
-  @extend .vs-text-80;
+  @extend .vs-text;
   width: 140px;
 }
 

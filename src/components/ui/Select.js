@@ -32,6 +32,7 @@ class Select extends View {
   }
 
   change(event) {
+    this.value = this.select.value;
     this.onChange(this.select.value);
   }
 

@@ -617,7 +617,8 @@ class PanelForImageList extends PanelForBox {
       new ui.Filter({
         fields: this.object.fields,
         items: this.object.items,
-        filter: this.object.filter
+        filter: this.object.filter,
+        onChange: value => { this.object.filter = value },
       }),
     ].forEach(item => this.appendChild(item));
 

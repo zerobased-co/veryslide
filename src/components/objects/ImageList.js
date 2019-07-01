@@ -2,6 +2,45 @@ import './ImageList.scss';
 import Box from './Box';
 import { randomInt } from '../../core/Util';
 
+function isValidItem(item, filter) {
+  let valid = true;
+  filter.forEach((f) => {
+    switch(f['operator']) {
+      case '=':
+        if (!(f['value'] == item[f['field']])) {
+          valid = false;
+        }
+        break;
+      case '!=':
+        if (!(f['value'] != item[f['field']])) {
+          valid = false;
+        }
+        break;
+      case '>':
+        if (!(f['value'] > item[f['field']])) {
+          valid = false;
+        }
+        break;
+      case '>=':
+        if (!(f['value'] >= item[f['field']])) {
+          valid = false;
+        }
+        break;
+      case '<':
+        if (!(f['value'] < item[f['field']])) {
+          valid = false;
+        }
+        break;
+      case '<=':
+        if (!(f['value'] <= item[f['field']])) {
+          valid = false;
+        }
+        break;
+    };
+  });
+  return valid;
+}
+
 class ImageList extends Box {
   constructor(state) {
     super({
@@ -42,18 +81,16 @@ class ImageList extends Box {
 
   apply() {
     if (this.items.length == 0) return;
+    console.log(this.filter);
 
     this.node.innerHTML = '';
-
-    var item_count = randomInt(10, 100);
-    var item_start = randomInt(0, this.items.length - item_count);
-
-    for(var i = item_start; i < item_start + item_count; i++) {
+    for(var i = 0; i < this.items.length; i++) {
       var item = this.items[i];
+      if (!isValidItem(item, this.filter)) continue;
 
-      let node = document.createElement('a');
+      let node = document.createElement('div');
       node.className = 'aligner';
-      node.href = item['Homepage'];
+      //node.href = item['Homepage'];
       node.style.margin = this.itemMargin + 'px';
 
       let img = document.createElement('img');

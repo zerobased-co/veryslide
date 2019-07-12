@@ -1,5 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
+const Dotenv = require('dotenv-webpack');
 
 module.exports = {
   mode: 'development',
@@ -40,11 +41,13 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
   },
   plugins: [
+    new Dotenv(),
     new webpack.HotModuleReplacementPlugin(),
   ],
   devtool: 'source-map',
   devServer: {
     contentBase: './dist',
+    historyApiFallback: true,
     hot: true,
   },
 };

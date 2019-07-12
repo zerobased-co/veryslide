@@ -1,8 +1,15 @@
 {
   "presets": [
-    "@babel/env",
+    ['@babel/env', {
+      targets: {
+        node: 'current',
+      },
+      useBuiltIns: 'entry',
+    }],
     "@babel/preset-react",
   ],
   "plugins": [
+    "@babel/plugin-proposal-class-properties",
+    "@babel/plugin-proposal-object-rest-spread",
   ]
 }

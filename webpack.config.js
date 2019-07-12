@@ -7,9 +7,10 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
+        options: { presets: ["@babel/env"] },
       },
       {
         test: /\.(sa|sc|c)ss$/,
@@ -35,7 +36,7 @@ module.exports = {
     extensions: ['*', '.js', '.jsx']
   },
   output: {
-    filename: 'veryslide.js',
+    filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
   },
   plugins: [

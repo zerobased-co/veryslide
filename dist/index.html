@@ -1,25 +1,18 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8" />
-  <title>veryslide test page</title>
-  <link rel="stylesheet" type="text/css" href="style.css">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="veryslide.js"></script>
-</head>
-<body>
-  <div id="veryslide">
-  </div>
-  <!-- The core Firebase JS SDK is always required and must be listed first -->
-  <script src="/__/firebase/6.3.0/firebase-app.js"></script>
-  <!-- Initialize Firebase -->
-  <script src="/__/firebase/init.js"></script>
 
-  <script>
-  const elem = document.getElementById('veryslide');
-  var editor = new Veryslide(elem, {
-    'this': 'that',
-  });
-  </script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Veryslide</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <noscript>
+    You need to enable JavaScript to run this app.
+  </noscript>
+  <script src="./bundle.js"></script>
 </body>
+
 </html>

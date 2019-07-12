@@ -111,3 +111,4 @@ node_modules/
 webpack-stats.json
 
 .DS_Store
+.firebase

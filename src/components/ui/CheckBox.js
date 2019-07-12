@@ -6,7 +6,8 @@ class CheckBox extends View {
       className: 'vs-checkbox',
       title: '',
       checked: false,
-    }.update(state));
+      ...state,
+    });
   }
 
   onChange(checked) {

@@ -15,4 +15,4 @@ class Veryslide {
   }
 }
 
-window.Veryslide = Veryslide;
+export default Veryslide;

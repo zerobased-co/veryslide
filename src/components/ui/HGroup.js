@@ -4,7 +4,8 @@ class HGroup extends View {
   constructor(state) {
     super({
       className: 'vs-hgroup',
-    }.update(state));
+      ...state,
+    });
   }
 }
 

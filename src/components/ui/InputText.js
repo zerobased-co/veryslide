@@ -5,7 +5,8 @@ class InputText extends View {
     super({
       className: 'vs-inputtext',
       value: '',
-    }.update(state));
+      ...state,
+    });
   }
 
   render() {

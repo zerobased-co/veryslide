@@ -7,7 +7,8 @@ class View extends State {
       className: 'vs-view',
       parent: null,
       children: [],
-    }.update(state));
+      ...state,
+    });
 
     if (this.parent != null) {
       this.parent.children.push(this);
@@ -55,16 +56,18 @@ class View extends State {
 class Horizon extends View {
   constructor(state) {
     super({
-      className: 'vs-horizon'
-    }.update(state));
+      className: 'vs-horizon',
+      ...state,
+    });
   }
 }
 
 class Vertical extends View {
   constructor(state) {
     super({
-      className: 'vs-vertical'
-    }.update(state));
+      className: 'vs-vertical',
+      ...state,
+    });
   }
 }
 

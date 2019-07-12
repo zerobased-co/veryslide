@@ -10,7 +10,8 @@ class ImageBox extends BaseObject {
       width: 100,
       height: 100,
       file: null,
-    }.update(state));
+      ...state,
+    });
   }
 
   on_file(file) {

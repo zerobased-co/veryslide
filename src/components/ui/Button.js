@@ -5,7 +5,8 @@ class Button extends View {
     super({
       className: 'vs-button',
       title: '',
-    }.update(state));
+      ...state,
+    });
 
     this.node.addEventListener('click', this.onClick);
   }

@@ -5,7 +5,8 @@ class Panel extends View {
     super({
       className: 'vs-panel',
       object: null,
-    }.update(state));
+      ...state,
+    });
   }
 }
 

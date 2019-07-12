@@ -14,7 +14,8 @@ class Box extends BaseObject {
       borderWidth: 1,
       borderColor: '#000000',
       padding: 10,
-    }.update(state));
+      ...state,
+    });
   }
 
   on_borderStyle(style) {

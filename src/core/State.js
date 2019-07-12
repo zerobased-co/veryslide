@@ -1,16 +1,9 @@
-// Add python-style update method to Object with Object.assign function
-if (Object.prototype.update == null) {
-  Object.prototype.update = function(obj) {
-    return Object.assign(this, obj);
-  }
-}
-
 class State {
   constructor(state) {
     this.state = state;
 
-    if (state != null) {
-      Object.getOwnPropertyNames(state).forEach(key => {
+    if (this.state != null) {
+      Object.getOwnPropertyNames(this.state).forEach(key => {
         Object.defineProperty(this, key, {
           get: function() {
             let func = this['_' + key];
@@ -27,6 +20,10 @@ class State {
         });
       });
     }
+  }
+
+  static merge(a, b) {
+    return Object.assign(a, b);
   }
 
   updateState(key) { // if key is null, then update all states

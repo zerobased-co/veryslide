@@ -17,7 +17,8 @@ class Handler extends View {
   constructor(state) {
     super({
       className: 'vs-handler',
-    }.update(state));
+      ...state,
+    });
 
     this.object = null;
     this.viewport = null;

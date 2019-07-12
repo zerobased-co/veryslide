@@ -24,7 +24,8 @@ class Filter extends View {
       operators: [],
       values: [],
       candidates: [],
-    }.update(state));
+      ...state,
+    });
   }
 
   update_candidates() {

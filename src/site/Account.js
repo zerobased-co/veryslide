@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
+import { generatePath } from 'react-router';
 import { compose } from 'recompose';
 
 import { PasswordForgetForm } from './PasswordForget';
@@ -6,26 +8,35 @@ import { PasswordChangeForm } from './PasswordChange';
 import { TestWriteForm } from './TestWrite';
 import { withFirebase } from './Firebase';
 import { AuthUserContext, withAuthorization } from './Session';
+import * as ROUTES from './constants/routes';
 
 class AccountPageBase extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      value: null,
+      data: {},
+      slides: [],
     };
   }
 
   componentDidMount() {
-    var docRef = this.props.firebase.currentUser();
-
-    docRef.get().then(doc => {
+    this.props.firebase.currentUser().get().then(doc => {
       if (doc.exists) {
-        console.log("Document data:", doc.data());
-        this.setState({value: doc.data().value });
+        this.setState({data: doc.data()});
       } else {
         console.log("No such document!");
       }
+    }).catch(function(error) {
+        console.log("Error getting document:", error);
+    });
+
+    this.props.firebase.mySlides().get().then(qs => {
+      let slides = [];
+      qs.docs.map(slide => {
+        slides.push({id: slide.id, data: slide.data()});
+      });
+      this.setState({slides});
     }).catch(function(error) {
         console.log("Error getting document:", error);
     });
@@ -38,7 +49,18 @@ class AccountPageBase extends Component {
           <div>
             <h2>Account Page</h2>
             <p>Account: {authUser.email}</p>
-            <p>Value: {this.state.value}</p>
+            <p>Value: {JSON.stringify(this.state.data)}</p>
+            <ul>Slides: {
+              this.state.slides.map((slide, idx) => {     
+                const url = generatePath(ROUTES.SLIDE, { id: slide.id });
+                return (
+                  <li key={slide.id}>
+                    <Link to={url}>ID: {slide.id}</Link>
+                  </li>
+                ) 
+              }
+            )}
+            </ul>
             <TestWriteForm />
             <hr />
             <PasswordForgetForm />

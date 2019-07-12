@@ -61,7 +61,9 @@ class ImageList extends Box {
       itemMaxWidth: 80,
       itemMaxHeight: 40,
       itemMargin: 5,
-    }.update(state));
+
+      ...state,
+    });
   }
 
   clear() {

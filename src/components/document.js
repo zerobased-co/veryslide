@@ -10,7 +10,8 @@ class Page extends BaseObject {
       type: 'Page',
       className: 'vs-page',
       objects: new List(),
-    }.update(state));
+      ...state,
+    });
 
     this.pagethumb = null;
     this.invalidate = false;

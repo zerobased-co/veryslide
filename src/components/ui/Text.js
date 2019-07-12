@@ -5,7 +5,8 @@ class Text extends View {
     super({
       className: 'vs-text',
       title: 'Text',
-    }.update(state));
+      ...state,
+    });
   }
 
   on_title(text) {

@@ -27,10 +27,16 @@ class Firebase {
     this.auth.currentUser.updatePassword(password);
 
   /* Database */
-
   users = () => this.db.collection('users');
   user = (uid) => this.db.collection('users').doc(uid);
   currentUser = () => this.user(this.auth.currentUser.uid);
+  mySlides = () => this.db.collection('slides').where(
+    'uid', '==', this.auth.currentUser.uid
+  );
+
+  newSlide = () => this.db.collection('slides').add({
+    uid: this.auth.currentUser.uid,
+  });
 }
 
 export default Firebase;

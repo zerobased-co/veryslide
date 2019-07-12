@@ -5,3 +5,5 @@ export const HOME = '/home';
 export const ACCOUNT = '/account';
 export const ADMIN = '/admin';
 export const PASSWORD_FORGET = '/password-forget';
+export const SLIDE = '/slide/:id';
+export const SLIDE_NEW = '/slide/new';

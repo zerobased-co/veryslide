@@ -8,7 +8,8 @@ class ColorButton extends View {
     super({
       className: 'vs-colorbutton',
       color: '#ffffff',
-    }.update(state));
+      ...state,
+    });
 
     this.colorPicker = new ColorPicker({
       color: this.color,

@@ -5,7 +5,8 @@ class TitleBar extends View {
     super({
       className: 'vs-titlebar',
       title: '',
-    }.update(state));
+      ...state,
+    });
   }
 
   on_title(text) {

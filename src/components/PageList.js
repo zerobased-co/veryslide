@@ -10,7 +10,8 @@ class PageThumb extends View {
       height: 80,
       page: null,
       thumbnail: null,
-    }.update(state));
+      ...state,
+    });
 
     this.node.addEventListener('click', () => {
       this.select();
@@ -77,7 +78,8 @@ class PageList extends View {
   constructor(state) {
     super({
       className: 'vs-pagelist',
-    }.update(state));
+      ...state,
+    });
 
     this.pagethumbs = new List();
     channel.bind(this, 'PageList:addPage', this.addPage);

@@ -7,7 +7,8 @@ class Node extends State {
       type: 'Node',
       className: 'vs-node',
       content: '',
-    }.update(state));
+      ...state,
+    });
 
     this.node = this.render();
     this.updateState();
@@ -34,7 +35,8 @@ class BaseObject extends Node {
       height: 0,
       color: '#FFFFFF',
       order: 0,
-    }.update(state));
+      ...state,
+    });
 
     this.page = null;
   }

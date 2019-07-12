@@ -14,7 +14,8 @@ class TextBox extends Box {
       italic: false,
       align: 'center',
       verticalAlign: 'middle',
-    }.update(state));
+      ...state,
+    });
   }
 
   editable() {

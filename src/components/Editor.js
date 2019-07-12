@@ -12,7 +12,8 @@ class Menu extends View {
   constructor(state) {
     super({
       className: 'vs-menu',
-    }.update(state));
+      ...state,
+    });
 
     [
       new ui.Text({'title': 'Page'}),
@@ -69,7 +70,8 @@ class Navigator extends View {
     super({
       className: 'vs-navigator',
       children: [new PageList()],
-    }.update(state));
+      ...state,
+    });
   }
 }
 
@@ -77,7 +79,8 @@ class Viewport extends View {
   constructor(state) {
     super({
       className: 'vs-viewport',
-    }.update(state));
+      ...state,
+    });
 
     this.page = null;
     this.object = null;
@@ -631,7 +634,8 @@ class Property extends View {
     super({
       className: 'vs-property',
       object: null,
-    }.update(state));
+      ...state,
+    });
 
     channel.bind(this, 'Property:setPanelFor', this.setPanelFor);
   }
@@ -686,7 +690,8 @@ class Editor extends View {
   constructor(state) {
     super({
       className: 'vs-editor',
-    }.update(state));
+      ...state,
+    });
   }
 
   render() {

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { hot } from "react-hot-loader";
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import "./App.css";
 import Navigation from './Navigation';
@@ -11,6 +11,7 @@ import PasswordForget from './PasswordForget';
 import Home from './Home';
 import Account from './Account';
 import Admin from './Admin';
+import Slide, { SlideNew } from './Slide';
 
 import { withAuthentication } from './Session';
 import * as ROUTES from './constants/routes';
@@ -33,13 +34,17 @@ class App extends Component {
 
           <hr />
 
-          <Route exact path={ROUTES.LANDING} component={Landing} />
-          <Route path={ROUTES.SIGNUP} component={SignUp} />
-          <Route path={ROUTES.SIGNIN} component={SignIn} />
-          <Route path={ROUTES.PASSWORD_FORGET} component={PasswordForget} />
-          <Route path={ROUTES.HOME} component={Home} />
-          <Route path={ROUTES.ACCOUNT} component={Account} />
-          <Route path={ROUTES.ADMIN} component={Admin} />
+          <Switch>
+            <Route exact path={ROUTES.LANDING} component={Landing} />
+            <Route path={ROUTES.SIGNUP} component={SignUp} />
+            <Route path={ROUTES.SIGNIN} component={SignIn} />
+            <Route path={ROUTES.PASSWORD_FORGET} component={PasswordForget} />
+            <Route path={ROUTES.HOME} component={Home} />
+            <Route path={ROUTES.ACCOUNT} component={Account} />
+            <Route path={ROUTES.ADMIN} component={Admin} />
+            <Route path={ROUTES.SLIDE_NEW} component={SlideNew} />
+            <Route path={ROUTES.SLIDE} component={Slide} />
+          </Switch>
         </div>
       </Router>
     );

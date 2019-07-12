@@ -6,7 +6,8 @@ class Select extends View {
       className: 'vs-select',
       value: null,
       options: [],
-    }.update(state));
+      ...state,
+    });
   }
 
   onChange(value) {

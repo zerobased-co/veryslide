@@ -12,6 +12,10 @@ class Message {
 
 class Channel {
   constructor() {
+    this.cleanup();
+  }
+
+  cleanup() {
     this.messages = new List();
     this.listeners = new Object();
   }

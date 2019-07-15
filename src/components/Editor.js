@@ -463,6 +463,14 @@ class PanelForTextBox extends PanelForBox {
       ),
 
       ui.H(
+        ui.createText('Color'),
+        new ui.ColorButton({ 
+          color: this.object.textColor,
+          onChange: value => { this.object.textColor = value; }, 
+        }),
+      ),
+
+      ui.H(
         ui.createText('Font'),
         new ui.InputText({
           value: this.object.size, 

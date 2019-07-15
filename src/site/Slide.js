@@ -20,12 +20,12 @@ class SlideBase extends Component {
     this.veryslide = new Veryslide(this.veryslideRef.current);
   }
 
+  componentWillUnmount() {
+  }
+
   render() {
     return (
-      <div>
-        <h2>Slide {this.slideId}</h2>
-        <div ref={this.veryslideRef}></div>
-      </div>
+      <div className='Veryslide' ref={this.veryslideRef} />
     );
   }
 }

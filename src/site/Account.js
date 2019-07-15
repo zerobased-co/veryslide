@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { generatePath } from 'react-router';
 import { compose } from 'recompose';
+import IconTrash from '@iconscout/react-unicons/icons/uil-trash-alt'
 
 import { PasswordForgetForm } from './PasswordForget';
 import { PasswordChangeForm } from './PasswordChange';
@@ -42,6 +43,17 @@ class AccountPageBase extends Component {
     });
   }
 
+  deleteSlide(id) {
+    console.log("deleteSlide", id);
+    this.props.firebase.slide(id).delete().then(() => {
+      this.setState(prevState => ({
+        slides: prevState.slides.filter(el => el.id != id)
+      }));
+    }).catch(function(error) {
+        console.log("Error deleting document:", error);
+    });
+  }
+
   render() {
     return (
       <AuthUserContext.Consumer>
@@ -56,6 +68,7 @@ class AccountPageBase extends Component {
                 return (
                   <li key={slide.id}>
                     <Link to={url}>ID: {slide.id}</Link>
+                    <IconTrash size="20" onClick={() => this.deleteSlide(slide.id)} />
                   </li>
                 ) 
               }

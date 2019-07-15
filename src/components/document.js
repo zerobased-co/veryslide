@@ -1,3 +1,4 @@
+import State from '../core/State.js';
 import List from '../core/List';
 import BaseObject from './objects/BaseObject';
 import TextBox from './objects/TextBox';
@@ -74,14 +75,21 @@ class Page extends BaseObject {
     });
     return node;
   }
+
+  serialize() {
+    return JSON.stringify(this.state);
+  }
 }
 
-class Document {
-  constructor() {
-    this.width = 1024;
-    this.height = 768;
-    this.pages = new List();
-    this.type = 'Document';
+class Document extends State {
+  constructor(state) {
+    super({
+      width: 1024,
+      height: 768,
+      pages: new List(),
+      type: 'Document',
+      ...state,
+    });
   }
 
   addPage() {

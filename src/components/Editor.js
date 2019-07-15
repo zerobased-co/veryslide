@@ -37,10 +37,11 @@ class Menu extends View {
       ),
       ui.createButton('Remove', () => { channel.send('Document:removeObject'); }),
 
-      new ui.Text({'title': 'Export'}),
+      new ui.Text({'title': 'Misc'}),
       ui.HGroup(
         ui.createButton('Image', () => { channel.send('Document:savePage', 'image'); }),
         ui.createButton('PDF',   () => { channel.send('Document:savePage', 'pdf'); }),
+        ui.createButton('Save',   () => { channel.send('Document:savePage', 'json'); }),
       ),
     ].forEach(item => this.appendChild(item));
 
@@ -120,7 +121,15 @@ class Viewport extends View {
     this.page = null;
   }
 
+  destroy() {
+    super.destroy();
+    ['copy', 'paste', 'keydown', 'keyup'].forEach(e => {
+      window.removeEventListener(e, this[e]);
+    }, this);
+  }
+
   selectPage(page) {
+    console.log('Viewport:selectPage', page);
     this.clear();
     this.page = page;
 
@@ -214,77 +223,81 @@ class Viewport extends View {
     this.updateTransform();
   }
 
+  keydown(event) {
+    if (event.target !== document.body && event.target !== this.node) {
+      return;
+    }
+
+    // space
+    if (event.keyCode === 32) {
+      event.preventDefault();
+      if (this.grab === false) {
+        this.node.style.cursor = 'grab';
+        this.grab = true;
+        this.blur();
+      }
+    }
+
+    // -
+    if (event.keyCode === 173 || event.keyCode === 189) {
+      this.zoomOut();
+    }
+
+    // +
+    if (event.keyCode === 61 || event.keyCode === 187) {
+      this.zoomIn();
+    }
+
+    // s
+    if (event.keyCode === 83) {
+      channel.send('Menu:toggleSnap', null);
+    }
+
+    // 0
+    if (event.keyCode === 48) {
+      channel.send('Menu:resetZoom', null);
+    }
+
+    // delete
+    if (event.keyCode === 46 || event.keyCode === 8) {
+      event.preventDefault();
+      channel.send('Document:removeObject', this.object);
+    }
+
+    // [
+    if (event.keyCode === 219) {
+      channel.send('Document:orderBackward', this.object);
+    }
+
+    // ]
+    if (event.keyCode === 221) {
+      channel.send('Document:orderForward', this.object);
+    }
+  }
+
+  keyup(event) {
+    if (event.keyCode === 32) {
+      event.preventDefault();
+      this.node.style.cursor = 'default';
+      this.grab = false;
+    }
+  }
+
+  copy(event) {
+    channel.send('Document:copy');
+  }
+
+  paste(event) {
+    channel.send('Document:paste');
+  }
+
   render() {
     super.render();
     this.node.tabIndex = '0';
 
-    window.addEventListener('copy', event => {
-      channel.send('Document:copy');
-    });
-
-    window.addEventListener('paste', event => {
-      channel.send('Document:paste');
-    });
-
-    window.addEventListener('keydown', event => {
-      if (event.target !== document.body && event.target !== this.node) {
-        return;
-      }
-
-      // space
-      if (event.keyCode === 32) {
-        event.preventDefault();
-        if (this.grab === false) {
-          this.node.style.cursor = 'grab';
-          this.grab = true;
-          this.blur();
-        }
-      }
-
-      // -
-      if (event.keyCode === 173 || event.keyCode === 189) {
-        this.zoomOut();
-      }
-
-      // +
-      if (event.keyCode === 61 || event.keyCode === 187) {
-        this.zoomIn();
-      }
-
-      // s
-      if (event.keyCode === 83) {
-        channel.send('Menu:toggleSnap', null);
-      }
-
-      // 0
-      if (event.keyCode === 48) {
-        channel.send('Menu:resetZoom', null);
-      }
-
-      // delete
-      if (event.keyCode === 46 || event.keyCode === 8) {
-        event.preventDefault();
-        channel.send('Document:removeObject', this.object);
-      }
-
-      // [
-      if (event.keyCode === 219) {
-        channel.send('Document:orderBackward', this.object);
-      }
-
-      // ]
-      if (event.keyCode === 221) {
-        channel.send('Document:orderForward', this.object);
-      }
-    });
-
-    window.addEventListener('keyup', event => {
-      if (event.keyCode === 32) {
-        event.preventDefault();
-        this.node.style.cursor = 'default';
-        this.grab = false;
-      }
-    });
+    ['copy', 'paste', 'keydown', 'keyup'].forEach(e => {
+      window.addEventListener(e, this[e]);
+    }, this);
 
     this.node.addEventListener('mousemove', event => {
       event.preventDefault();
@@ -649,7 +662,8 @@ class Property extends View {
   }
 
   setPanelFor(object) {
-    this.panel.clear();
+    this.panel.destroy();
+    delete this.panel;
 
     switch(object.type) {
       case 'ImageList':

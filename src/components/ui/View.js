@@ -18,7 +18,15 @@ class View extends State {
     this.updateState();
   }
 
-  clear() {
+  destroy() {
+    super.destroy();
+
+    if (this.children.length > 0) {
+      this.children.forEach(child => {
+        child.destroy();
+      });
+    }
+
     if (this.node != null) {
       if (this.node.parentNode != null) {
         this.node.parentNode.removeChild(this.node);
@@ -28,8 +36,6 @@ class View extends State {
   }
 
   render() {
-    this.clear();
-
     this.node = document.createElement('div');
     this.node.className = this.className;
 

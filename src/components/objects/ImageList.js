@@ -96,7 +96,7 @@ class ImageList extends Box {
       node.style.margin = this.itemMargin + 'px';
 
       let img = document.createElement('img');
-      img.src = 'static/logo/' + item['UID'] + '.png';
+      img.src = '/static/logo/' + item['UID'] + '.png';
       img.style.maxHeight = this.itemMaxHeight + 'px';
       img.style.maxWidth = this.itemMaxWidth + 'px';
       node.appendChild(img);

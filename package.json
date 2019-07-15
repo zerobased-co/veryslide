@@ -39,6 +39,7 @@
     "webpack-dev-server": "^3.7.2"
   },
   "dependencies": {
+    "@iconscout/react-unicons": "0.0.1",
     "codemirror": "^5.48.0",
     "codemirror-colorpicker": "^1.9.51",
     "papaparse": "^5.0.0"

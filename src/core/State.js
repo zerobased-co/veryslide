@@ -1,6 +1,9 @@
+import channel from '../core/Channel';
+
 class State {
   constructor(state) {
     this.state = state;
+    this.__STATE__ = true;
 
     if (this.state != null) {
       Object.getOwnPropertyNames(this.state).forEach(key => {
@@ -22,10 +25,6 @@ class State {
     }
   }
 
-  static merge(a, b) {
-    return Object.assign(a, b);
-  }
-
   updateState(key) { // if key is null, then update all states
     if (key != null) {
       let func = this['on_' + key];
@@ -44,6 +43,47 @@ class State {
     if (this['on'] != null) {
       this['on'].bind(this)();
     }
+  }
+
+  serialize() {
+    function replacer(k, v) {
+      if (v.hasOwnProperty('__STATE__')) {
+        return v.state;
+      }
+
+      if (v.constructor.name === 'List') {
+        return v.array;
+      } else {
+        return v;
+      }
+    };
+    return JSON.stringify(this.state, replacer);
+  }
+
+  deserialize(data) {
+    for (const [k, v] of Object.entries(data)) {
+      if (v.constructor.name === 'Array') {
+        v.forEach((item) => {
+          if (k === 'pages') {
+            let page = this.addPage();
+            // TBD: without using channel
+            channel.send('PageList:addPage', page);
+            page.deserialize(item);
+          } else if (k === 'objects') {
+            let obj = this.addObject(item.type);
+            obj.deserialize(item);
+          } else {
+            this[k].push(item);
+          }
+        }, this);
+      } else {
+        this[k] = v;
+      }
+    }
+  }
+
+  destroy() {
+    channel.unbind(this);
   }
 }
 

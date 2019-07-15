@@ -159,6 +159,8 @@ class DocumentController {
         });
       } else if (format == 'pdf') {
         //var worker = html2pdf().from(this.page.node).save();
+      } else if (format == 'json') {
+        console.log(this.doc.serialize());
       }
     });
   }

@@ -30,10 +30,11 @@ class Firebase {
   users = () => this.db.collection('users');
   user = (uid) => this.db.collection('users').doc(uid);
   currentUser = () => this.user(this.auth.currentUser.uid);
+
+  slide = (id) => this.db.collection('slides').doc(id);
   mySlides = () => this.db.collection('slides').where(
     'uid', '==', this.auth.currentUser.uid
   );
-
   newSlide = () => this.db.collection('slides').add({
     uid: this.auth.currentUser.uid,
   });

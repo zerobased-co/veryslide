@@ -11,21 +11,61 @@ import Veryslide from '../Veryslide';
 class SlideBase extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      loaded: false,
+    };
 
     this.slideId = props.match.params.id;
     this.veryslideRef = React.createRef();
   }
 
   componentDidMount() {
-    this.veryslide = new Veryslide(this.veryslideRef.current);
+    this.props.firebase.slide(this.slideId).get().then(doc => {
+      if (doc.exists) {
+        this.setState({loaded: true});
+
+        const data = doc.data();
+        this.veryslide = new Veryslide(
+          this.veryslideRef.current,
+          (data.data != null) ? JSON.parse(data.data) : null
+        );
+      }
+      else {
+        // TBD: then create one on the fly?
+      }
+    }).catch(function(error) {
+        console.log("Error retrieving document:", error);
+    });
   }
 
   componentWillUnmount() {
+    this.veryslide.destroy();
+  }
+
+  saveSlide(id) {
+    let data = this.veryslide.serialize();
+
+    // TBD: permission check
+    this.props.firebase.slide(id).update({data}).then(() => {
+      alert('Successfully saved.');
+    }).catch(function(error) {
+        console.log("Error saving document:", error);
+    });
   }
 
   render() {
     return (
-      <div className='Veryslide' ref={this.veryslideRef} />
+      <div>
+        {this.state.loaded ? (
+          <div>
+            <h2>Slide {this.slideId}</h2>
+            <button type="button" onClick={() => this.saveSlide(this.slideId)}>Save</button>
+            <div className='Veryslide' ref={this.veryslideRef} />
+          </div>
+        ) : (
+          <p>Loading...</p>
+        )}
+      </div>
     );
   }
 }

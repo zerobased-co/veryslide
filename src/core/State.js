@@ -3,7 +3,7 @@ import channel from '../core/Channel';
 class State {
   constructor(state) {
     this.state = state;
-    this.__STATE__ = true;
+    this.__TYPE__ = 'State';
 
     if (this.state != null) {
       Object.getOwnPropertyNames(this.state).forEach(key => {
@@ -47,14 +47,13 @@ class State {
 
   serialize() {
     function replacer(k, v) {
-      if (v.hasOwnProperty('__STATE__')) {
-        return v.state;
-      }
-
-      if (v.constructor.name === 'List') {
-        return v.array;
-      } else {
-        return v;
+      switch(v['__TYPE__']) {
+        case 'State':
+          return v.state;
+        case 'List':
+          return v.array;
+        default:
+          return v;
       }
     };
     return JSON.stringify(this.state, replacer);

@@ -1,5 +1,6 @@
 class List {
   constructor(...args) {
+    this.__TYPE__ = 'List';
     this.head = null;
     this.tail = null;
     this.array = new Array();

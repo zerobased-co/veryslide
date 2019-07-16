@@ -49,7 +49,7 @@ class View extends State {
   appendChild(child) {
     // TODO: only View can be added as child
     // TODO: add children at once
-    if (child.hasOwnProperty('state')) {
+    if (child.hasOwnProperty('children') && child.hasOwnProperty('state')) {
       child.parent = this;
       this.children.push(child);
       this.node.appendChild(child.node);

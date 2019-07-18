@@ -18,7 +18,7 @@ class Page extends BaseObject {
     this.invalidate = false;
   }
 
-  addObject(type) {
+  addObject(type, states) {
     let object = null;
     switch(type) {
       case 'TextBox':
@@ -32,6 +32,12 @@ class Page extends BaseObject {
         break;
     }
     object.page = this;
+    // set default states
+    if (states != null) {
+      for (const [k, v] of Object.entries(states)) {
+        object[k] = v;
+      }
+    }
     this.objects.append(object);
     this.node.append(object.node);
     this.invalidate = true;

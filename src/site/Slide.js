@@ -44,6 +44,7 @@ class SlideBase extends Component {
 
   saveSlide(id) {
     let data = this.veryslide.serialize();
+    console.log(data.length);
 
     // TBD: permission check
     this.props.firebase.slide(id).update({data}).then(() => {

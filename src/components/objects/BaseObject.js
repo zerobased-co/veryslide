@@ -6,10 +6,10 @@ class Node extends State {
     super({
       type: 'Node',
       className: 'vs-node',
-      content: '',
       ...state,
     });
 
+    this.content = '';
     this.node = this.render();
     this.updateState();
   }
@@ -54,7 +54,9 @@ class BaseObject extends Node {
   }
 
   on_content(content) {
-    this.node.innerHTML = content;
+    if (content != '') {
+      this.node.innerHTML = content;
+    }
   }
 
   on() {

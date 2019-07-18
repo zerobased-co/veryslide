@@ -52,14 +52,14 @@ class Channel {
   }
   */
 
-  send(type, value) {
+  send(type, ...value) {
     //console.log('Send', type, value);
 
     let responses = new Array();
     if (type in this.listeners) {
       this.listeners[type].forEach(function(obj) {
         //console.log('-- Recv', obj['listener']);
-        responses.push(obj['handler'].call(obj['listener'], value));
+        responses.push(obj['handler'].call(obj['listener'], ...value));
       });
     }
     return responses;

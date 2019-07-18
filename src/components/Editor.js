@@ -32,7 +32,7 @@ class Menu extends View {
       new ui.Text({'title': 'Object'}),
       ui.HGroup(
         ui.createButton('TextBox',   () => { channel.send('Document:addObject', 'TextBox'); }),
-        ui.createButton('Image',     () => { channel.send('Document:addObject', 'ImageBox'); }),
+        ui.createButton('Image',     () => { this.openFileDialog(); }),
         ui.createButton('ImageList', () => { channel.send('Document:addObject', 'ImageList'); }),
       ),
       ui.createButton('Remove', () => { channel.send('Document:removeObject'); }),
@@ -45,10 +45,36 @@ class Menu extends View {
       ),
     ].forEach(item => this.appendChild(item));
 
+
     channel.bind(this, 'Menu:resetZoom', this.resetZoom);
     channel.bind(this, 'Menu:toggleSnap', this.toggleSnap);
 
     this.render();
+  }
+
+  openFileDialog() {
+    // create hidden file input
+    var input = document.createElement('input');
+    input.style.visibility = 'hidden';
+    input.type = 'file';
+    input.addEventListener('change', event => {
+      // TBD: duplicated code
+      var file = event.target.files[0];
+      var reader = new FileReader();
+      reader.addEventListener("load", () => {
+        var image = new Image();
+        image.src = reader.result;
+        image.onload =  () => {
+          channel.send('Document:addObject', 'ImageBox', {
+            width: image.width,
+            height: image.height,
+            src: image.src,
+          });
+        }
+      }, false);
+      reader.readAsDataURL(file);
+    });
+    input.click();
   }
 
   resetZoom() {
@@ -122,7 +148,6 @@ class Viewport extends View {
   }
 
   selectPage(page) {
-    console.log('Viewport:selectPage', page);
     this.clear();
     this.page = page;
 
@@ -217,7 +242,6 @@ class Viewport extends View {
   }
 
   keydown(event) {
-    console.log('keydown');
     if (event.target !== document.body && event.target !== this.node) {
       return;
     }
@@ -535,7 +559,18 @@ class PanelForImageBox extends Panel {
     input.type = 'file';
     input.addEventListener('change', event => {
       var file = event.target.files[0];
-      this.object.file = file;
+      var reader = new FileReader();
+      reader.addEventListener("load", () => {
+        var image = new Image();
+        image.src = reader.result;
+        image.onload =  () => {
+          this.object.width = image.width;
+          this.object.height = image.height;
+          this.object.src = image.src;
+          channel.send('Viewport:focus', this.object);
+        }
+      }, false);
+      reader.readAsDataURL(file);
     });
     this.node.appendChild(input);
 

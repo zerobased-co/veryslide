@@ -41,9 +41,9 @@ class DocumentController {
       }
     });
 
-    channel.bind(this, 'Document:addObject', (value) => {
+    channel.bind(this, 'Document:addObject', (objType, states) => {
       if (this.page == null) return;
-      let newObject = this.page.addObject(value);
+      let newObject = this.page.addObject(objType, states);
       channel.send('Viewport:focus', newObject);
     });
 
@@ -61,24 +61,28 @@ class DocumentController {
     });
 
     channel.bind(this, 'Document:orderBack', (object) => {
+      if (object == null) return;
       if (this.page == null) return;
       this.page.objects.makeHead(object);
       this.page.reorder();
     });
 
     channel.bind(this, 'Document:orderFront', (object) => {
+      if (object == null) return;
       if (this.page == null) return;
       this.page.objects.makeLast(object);
       this.page.reorder();
     });
 
     channel.bind(this, 'Document:orderBackward', (object) => {
+      if (object == null) return;
       if (this.page == null) return;
       this.page.objects.backward(object);
       this.page.reorder();
     });
 
     channel.bind(this, 'Document:orderForward', (object) => {
+      if (object == null) return;
       if (this.page == null) return;
       this.page.objects.forward(object);
       this.page.reorder();

@@ -7,6 +7,7 @@ class View extends State {
       className: 'vs-view',
       parent: null,
       children: [],
+      eventListeners: [],
       ...state,
     });
 
@@ -18,14 +19,49 @@ class View extends State {
     this.updateState();
   }
 
+  addEventListener(eventType, handler, target) {
+    if (target == null) {
+      target = this.node;
+    }
+
+    if (handler.hasOwnProperty('prototype') !== false) {
+      handler = handler.bind(this);
+    }
+
+    target.addEventListener(eventType, handler);
+
+    this.eventListeners.push({
+      eventType,
+      handler,
+      target,
+    });
+  }
+
+  removeEventListener(eventType, target) {
+    if (target == null) {
+      target = this.node;
+    }
+
+    this.eventListeners = this.eventListeners.filter(el => {
+      if (el['eventType'] == eventType && el['target'] == target) {
+        el['target'].removeEventListener(el['eventType'], el['handler']);
+        return false;
+      } else {
+        return true;
+      }
+    });
+  }
+
   destroy() {
     super.destroy();
 
-    if (this.children.length > 0) {
-      this.children.forEach(child => {
-        child.destroy();
-      });
-    }
+    this.eventListeners.forEach(el => {
+      el['target'].removeEventListener(el['eventType'], el['handler']);
+    });
+
+    this.children.forEach(child => {
+      child.destroy();
+    });
 
     if (this.node != null) {
       if (this.node.parentNode != null) {

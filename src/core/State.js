@@ -47,14 +47,15 @@ class State {
 
   serialize() {
     function replacer(k, v) {
-      switch(v['__TYPE__']) {
-        case 'State':
-          return v.state;
-        case 'List':
-          return v.array;
-        default:
-          return v;
+      if (v.hasOwnProperty('__TYPE__')) {
+        switch(v['__TYPE__']) {
+          case 'State':
+            return v.state;
+          case 'List':
+            return v.array;
+        }
       }
+      return v;
     };
     return JSON.stringify(this.state, replacer);
   }

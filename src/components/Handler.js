@@ -31,7 +31,7 @@ class Handler extends View {
     this.snapSize = 16;
 
     channel.bind(this, 'Handler:connect', this.connect);
-    this.node.addEventListener('mousedown', this.mousedown.bind(this));
+    this.addEventListener('mousedown', this.mousedown);
   }
 
   connect(object) {
@@ -166,8 +166,8 @@ class Handler extends View {
       this.currentDot = null;
     }
 
-    window.removeEventListener('mousemove', this.mousemove.bind(this));
-    window.removeEventListener('mouseup', this.mouseup.bind(this));
+    this.removeEventListener('mousemove', window);
+    this.removeEventListener('mouseup', window);
   }
 
   mousedown(event) {
@@ -194,8 +194,8 @@ class Handler extends View {
     } else {
       this.transform = 'move';
     }
-    window.addEventListener('mousemove', this.mousemove.bind(this));
-    window.addEventListener('mouseup', this.mouseup.bind(this));
+    this.addEventListener('mousemove', this.mousemove, window);
+    this.addEventListener('mouseup', this.mouseup, window);
   }
 
   render() {

@@ -121,13 +121,6 @@ class Viewport extends View {
     this.page = null;
   }
 
-  destroy() {
-    super.destroy();
-    ['copy', 'paste', 'keydown', 'keyup'].forEach(e => {
-      window.removeEventListener(e, this[e]);
-    }, this);
-  }
-
   selectPage(page) {
     console.log('Viewport:selectPage', page);
     this.clear();
@@ -224,6 +217,7 @@ class Viewport extends View {
   }
 
   keydown(event) {
+    console.log('keydown');
     if (event.target !== document.body && event.target !== this.node) {
       return;
     }
@@ -296,10 +290,10 @@ class Viewport extends View {
     this.node.tabIndex = '0';
 
     ['copy', 'paste', 'keydown', 'keyup'].forEach(e => {
-      window.addEventListener(e, this[e]);
+      this.addEventListener(e, this[e], window);
     }, this);
 
-    this.node.addEventListener('mousemove', event => {
+    this.addEventListener('mousemove', event => {
       event.preventDefault();
 
       if (this.page == null) return;
@@ -313,7 +307,7 @@ class Viewport extends View {
       }
     });
 
-    this.node.addEventListener('mousedown', event => {
+    this.addEventListener('mousedown', event => {
 
       if (this.page == null) return;
       if (this.grab === true) {
@@ -350,14 +344,14 @@ class Viewport extends View {
       }
     });
 
-    this.node.addEventListener('mouseup', () => {
+    this.addEventListener('mouseup', () => {
       if (this.grab === true) {
         this.node.style.cursor = 'grab';
         this.drag = false;
       }
     });
 
-    this.node.addEventListener('mouseleave', () => {
+    this.addEventListener('mouseleave', () => {
       this.node.style.cursor = 'default';
       this.grab = false;
       this.drag = false;

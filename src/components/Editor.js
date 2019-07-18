@@ -729,6 +729,48 @@ class Property extends View {
   }
 }
 
+class DataSetBox extends View {
+  constructor(state) {
+    super({
+      className: 'vs-datasetbox',
+      name: '',
+      url: '',
+      ...state,
+    });
+  }
+
+  addSet() {
+    console.log('addSet', this.name, this.url);
+    channel.send('Document:addDataSet', {
+      name: this.name,
+      url: this.url,
+    });
+
+    // TBD: How can I improve this with binding?
+    this.inputName.value = '';
+    this.inputUrl.value = '';
+  }
+
+  render() {
+    super.render();
+    this.node.className = '';
+
+    [
+      new ui.TitleBar({title: 'Data Sets'}),
+      ui.P(
+        ui.HGroup(
+          ui.createText('Name & URL'),
+          this.inputName = ui.createInputText(this, 'name'),
+          this.inputUrl = ui.createInputText(this, 'url'),
+          ui.createButton('Add', () => { this.addSet(); }),
+        ),
+      ),
+    ].forEach(item => this.appendChild(item));
+
+    return this.node;
+  }
+}
+
 class ToolBox extends View {
   render() {
     super.render();
@@ -756,6 +798,7 @@ class Editor extends View {
     row.appendChild(new Viewport());
     row.appendChild(new ToolBox({children: [
       new Property(),
+      new DataSetBox(),
     ]}));
 
     return this.node;

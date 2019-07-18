@@ -38,16 +38,22 @@ class UI {
     return new Button({title, onClick});
   }
 
-  createInputText(object, property) {
+  createInputText(target, property) {
     return new ui.InputText({
-      value: object[property], 
-      onChange: value => { object[property] = value },
+      value: target[property], 
+      onChange: value => { target[property] = value },
     });
   }
 
   HGroup(...buttons) {
     return new HGroup({
       children: buttons,
+    });
+  }
+
+  P(...children) {
+    return new Panel({
+      children: children,
     });
   }
 

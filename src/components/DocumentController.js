@@ -112,10 +112,12 @@ class DocumentController {
         case 'TextBox':
           newObject = new TextBox(this.clipboard.state);
           break;
-          /*
         case 'Page':
-          newObject = new Page(this.clipboard.state);
+          let data = this.clipboard.serialize();
+          newObject = new Page();
+          newObject.deserialize(JSON.parse(data));
           break;
+          /*
         case 'Document':
           this.panel = new PanelForDocument({object});
           break;
@@ -146,9 +148,19 @@ class DocumentController {
 
       // TBD: we have to hide things before capturing
       if (format == 'image') {
-        html2canvas(this.page.node, {
+        let clone = this.page.node.cloneNode(true);
+        clone.style.position = 'absolute';
+        clone.style.top = 0;
+        clone.style.left = 0;
+        document.body.appendChild(clone);
+
+        html2canvas(clone, {
           allowTaint: true,
+          backgroundColor: this.page.color,
+          width: this.page.width,
+          height: this.page.height,
         }).then((canvas) => {
+          document.body.removeChild(clone);
           var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
 
           var link = document.createElement("a");
@@ -167,6 +179,12 @@ class DocumentController {
         console.log(this.doc.serialize());
       }
     });
+
+    channel.bind(this, 'Document:addDataSet', (name, url) => {
+      const newDataSet = this.doc.addDataSet(name, url);
+      channel.send('DataSetBox:addDataSet', newDataSet);
+    });
+
   }
 }
 

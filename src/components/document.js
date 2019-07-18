@@ -81,10 +81,6 @@ class Page extends BaseObject {
     });
     return node;
   }
-
-  serialize() {
-    return JSON.stringify(this.state);
-  }
 }
 
 class Document extends State {
@@ -93,6 +89,7 @@ class Document extends State {
       width: 1024,
       height: 768,
       pages: new List(),
+      dataSets: new List(),
       type: 'Document',
       ...state,
     });

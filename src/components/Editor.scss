@@ -96,6 +96,16 @@
   width: 320px;
   border: 1px solid gray;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.vs-property {
+  flex-grow: 1;
+}
+
+.vs-datasetbox {
+  flex-grow: 1;
 }
 
 .vs-handler {

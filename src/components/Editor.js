@@ -40,8 +40,8 @@ class Menu extends View {
       new ui.Text({'title': 'Misc'}),
       ui.HGroup(
         ui.createButton('Image', () => { channel.send('Document:savePage', 'image'); }),
-        ui.createButton('PDF',   () => { channel.send('Document:savePage', 'pdf'); }),
-        ui.createButton('Save',   () => { channel.send('Document:savePage', 'json'); }),
+        //ui.createButton('PDF',   () => { channel.send('Document:savePage', 'pdf'); }),
+        ui.createButton('Save',   () => { channel.send('Veryslide:save'); }),
       ),
     ].forEach(item => this.appendChild(item));
 
@@ -130,12 +130,17 @@ class Viewport extends View {
     channel.bind(this, 'Viewport:blur', this.blur);
     channel.bind(this, 'Viewport:toggleSnap', this.toggleSnap);
 
-    setInterval(this.updateThumbnail.bind(this), 500)
+    this.interval = setInterval(this.updateThumbnail.bind(this), 2000);
   }
 
   updateThumbnail() {
     if (this.page == null) return;
     this.page.pagethumb.updateThumbnail();
+  }
+
+  destroy() {
+    super.destroy();
+    clearInterval(this.interval);
   }
 
   clear() {

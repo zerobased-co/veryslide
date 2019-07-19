@@ -66,6 +66,11 @@ class ImageList extends Box {
     });
   }
 
+  deserialize(data) {
+    super.deserialize(data);
+    this.apply();
+  }
+
   clear() {
     super.clear();
     this.selectedItems = [];

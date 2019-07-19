@@ -1,3 +1,5 @@
+import html2canvas from 'html2canvas';
+
 import View from './ui/View';
 import List from '../core/List';
 import channel from '../core/Channel';
@@ -26,7 +28,7 @@ class PageThumb extends View {
     if (page != null) {
       page.pagethumb = this;
       this.height = this.width / (page.width / page.height);
-      this.updateThumbnail();
+      this.updateThumbnail(true);
     }
   }
 
@@ -38,29 +40,37 @@ class PageThumb extends View {
     this.node.style.height = height + 'px';
   }
 
-  updateThumbnail() {
+  updateThumbnail(force) {
+    console.log('updateThumbnail', this.page.order, force);
     if (this.node == null) return;
 
-    // check invalidation
-    if (this.page.invalidate != true) return;
+    // check invalidation and force update
+    if (this.page.invalidate != true && force != true) return;
     this.page.invalidate = false;
 
-    if (this.thumbnail != null) {
-      this.node.removeChild(this.thumbnail);
-    }
-
     const scale = this.width / this.page.width;
-    this.thumbnail = this.page.node.cloneNode(true);
-    this.thumbnail.classList.remove('vs-page');
-    this.thumbnail.style.transform = 'scale(' + scale + ')';
-    this.thumbnail.style.transformOrigin = 'top left';
-    this.node.appendChild(this.thumbnail);
+    const rect = this.page.node.getBoundingClientRect();
+    html2canvas(this.page.node, {
+      allowTaint: true,
+      backgroundColor: this.page.color,
+      scale: scale,
+      scrollX: parseInt(window.scrollX),
+      scrollY: -parseInt(window.scrollY),
+    }).then((canvas) => {
+      if (this.thumbnail != null) {
+        this.node.removeChild(this.thumbnail);
+        this.thumbnail = null;
+      }
+      this.thumbnail = document.createElement('img');
+      this.thumbnail.src = canvas.toDataURL();
+      this.node.appendChild(this.thumbnail);
+    });
   }
 
   select() {
     channel.send('PageThumb:deselect');
     this.node.classList.toggle('focus');
-    this.updateThumbnail();
+    this.updateThumbnail(true);
     channel.send('Viewport:selectPage', this.page);
   }
 

@@ -1,5 +1,4 @@
 import html2canvas from 'html2canvas';
-import html2pdf from 'html2pdf.js';
 
 import channel from '../core/Channel';
 import { Page } from './Document';
@@ -101,21 +100,20 @@ class DocumentController {
 
       console.log('pasting', this.clipboard);
       let newObject = null;
+      let data = this.clipboard.serialize();
 
       switch(this.clipboard.type) {
         case 'ImageList':
-          newObject = new ImageList(this.clipboard.state);
+          newObject = new ImageList();
           break;
         case 'ImageBox':
-          newObject = new ImageBox(this.clipboard.state);
+          newObject = new ImageBox();
           break;
         case 'TextBox':
-          newObject = new TextBox(this.clipboard.state);
+          newObject = new TextBox();
           break;
         case 'Page':
-          let data = this.clipboard.serialize();
           newObject = new Page();
-          newObject.deserialize(JSON.parse(data));
           break;
           /*
         case 'Document':
@@ -125,6 +123,8 @@ class DocumentController {
       }
 
       if (newObject != null) {
+        newObject.deserialize(JSON.parse(data));
+
         if (newObject.type == 'Page') {
           this.doc.appendPage(newObject);
           channel.send('PageList:addPage', newObject);
@@ -148,19 +148,12 @@ class DocumentController {
 
       // TBD: we have to hide things before capturing
       if (format == 'image') {
-        let clone = this.page.node.cloneNode(true);
-        clone.style.position = 'absolute';
-        clone.style.top = 0;
-        clone.style.left = 0;
-        document.body.appendChild(clone);
-
-        html2canvas(clone, {
+        html2canvas(this.page.node, {
           allowTaint: true,
           backgroundColor: this.page.color,
-          width: this.page.width,
-          height: this.page.height,
+          scrollX: parseInt(window.scrollX),
+          scrollY: -parseInt(window.scrollY),
         }).then((canvas) => {
-          document.body.removeChild(clone);
           var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
 
           var link = document.createElement("a");
@@ -173,10 +166,6 @@ class DocumentController {
           // Cleanup the DOM
           document.body.removeChild(link);
         });
-      } else if (format == 'pdf') {
-        //var worker = html2pdf().from(this.page.node).save();
-      } else if (format == 'json') {
-        console.log(this.doc.serialize());
       }
     });
 

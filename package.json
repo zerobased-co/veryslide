@@ -25,6 +25,7 @@
     "eslint": "^6.0.1",
     "firebase": "^6.3.0",
     "html2canvas": "^1.0.0-rc.3",
+    "html2canvas-render-offscreen": "0.0.3",
     "html2pdf.js": "^0.9.1",
     "node-sass": "^4.12.0",
     "react": "^16.8.6",

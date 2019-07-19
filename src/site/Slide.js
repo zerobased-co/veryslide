@@ -25,10 +25,12 @@ class SlideBase extends Component {
         this.setState({loaded: true});
 
         const data = doc.data();
-        this.veryslide = new Veryslide(
-          this.veryslideRef.current,
-          (data.data != null) ? JSON.parse(data.data) : null
-        );
+        this.veryslide = new Veryslide({
+          target: this.veryslideRef.current,
+          data: (data.data != null) ? JSON.parse(data.data) : null,
+          slideId: this.slideId,
+          firebase: this.props.firebase,
+        });
       }
       else {
         // TBD: then create one on the fly?
@@ -42,27 +44,11 @@ class SlideBase extends Component {
     this.veryslide.destroy();
   }
 
-  saveSlide(id) {
-    let data = this.veryslide.serialize();
-    console.log(data.length);
-
-    // TBD: permission check
-    this.props.firebase.slide(id).update({data}).then(() => {
-      alert('Successfully saved.');
-    }).catch(function(error) {
-        console.log("Error saving document:", error);
-    });
-  }
-
   render() {
     return (
       <div>
         {this.state.loaded ? (
-          <div>
-            <h2>Slide {this.slideId}</h2>
-            <button type="button" onClick={() => this.saveSlide(this.slideId)}>Save</button>
-            <div className='Veryslide' ref={this.veryslideRef} />
-          </div>
+          <div className='Veryslide' ref={this.veryslideRef} />
         ) : (
           <p>Loading...</p>
         )}

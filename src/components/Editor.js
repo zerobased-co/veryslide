@@ -135,7 +135,7 @@ class Viewport extends View {
 
   updateThumbnail() {
     if (this.page == null) return;
-    this.page.pagethumb.updateThumbnail();
+    this.page.updateThumbnail();
   }
 
   destroy() {

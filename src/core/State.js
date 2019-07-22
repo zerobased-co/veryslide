@@ -67,8 +67,8 @@ class State {
           if (k === 'pages') {
             let page = this.addPage();
             // TBD: without using channel
-            channel.send('PageList:addPage', page);
             page.deserialize(item);
+            channel.send('PageList:addPage', page);
           } else if (k === 'objects') {
             let obj = this.addObject(item.type);
             obj.deserialize(item);

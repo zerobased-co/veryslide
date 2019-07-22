@@ -1,3 +1,5 @@
+import html2canvas from 'html2canvas';
+
 import State from '../core/State.js';
 import List from '../core/List';
 import BaseObject from './objects/BaseObject';
@@ -11,11 +13,13 @@ class Page extends BaseObject {
       type: 'Page',
       className: 'vs-page',
       objects: new List(),
+      thumbnail: '',
       ...state,
     });
 
-    this.pagethumb = null;
     this.invalidate = false;
+    this.thumbnailScale = 0.2;
+    this.pagethumb = null;
   }
 
   addObject(type, states) {
@@ -59,6 +63,28 @@ class Page extends BaseObject {
       }
     });
     return found;
+  }
+
+  updateThumbnail(force) {
+    if (this.node == null) return;
+
+    // check invalidation and force update
+    if (this.invalidate != true && force != true) return;
+    this.invalidate = false;
+
+    const rect = this.node.getBoundingClientRect();
+    html2canvas(this.node, {
+      allowTaint: true,
+      backgroundColor: this.color,
+      scale: this.thumbnailScale,
+      scrollX: parseInt(window.scrollX),
+      scrollY: -parseInt(window.scrollY),
+    }).then((canvas) => {
+      this.thumbnail = canvas.toDataURL();
+      if (this.pagethumb != null) {
+        this.pagethumb.updateThumbnail();
+      }
+    });
   }
 
   removeObject(object) {

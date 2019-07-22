@@ -8,6 +8,7 @@ class ImageBox extends BaseObject {
       className: 'vs-imagebox',
       width: 100,
       height: 100,
+      color: '#00000000',
       src: '',
       ...state,
     });

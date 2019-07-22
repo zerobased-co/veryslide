@@ -1,7 +1,7 @@
 import View from './View.js';
-import { ColorPicker } from 'codemirror-colorpicker';
+import '@easylogic/colorpicker/dist/colorpicker.css';
+import ColorPickerUI from '@easylogic/colorpicker'
 import { properTextColor } from '../../core/Util';
-import 'codemirror-colorpicker/dist/codemirror-colorpicker.css';
 
 class ColorButton extends View {
   constructor(state) {
@@ -11,7 +11,8 @@ class ColorButton extends View {
       ...state,
     });
 
-    this.colorPicker = new ColorPicker({
+    this.colorPicker = ColorPickerUI.create({
+      type: 'sketch',
       color: this.color,
       outputFormat : 'hex',
       hideDelay: 2000,

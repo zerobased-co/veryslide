@@ -1,16 +1,52 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,700|Vollkorn:400,700&display=swap');
+
 body, html {
   margin: 0;
   padding: 0;
+  background: #fafafa;
 }
 
 * {
+  font-family: 'Montserrat', sans-serif;
   box-sizing: border-box;
 }
 
-.App {
+.VerySlideWeb {
+  display: flex;
+  flex-direction: row;
 }
 
 .Veryslide {
   height: 100vh;
   display: flex;
+}
+
+.Landing {
+  width: 50vw;
+  height: 100vh;
+  background: #1a237e;
+  display: flex;
+  align-items: center;
+}
+
+.Landing .Hero {
+  color: #ffcd00;
+  padding: 5em;
+}
+
+.Landing .Hero h1 {
+  font-weight: 700;
+  font-size: 7vw;
+  margin: 0;
+}
+.Landing .Hero p {
+  font-family: 'Vollkorn', serif;
+  font-size: 1.5vw;
+  margin: 0.5em 0.25em;
+}
+
+@media screen and (max-width: 720px) {
+  .VerySlideWeb {
+    flex-direction: column;
+  }
 }

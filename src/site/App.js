@@ -28,12 +28,7 @@ class App extends Component {
   render() {
     return (
       <Router>
-        <div className="App">
-          <h1>Veryslide</h1>
-          <Navigation />
-
-          <hr />
-
+        <div className="VerySlideWeb">
           <Switch>
             <Route exact path={ROUTES.LANDING} component={Landing} />
             <Route path={ROUTES.SIGNUP} component={SignUp} />

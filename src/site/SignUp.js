@@ -32,7 +32,12 @@ class SignUpFormBase extends Component {
     this.props.firebase
       .doCreateUserWithEmailAndPassword(email, passwordOne)
       .then(authUser => {
-        // Create a user in your Firebase realtime database
+        // TBD: now we're writing profile on both sides.
+
+        this.props.firebase.auth.currentUser.updateProfile({
+          displayName: username,
+        });
+
         return this.props.firebase
           .currentUser()
           .set({

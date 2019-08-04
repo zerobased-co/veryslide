@@ -41,14 +41,16 @@ class App extends Component {
         <div className="VerySlideWeb">
           <Switch>
             <Route exact path={ROUTES.LANDING} component={Landing} />
+
             <NavRoute path={ROUTES.SIGNUP} component={SignUp} />
             <NavRoute path={ROUTES.SIGNIN} component={SignIn} />
             <NavRoute path={ROUTES.PASSWORD_FORGET} component={PasswordForget} />
-            <Route path={ROUTES.HOME} component={Home} />
+            <NavRoute path={ROUTES.HOME} component={Home} />
             <NavRoute path={ROUTES.ACCOUNT} component={Account} />
             <NavRoute path={ROUTES.ADMIN} component={Admin} />
-            <NavRoute path={ROUTES.SLIDE_NEW} component={SlideNew} />
-            <NavRoute path={ROUTES.SLIDE} component={Slide} />
+
+            <NavRoute exact path={ROUTES.SLIDE_NEW} component={SlideNew} />
+            <Route path={ROUTES.SLIDE} component={Slide} />
           </Switch>
         </div>
       </Router>

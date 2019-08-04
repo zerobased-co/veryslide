@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { SignInLink } from './SignIn';
+import { AuthUserContext } from './Session';
 import * as ROUTES from './constants/routes';
 
 const Landing = () => (
@@ -9,10 +10,27 @@ const Landing = () => (
       <div className="Hero">
         <h1>Veryslide</h1>
         <h2>Forge and share versatile slides.</h2>
-        <Link to={ROUTES.SIGNUP} className="Button">
-          Sign up&nbsp;<i className="fas fa-arrow-circle-right"></i>
-        </Link>
-        <SignInLink />
+        <AuthUserContext.Consumer>
+          {authUser =>
+            authUser ? 
+
+            <div>
+              <p>Welcome back, {authUser.displayName}.</p>
+              <Link to={ROUTES.HOME} className="Button">
+                Go to my page&nbsp;<i className="fas fa-arrow-circle-right"></i>
+              </Link>
+            </div>
+
+            : 
+
+            <div>
+              <Link to={ROUTES.SIGNUP} className="Button">
+                Sign up&nbsp;<i className="fas fa-arrow-circle-right"></i>
+              </Link>
+              <SignInLink />
+            </div>
+          }
+        </AuthUserContext.Consumer>
       </div>
     </div>
     <div className="Intro">

@@ -118,7 +118,7 @@ const SignUpForm = compose(
 
 const SignUpLink = () => (
   <p>
-    Don't have an account? <Link to={ROUTES.SIGNUP}>Sign Up</Link>
+    Don't have an account? <Link to={ROUTES.SIGNUP}>Sign Up</Link>.
   </p>
 );
 

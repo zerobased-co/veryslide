@@ -50,7 +50,7 @@ class SlideBase extends Component {
         {this.state.loaded ? (
           <div className='Veryslide' ref={this.veryslideRef} />
         ) : (
-          <p>Loading...</p>
+          <p>Loading slide...</p>
         )}
       </div>
     );

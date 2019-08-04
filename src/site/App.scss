@@ -1,0 +1,159 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,600,900&display=swap');
+
+$small-screen: screen and (max-width: 1024px);
+$large-screen: screen and (min-width: 1920px);
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #fafafa;
+  color: #414350;
+  font-size: 1.25vw;
+
+  @media #{$large-screen} {
+    font-size: 24px;
+  }
+  @media #{$small-screen} {
+      font-size: 14px;
+  }
+}
+
+* {
+  font-family: 'Helvetica Neue', 'Arial', sans-serif;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Montserrat', 'Helvetica Neue', 'Arial', sans-serif;
+  letter-spacing: -0.15px;
+  font-weight: 600;
+}
+
+h1 {
+  font-size: 2em;
+}
+
+h2 {
+  font-size: 1.6em;
+}
+
+article {
+  padding: 2em 0;
+  margin: 0 2em;
+  min-height: 100vh;
+
+  * + h1, * + h2 {
+    margin-top: 3em;
+  }
+}
+
+.VerySlideWeb {
+  display: flex;
+  flex-direction: row;
+}
+
+.Veryslide {
+  height: 100vh;
+  display: flex;
+}
+
+.Landing {
+  display: flex;
+  flex-grow: 1;
+
+  @media #{$small-screen} {
+    flex-direction: column;
+  }
+
+  .Title {
+    background: #ececec;
+    display: flex;
+    width: 40%;
+    border-right: 1px solid #ddd;
+
+    @media #{$small-screen} {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .Hero {
+      padding: 2em;
+      position: fixed;
+      margin-top: 20vh;
+
+      @media #{$small-screen} {
+        position: inherit;
+        margin-top: 0;
+      }
+
+      h1 {
+        color: #ff206f;
+        font-weight: 900;
+        font-size: 5.4em;
+        margin: 0;
+      }
+
+      h2 {
+        font-size: 1.2em;
+        margin: 0.25em 0 2.5em;
+        text-shadow: 1px 1px 0px #fafafa;
+      }
+    }
+  }
+
+  .Intro {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    flex-grow: 1;
+  }
+}
+
+.Button {
+  font-size: 1em;
+  border: 1px solid #e61e64;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  font-weight: 400;
+  user-select: none;
+  outline: none;
+  text-decoration: none;
+  display: inline-block;
+
+  padding: 1em 2em;
+  font-family: 'Montserrat';
+  font-weight: 600;
+  color: #e61e64;
+  line-height: 1;
+
+  &:hover {
+    background: #e61e64;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease-out;
+  }
+
+  &:active {
+    transform: scale(0.95, 0.95);
+    transition: all 0.2s ease-out;
+  }
+}
+
+.Footer {
+  width: 100%;
+  background: #eee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  p {
+    font-size: 0.8em;
+  }
+}

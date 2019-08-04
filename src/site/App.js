@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { hot } from "react-hot-loader";
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
-import "./App.css";
+import "./App.scss";
 import Navigation from './Navigation';
 import Landing from './Landing';
 import SignUp from './SignUp';
@@ -15,6 +15,16 @@ import Slide, { SlideNew } from './Slide';
 
 import { withAuthentication } from './Session';
 import * as ROUTES from './constants/routes';
+
+
+const NavRoute = ({exact, path, component: Component}) => (
+  <Route exact={exact} path={path} render={(props) => (
+    <div>
+      <Navigation/>
+      <Component {...props}/>
+    </div>
+  )}/>
+)
 
 class App extends Component {
   constructor(props) {
@@ -31,14 +41,14 @@ class App extends Component {
         <div className="VerySlideWeb">
           <Switch>
             <Route exact path={ROUTES.LANDING} component={Landing} />
-            <Route path={ROUTES.SIGNUP} component={SignUp} />
-            <Route path={ROUTES.SIGNIN} component={SignIn} />
-            <Route path={ROUTES.PASSWORD_FORGET} component={PasswordForget} />
+            <NavRoute path={ROUTES.SIGNUP} component={SignUp} />
+            <NavRoute path={ROUTES.SIGNIN} component={SignIn} />
+            <NavRoute path={ROUTES.PASSWORD_FORGET} component={PasswordForget} />
             <Route path={ROUTES.HOME} component={Home} />
-            <Route path={ROUTES.ACCOUNT} component={Account} />
-            <Route path={ROUTES.ADMIN} component={Admin} />
-            <Route path={ROUTES.SLIDE_NEW} component={SlideNew} />
-            <Route path={ROUTES.SLIDE} component={Slide} />
+            <NavRoute path={ROUTES.ACCOUNT} component={Account} />
+            <NavRoute path={ROUTES.ADMIN} component={Admin} />
+            <NavRoute path={ROUTES.SLIDE_NEW} component={SlideNew} />
+            <NavRoute path={ROUTES.SLIDE} component={Slide} />
           </Switch>
         </div>
       </Router>

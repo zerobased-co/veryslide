@@ -43,6 +43,10 @@ class Menu extends View {
         //ui.createButton('PDF',   () => { channel.send('Document:savePage', 'pdf'); }),
         ui.createButton('Save',   () => { channel.send('Veryslide:save'); }),
       ),
+
+      ui.createButton('Close',   () => { 
+        window.history.back();
+      }),
     ].forEach(item => this.appendChild(item));
 
 

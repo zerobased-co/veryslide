@@ -19,7 +19,7 @@ import * as ROUTES from './constants/routes';
 
 const NavRoute = ({exact, path, component: Component}) => (
   <Route exact={exact} path={path} render={(props) => (
-    <div>
+    <div className="VerySlideWeb">
       <Navigation/>
       <Component {...props}/>
     </div>
@@ -38,21 +38,19 @@ class App extends Component {
   render() {
     return (
       <Router>
-        <div className="VerySlideWeb">
-          <Switch>
-            <Route exact path={ROUTES.LANDING} component={Landing} />
+        <Switch>
+          <Route exact path={ROUTES.LANDING} component={Landing} />
 
-            <NavRoute path={ROUTES.SIGNUP} component={SignUp} />
-            <NavRoute path={ROUTES.SIGNIN} component={SignIn} />
-            <NavRoute path={ROUTES.PASSWORD_FORGET} component={PasswordForget} />
-            <NavRoute path={ROUTES.HOME} component={Home} />
-            <NavRoute path={ROUTES.ACCOUNT} component={Account} />
-            <NavRoute path={ROUTES.ADMIN} component={Admin} />
+          <NavRoute path={ROUTES.SIGNUP} component={SignUp} />
+          <NavRoute path={ROUTES.SIGNIN} component={SignIn} />
+          <NavRoute path={ROUTES.PASSWORD_FORGET} component={PasswordForget} />
+          <NavRoute path={ROUTES.HOME} component={Home} />
+          <NavRoute path={ROUTES.ACCOUNT} component={Account} />
+          <NavRoute path={ROUTES.ADMIN} component={Admin} />
 
-            <NavRoute exact path={ROUTES.SLIDE_NEW} component={SlideNew} />
-            <Route path={ROUTES.SLIDE} component={Slide} />
-          </Switch>
-        </div>
+          <NavRoute exact path={ROUTES.SLIDE_NEW} component={SlideNew} />
+          <Route path={ROUTES.SLIDE} component={Slide} />
+        </Switch>
       </Router>
     );
   }

@@ -1,13 +1,24 @@
 @import url('https://fonts.googleapis.com/css?family=Montserrat:400,600,900&display=swap');
 
+$color-brand: #ff206f;
+$color-primary: #e61e64;
+$color-content: #414350;
+
+$color-gray-1: #fafafa;
+$color-gray-2: #ececec;
+$color-gray-3: #dddddd;
+
+$font-brand: 'Montserrat', 'Helvetica Neue', 'Arial', sans-serif;
+$font-primary: 'Helvetica Neue', 'Arial', sans-serif;
+
 $small-screen: screen and (max-width: 1024px);
 $large-screen: screen and (min-width: 1920px);
 
 body {
   margin: 0;
   padding: 0;
-  background: #fafafa;
-  color: #414350;
+  background: $color-gray-1;
+  color: $color-content;
   font-size: 1.25vw;
 
   @media #{$large-screen} {
@@ -19,7 +30,7 @@ body {
 }
 
 * {
-  font-family: 'Helvetica Neue', 'Arial', sans-serif;
+  font-family: $font-primary;
   box-sizing: border-box;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -27,7 +38,7 @@ body {
 }
 
 h1, h2, h3, h4 {
-  font-family: 'Montserrat', 'Helvetica Neue', 'Arial', sans-serif;
+  font-family: $font-brand;
   letter-spacing: -0.15px;
   font-weight: 600;
 }
@@ -52,12 +63,7 @@ article {
 
 .VerySlideWeb {
   display: flex;
-  flex-direction: row;
-}
-
-.Veryslide {
-  height: 100vh;
-  display: flex;
+  flex-direction: column;
 }
 
 .Landing {
@@ -69,15 +75,15 @@ article {
   }
 
   .Title {
-    background: #ececec;
+    background: $color-gray-2;
     display: flex;
     width: 40%;
-    border-right: 1px solid #ddd;
+    border-right: 1px solid $color-gray-3;
 
     @media #{$small-screen} {
       width: 100%;
       border-right: none;
-      border-bottom: 1px solid #ddd;
+      border-bottom: 1px solid $color-gray-3;
     }
 
     .Hero {
@@ -91,7 +97,7 @@ article {
       }
 
       h1 {
-        color: #ff206f;
+        color: $color-brand;
         font-weight: 900;
         font-size: 5.4em;
         margin: 0;
@@ -100,7 +106,7 @@ article {
       h2 {
         font-size: 1.2em;
         margin: 0.25em 0 2.5em;
-        text-shadow: 1px 1px 0px #fafafa;
+        text-shadow: 1px 1px 0px $color-gray-1;
       }
     }
   }
@@ -115,7 +121,7 @@ article {
 
 .Button {
   font-size: 1em;
-  border: 1px solid #e61e64;
+  border: 1px solid $color-primary;
   border-radius: 100px;
   display: flex;
   align-items: center;
@@ -130,11 +136,11 @@ article {
   padding: 1em 2em;
   font-family: 'Montserrat';
   font-weight: 600;
-  color: #e61e64;
+  color: $color-primary;
   line-height: 1;
 
   &:hover {
-    background: #e61e64;
+    background: $color-primary;
     color: white;
     cursor: pointer;
     transition: all 0.2s ease-out;
@@ -146,9 +152,31 @@ article {
   }
 }
 
+.Navigation {
+  padding: 1em;
+  background: $color-gray-2;
+
+  .Brand {
+    color: $color-brand;
+    font-family: $font-brand;
+    font-size: 2em;
+    font-weight: 900;
+    text-decoration: none;
+  }
+
+  ul {
+    display: flex;
+    flex-display: row;
+
+    li {
+      list-style: none;
+    }
+  }
+}
+
 .Footer {
   width: 100%;
-  background: #eee;
+  background: $color-gray-2;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -156,4 +184,24 @@ article {
   p {
     font-size: 0.8em;
   }
+}
+
+.Loading {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 2em;
+  color: $color-brand;
+  font-family: $font-brand;
+  background: $color-gray-2;
+}
+
+.Veryslide {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  font-size: 16px;
 }

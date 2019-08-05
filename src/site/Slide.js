@@ -50,7 +50,7 @@ class SlideBase extends Component {
         {this.state.loaded ? (
           <div className='Veryslide' ref={this.veryslideRef} />
         ) : (
-          <p>Loading slide...</p>
+          <div className='Loading'>Loading slide...</div>
         )}
       </div>
     );
@@ -69,7 +69,7 @@ class SlideNewBase extends Component {
   componentDidMount() {
     this.props.firebase.newSlide().then(slide => {
       const url = generatePath(ROUTES.SLIDE, { id: slide.id });
-      this.props.history.push(url);
+      this.props.history.replace(url);
     }).catch(function(error) {
         console.log("Error creating document:", error);
     });

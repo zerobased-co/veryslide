@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { compose } from 'recompose';
 
+import SignOutButton from './SignOut';
 import { PasswordForgetForm } from './PasswordForget';
 import { PasswordChangeForm } from './PasswordChange';
 import { AuthUserContext, withAuthorization } from './Session';
@@ -26,6 +27,8 @@ class AccountPageBase extends Component {
             <PasswordForgetForm />
             <hr />
             <PasswordChangeForm />
+            <hr />
+            <SignOutButton />
           </div>
         )}
       </AuthUserContext.Consumer>

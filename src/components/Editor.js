@@ -560,7 +560,7 @@ class PanelForTextBox extends PanelForBox {
   }
 }
 
-class PanelForImageBox extends Panel {
+class PanelForImageBox extends PanelForBox {
   render() {
     super.render();
 

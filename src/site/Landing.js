@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { SignInLink } from './SignIn';
+import Footer from './Footer';
 import { AuthUserContext } from './Session';
 import * as ROUTES from './constants/routes';
 
@@ -16,7 +17,7 @@ const Landing = () => (
 
             <div>
               <p>Welcome back, {authUser.displayName}.</p>
-              <Link to={ROUTES.HOME} className="Button">
+              <Link to={ROUTES.HOME} className="Button Primary Large">
                 Go to my page&nbsp;<i className="fas fa-arrow-circle-right"></i>
               </Link>
             </div>
@@ -24,7 +25,7 @@ const Landing = () => (
             : 
 
             <div>
-              <Link to={ROUTES.SIGNUP} className="Button">
+              <Link to={ROUTES.SIGNUP} className="Button Primary Large">
                 Sign up&nbsp;<i className="fas fa-arrow-circle-right"></i>
               </Link>
               <SignInLink />
@@ -34,15 +35,13 @@ const Landing = () => (
       </div>
     </div>
     <div className="Intro">
-      <article>
+      <div className="Content">
         <h1>What is Veryslide?</h1>
         <p>Description goes here.</p>
         <h1>Discover slides</h1>
         <p>Slides goes here.</p>
-      </article>
-      <div className="Footer">
-        <p>This site brought to you by <a href="https://zerobased.co">zerobased.co</a></p>
       </div>
+      <Footer />
     </div>
   </div>
 );

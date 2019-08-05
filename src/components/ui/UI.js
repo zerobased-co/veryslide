@@ -34,8 +34,8 @@ class UI {
     return new Text({title, className});
   }
 
-  createButton(title, onClick) {
-    return new Button({title, onClick});
+  createButton(title, onClick, className='vs-button') {
+    return new Button({title, onClick, className});
   }
 
   createInputText(target, property) {

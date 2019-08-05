@@ -15,7 +15,7 @@ class HomeBase extends Component {
 
     this.state = {
       data: {},
-      slides: [],
+      slides: null,
     };
   }
 
@@ -53,13 +53,21 @@ class HomeBase extends Component {
   }
 
   render() {
+    const slides = this.state.slides;
+
     return (
       <AuthUserContext.Consumer>
         {authUser => (
           <div>
             <h2>My slides</h2>
             <ul>{
-              this.state.slides.map((slide, idx) => {     
+              slides == null ?
+              <p>Loading...</p>
+              :
+              slides.length == 0 ?
+              <p>No slide found.</p>
+              :
+              slides.map((slide, idx) => {     
                 const url = generatePath(ROUTES.SLIDE, { id: slide.id });
                 return (
                   <li key={slide.id}>

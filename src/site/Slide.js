@@ -77,7 +77,9 @@ class SlideNewBase extends Component {
 
   render() {
     return (
-      <p><strong>Now creating</strong> a new document...{this.state.slideId}</p>
+      <div className="Loading">
+        Now creating a new document...{this.state.slideId}
+      </div>
     );
   }
 }

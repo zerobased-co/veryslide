@@ -20,23 +20,21 @@ const Navigation = () => (
 const NavigationAuth = () => (
   <ul>
     <li>
-      <Link to={ROUTES.HOME}>Home</Link>
+      <Link className="Button Primary" to={ROUTES.SLIDE_NEW}>
+        <i className="fas fa-plus-circle"/>&nbsp;New Slide
+      </Link>
     </li>
     <li>
-      <Link to={ROUTES.SLIDE_NEW}>New Slide</Link>
+      <Link className="Button" to={ROUTES.HOME}>My page</Link>
     </li>
     <li>
-      <Link to={ROUTES.ACCOUNT}>Account</Link>
+      <Link className="Button" to={ROUTES.ACCOUNT}>Account</Link>
     </li>
   </ul>
 );
 
 const NavigationNonAuth = () => (
-  <ul>
-    <li>
-      <Link to={ROUTES.SIGNIN}>Sign In</Link>
-    </li>
-  </ul>
+  <div/>
 );
 
 export default Navigation;

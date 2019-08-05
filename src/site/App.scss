@@ -1,9 +1,12 @@
-@import url('https://fonts.googleapis.com/css?family=Montserrat:400,600,900&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,600,700,900&display=swap');
 
 $color-brand: #ff206f;
 $color-primary: #e61e64;
+$color-secondary: #e62787;
 $color-content: #414350;
+$color-normal: #414350;
 
+$color-gray-0: #ffffff;
 $color-gray-1: #fafafa;
 $color-gray-2: #ececec;
 $color-gray-3: #dddddd;
@@ -19,13 +22,13 @@ body {
   padding: 0;
   background: $color-gray-1;
   color: $color-content;
-  font-size: 1.25vw;
+  font-size: 1.2vw;
 
   @media #{$large-screen} {
     font-size: 24px;
   }
   @media #{$small-screen} {
-      font-size: 14px;
+      font-size: 16px;
   }
 }
 
@@ -40,30 +43,33 @@ body {
 h1, h2, h3, h4 {
   font-family: $font-brand;
   letter-spacing: -0.15px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 h1 {
-  font-size: 2em;
+  font-size: 2rem;
 }
 
 h2 {
-  font-size: 1.6em;
-}
-
-article {
-  padding: 2em 0;
-  margin: 0 2em;
-  min-height: 100vh;
-
-  * + h1, * + h2 {
-    margin-top: 3em;
-  }
+  font-size: 1.6rem;
 }
 
 .VerySlideWeb {
   display: flex;
   flex-direction: column;
+}
+
+.Content {
+  margin: 0 2rem;
+  min-height: 100vh;
+
+  & + & {
+    padding: 2rem 0;
+  }
+
+  * + h1, * + h2 {
+    margin-top: 3rem;
+  }
 }
 
 .Landing {
@@ -87,7 +93,7 @@ article {
     }
 
     .Hero {
-      padding: 2em;
+      padding: 2rem;
       position: fixed;
       margin-top: 20vh;
 
@@ -99,13 +105,13 @@ article {
       h1 {
         color: $color-brand;
         font-weight: 900;
-        font-size: 5.4em;
+        font-size: 6rem;
         margin: 0;
       }
 
       h2 {
-        font-size: 1.2em;
-        margin: 0.25em 0 2.5em;
+        font-size: 1.2rem;
+        margin: 0.25rem 0 2.5rem;
         text-shadow: 1px 1px 0px $color-gray-1;
       }
     }
@@ -120,24 +126,36 @@ article {
 }
 
 .Button {
-  font-size: 1em;
-  border: 1px solid $color-primary;
+  color: $color-normal;
+  background: $color-gray-1;
+
+  border: 1px solid $color-gray-3;
   border-radius: 100px;
-  display: flex;
   align-items: center;
   justify-content: center;
-  background: #fff;
   font-weight: 400;
   user-select: none;
   outline: none;
   text-decoration: none;
-  display: inline-block;
+  display: inline-flex;
 
-  padding: 1em 2em;
+  font-size: 0.8rem;
+  padding: 0.8rem 1rem;
+
   font-family: 'Montserrat';
   font-weight: 600;
-  color: $color-primary;
   line-height: 1;
+
+  &.Primary {
+    color: $color-primary;
+    background: $color-gray-0;
+    border: 1px solid $color-primary;
+  }
+
+  &.Large {
+  font-size: 1rem;
+    padding: 1rem 2rem;
+  }
 
   &:hover {
     background: $color-primary;
@@ -153,23 +171,47 @@ article {
 }
 
 .Navigation {
-  padding: 1em;
+  padding: 1rem;
   background: $color-gray-2;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-bottom: 1px solid $color-gray-3;
 
   .Brand {
     color: $color-brand;
     font-family: $font-brand;
-    font-size: 2em;
+    font-size: 2rem;
     font-weight: 900;
     text-decoration: none;
   }
 
   ul {
     display: flex;
-    flex-display: row;
+    flex-direction: row;
+    flex-grow: 1;
+    padding: 0 0 0 2rem;
+    margin: 0;
+
+    li:last-child {
+      margin-left: auto;
+    }
 
     li {
       list-style: none;
+    }
+
+    li + li {
+      padding-left: 1rem;
+    }
+  }
+
+  @media #{$small-screen} {
+    flex-direction: column;
+    align-items: inherit;
+
+    ul {
+      padding: 1rem 0 0 0;
     }
   }
 }
@@ -181,19 +223,26 @@ article {
   align-items: center;
   justify-content: center;
 
-  p {
-    font-size: 0.8em;
+  p, p * {
+    font-size: 0.8rem;
+    color: $color-normal;
+    font-family: $font-brand;
+    letter-spacing: -0.15px;
   }
 }
 
 .Loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+
   width: 100vw;
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 2em;
+  font-size: 2rem;
   color: $color-brand;
   font-family: $font-brand;
   background: $color-gray-2;

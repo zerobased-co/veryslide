@@ -11,6 +11,7 @@ import PasswordForget from './PasswordForget';
 import Home from './Home';
 import Account from './Account';
 import Admin from './Admin';
+import Footer from './Footer';
 import Slide, { SlideNew } from './Slide';
 
 import { withAuthentication } from './Session';
@@ -21,7 +22,10 @@ const NavRoute = ({exact, path, component: Component}) => (
   <Route exact={exact} path={path} render={(props) => (
     <div className="VerySlideWeb">
       <Navigation/>
-      <Component {...props}/>
+      <div className="Content">
+        <Component {...props}/>
+      </div>
+      <Footer/>
     </div>
   )}/>
 )

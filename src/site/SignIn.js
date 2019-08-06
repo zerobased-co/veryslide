@@ -8,11 +8,14 @@ import { withFirebase } from './Firebase';
 import * as ROUTES from './constants/routes';
 
 const SignInPage = () => (
-  <div>
-    <h2>SignIn</h2>
-    <SignInForm />
-    <PasswordForgetLink />
-    <SignUpLink />
+  <div className="Center">
+    <div>
+      <h2>SignIn</h2>
+      <SignInForm />
+      <hr />
+      <PasswordForgetLink />
+      <SignUpLink />
+    </div>
   </div>
 );
 
@@ -55,27 +58,22 @@ class SignInFormBase extends Component {
     const isInvalid = password === '' || email === '';
 
     return (
-      <form onSubmit={this.onSubmit}>
-        <input
-          name="email"
-          value={email}
-          onChange={this.onChange}
-          type="text"
-          placeholder="Email Address"
-        />
-        <input
-          name="password"
-          value={password}
-          onChange={this.onChange}
-          type="password"
-          placeholder="Password"
-        />
-        <button disabled={isInvalid} type="submit">
-          Sign In
-        </button>
-
-        {error && <p>{error.message}</p>}
-      </form>
+      <div>
+        {error && <p className="Label Error">{error.message}</p>}
+        <form onSubmit={this.onSubmit}>
+          <div className="InputGroup">
+            <i className="fas fa-envelope"/>
+            <input name="email" value={email} onChange={this.onChange} type="text" placeholder="Email Address" required />
+          </div>
+          <div className="InputGroup">
+            <i className="fas fa-key"/>
+            <input name="password" value={password} onChange={this.onChange} type="password" placeholder="Password" required />
+          </div>
+          <button className="Primary" disabled={isInvalid} type="submit">
+            Sign In
+          </button>
+        </form>
+      </div>
     );
   }
 }

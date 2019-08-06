@@ -6,9 +6,12 @@ import { withFirebase } from './Firebase';
 import * as ROUTES from './constants/routes';
 
 const SignUpPage = () => (
-  <div>
-    <h2>SignUp</h2>
-    <SignUpForm />
+  <div className="Center">
+    <div>
+      <h2>Welcome to Veryslide!</h2>
+      <p>Create an account and bake your ideas into awesome slides.</p>
+      <SignUpForm />
+    </div>
   </div>
 );
 
@@ -76,41 +79,30 @@ class SignUpFormBase extends Component {
       username === '';
 
     return (
-      <form onSubmit={this.onSubmit}>
-        <input
-          name="username"
-          value={username}
-          onChange={this.onChange}
-          type="text"
-          placeholder="Full Name"
-        />
-        <input
-          name="email"
-          value={email}
-          onChange={this.onChange}
-          type="text"
-          placeholder="Email Address"
-        />
-        <input
-          name="passwordOne"
-          value={passwordOne}
-          onChange={this.onChange}
-          type="password"
-          placeholder="Password"
-        />
-        <input
-          name="passwordTwo"
-          value={passwordTwo}
-          onChange={this.onChange}
-          type="password"
-          placeholder="Confirm Password"
-        />
-        <button disabled={isInvalid} type="submit">
-          Sign Up
-        </button>
-
-        {error && <p>{error.message}</p>}
-      </form>
+      <div>
+        {error && <p className="Label Error">{error.message}</p>}
+        <form onSubmit={this.onSubmit}>
+          <div className="InputGroup">
+            <i className="fas fa-user"/>
+            <input name="username" value={username} onChange={this.onChange} type="text" placeholder="Full Name" required />
+          </div>
+          <div className="InputGroup">
+            <i className="fas fa-envelope"/>
+            <input name="email" value={email} onChange={this.onChange} type="text" placeholder="Email Address" required />
+          </div>
+          <div className="InputGroup">
+            <i className="fas fa-check"/>
+            <input name="passwordOne" value={passwordOne} onChange={this.onChange} type="password" placeholder="Password" required />
+          </div>
+          <div className="InputGroup">
+            <i className="fas fa-check-double"/>
+            <input name="passwordTwo" value={passwordTwo} onChange={this.onChange} type="password" placeholder="Confirm Password" required />
+          </div>
+          <button className="Primary" disabled={isInvalid} type="submit">
+            Sign Up
+          </button>
+        </form>
+      </div>
     );
   }
 }

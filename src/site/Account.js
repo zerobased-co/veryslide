@@ -24,8 +24,7 @@ class AccountPageBase extends Component {
             <h2>Account Page</h2>
             <p>Account: {authUser.email}</p>
             <hr />
-            <PasswordForgetForm />
-            <hr />
+            <h3>Change Password</h3>
             <PasswordChangeForm />
             <hr />
             <SignOutButton />

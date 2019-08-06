@@ -34,7 +34,11 @@ const NavigationAuth = () => (
 );
 
 const NavigationNonAuth = () => (
-  <div/>
+  <ul>
+    <li>
+      <Link className="Button" to={ROUTES.SIGNIN}>Sign In</Link>
+    </li>
+  </ul>
 );
 
 export default Navigation;

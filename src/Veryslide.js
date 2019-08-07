@@ -25,6 +25,8 @@ class Veryslide extends State {
     this.document = new Document();
     this.editor = new Editor();
     this.documentController = new DocumentController(this.document, this.editor);
+    this.documentController.firebase = this.firebase;
+    this.documentController.slideId = this.slideId;
 
     this.target.appendChild(this.editor.node);
     if (this.data != null) {
@@ -35,14 +37,17 @@ class Veryslide extends State {
   }
 
   save() {
+    this.editor.loading(true);
     let data = this.document.serialize();
     console.log(data.length);
 
     // TBD: permission check
     this.firebase.slide(this.slideId).update({data}).then(() => {
-      alert('Successfully saved.');
+      this.editor.loading(false);
+      //alert('Successfully saved.');
     }).catch(function(error) {
-        console.log("Error saving document:", error);
+      this.editor.loading(false);
+      console.log("Error saving document:", error);
     });
   }
 

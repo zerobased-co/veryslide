@@ -1,10 +1,9 @@
 import './Editor.scss';
-import { parse } from 'papaparse';
 import ui from './ui/UI';
 import View from './ui/View';
 import Panel from './ui/Panel';
 import PageList from './PageList';
-import { AssetList } from './Asset';
+import AssetList from './AssetList';
 import Handler from './Handler';
 import channel from '../core/Channel';
 
@@ -68,12 +67,12 @@ class Menu extends View {
       reader.addEventListener("load", () => {
         var image = new Image();
         image.src = reader.result;
-        image.onload =  () => {
+        image.onload = () => {
           channel.send('Document:addObject', 'ImageBox', {
             width: image.width,
             height: image.height,
             src: image.src,
-          });
+          }, file);
         }
       }, false);
       reader.readAsDataURL(file);
@@ -569,6 +568,8 @@ class PanelForImageBox extends PanelForBox {
   render() {
     super.render();
 
+    // TBD: We cannot change image after creation
+    /*
     var input = document.createElement('input');
     input.type = 'file';
     input.addEventListener('change', event => {
@@ -586,12 +587,17 @@ class PanelForImageBox extends PanelForBox {
       }, false);
       reader.readAsDataURL(file);
     });
+    */
 
-    this.titlebar = new ui.TitleBar();
-    this.titlebar.title = 'ImageBox';
-    this.appendChild(this.titlebar);
-
-    this.appendChild(input);
+    [
+      new ui.TitleBar({'title': 'Image'}),
+      ui.H(
+        ui.createText('Reset'),
+        ui.createButton('Original size', () => { 
+          this.object.resetSize();
+        }),
+      ),
+    ].forEach(item => this.appendChild(item));
 
     return this.node;
   }
@@ -601,35 +607,23 @@ class PanelForImageList extends PanelForBox {
   render() {
     super.render();
 
-    var fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.addEventListener('change', event => {
-      this.object.clear();
-
-      // getting a hold of the file reference
-      var file = event.target.files[0];
-
-      // setting up the reader
-      var reader = new FileReader();
-      reader.readAsText(file, 'UTF-8');
-
-      // here we tell the reader what to do when it's done reading...
-      reader.onload = readerEvent => {
-        var csv = readerEvent.target.result; // this is the content!
-        var results = parse(csv, {header: true});
-
-        this.object.fields = results.meta.fields;
-        this.object.items = results.data;
-
-        // refresh panel
-        channel.send('Property:setPanelFor', this.object);
-      }
-    });
+    this.assets = channel.send('Document:getAssetList')[0];
+    this.dataOptions = [['none', '----']].concat(this.assets.array.map(x => [x.name, x.name]));
 
     [
       new ui.TitleBar({title: 'List Property'}),
-      fileInput,
-      this.itemCount = ui.createText(this.object.items.length + ' Item(s)'),
+      ui.H(
+        ui.createText('Data Asset'),
+        new ui.Select({
+          value: this.object.asset,
+          options: this.dataOptions,
+          onChange: (value) => { 
+            this.object.asset = value;
+            channel.send('Property:setPanelFor', this.object);
+          },
+        }),
+        this.itemCount = ui.createText('&nbsp;' + this.object.items.length + ' Item(s)'),
+      ),
 
       ui.H(
         ui.createText('Control'),

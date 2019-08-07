@@ -1,38 +1,49 @@
 import './ImageList.scss';
+import { parse } from 'papaparse';
+import channel from '../../core/Channel';
 import Box from './Box';
 import { randomInt } from '../../core/Util';
 
 function isValidItem(item, filter) {
   let valid = true;
   filter.forEach((f) => {
+    let fv = f['value'];
+    let ff = item[f['field']];
+
+    // If value is a number, then convert them as numbers
+    if (isNaN(f['value']) == false) {
+      fv = Number(fv);
+      ff = Number(ff);
+    }
+
     switch(f['operator']) {
       case '=':
-        if (!(f['value'] == item[f['field']])) {
+        if (!(ff == fv)) {
           valid = false;
         }
         break;
       case '!=':
-        if (!(f['value'] != item[f['field']])) {
+        if (!(ff != fv)) {
           valid = false;
         }
         break;
       case '>':
-        if (!(f['value'] > item[f['field']])) {
+        if (!(ff > fv)) {
           valid = false;
         }
         break;
       case '>=':
-        if (!(f['value'] >= item[f['field']])) {
+        if (!(ff >= fv)) {
           valid = false;
         }
         break;
       case '<':
-        if (!(f['value'] < item[f['field']])) {
+        if (!(ff < fv)) {
           valid = false;
         }
         break;
       case '<=':
-        if (!(f['value'] <= item[f['field']])) {
+        if (!(ff <= fv)) {
           valid = false;
         }
         break;
@@ -48,12 +59,9 @@ class ImageList extends Box {
       className: 'vs-imagelist',
       color: '#FFFFFF',
       borderStyle: 'solid',
+      asset: '',
 
-      fields: [],
       filter: [],
-
-      items: [],
-      selectedItems: [],
 
       itemDirection: 'row',
       itemAlign: 'space-between',
@@ -64,16 +72,36 @@ class ImageList extends Box {
 
       ...state,
     });
+
+    this.items = [];
+    this.fields = [];
   }
 
   deserialize(data) {
     super.deserialize(data);
-    this.apply();
+    
+    // wait until asset is ready
+    if (this.asset != '') {
+      this.loading(true);
+      this.__waitAssetAndApply();
+    } else {
+      this.apply();
+    }
+  }
+
+  __waitAssetAndApply() {
+    let asset = channel.send('Document:getAsset', this.asset)[0];
+    if (asset == null || asset.data == '') {
+      setTimeout(this.__waitAssetAndApply.bind(this), 500);
+    } else {
+      this.update();
+      this.apply();
+      this.loading(false);
+    }
   }
 
   clear() {
     super.clear();
-    this.selectedItems = [];
     this.filter = [];
   }
 
@@ -88,8 +116,6 @@ class ImageList extends Box {
 
   apply() {
     if (this.items.length == 0) return;
-    this.loading(true);
-    console.log(this.filter);
 
     this.node.innerHTML = '';
     for(var i = 0; i < this.items.length; i++) {
@@ -109,8 +135,19 @@ class ImageList extends Box {
 
       this.node.appendChild(node);
     }
-    this.loading(false);
     this.record();
+  }
+
+  update() {
+    let asset = channel.send('Document:getAsset', this.asset)[0];
+    // TBD: ???
+    if (asset == null) return;
+
+    let csv = asset.data;
+    var results = parse(csv, {header: true});
+
+    this.fields = results.meta.fields;
+    this.items = results.data;
   }
 
   on_itemDirection(direction) {

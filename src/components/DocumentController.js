@@ -1,6 +1,8 @@
 import html2canvas from 'html2canvas';
 
+import { uuid } from '../core/Util';
 import channel from '../core/Channel';
+
 import { Page } from './Document';
 import TextBox from './objects/TextBox';
 import ImageBox from './objects/ImageBox';
@@ -13,6 +15,8 @@ class DocumentController {
     this.page = null;
     this.object = null;
     this.clipboard = null;
+    this.firebase = null;
+    this.slideId = null;
 
     channel.bind(this, 'Document:addPage', () => {
       const newPage = this.doc.addPage();
@@ -40,17 +44,23 @@ class DocumentController {
       }
     });
 
-    channel.bind(this, 'Document:addObject', (objType, states) => {
+    channel.bind(this, 'Document:addObject', (objType, states, file) => {
       if (this.page == null) return;
       let newObject = this.page.addObject(objType, states);
       switch(newObject.type) {
         case 'ImageBox':
           newObject.loading(true);
+
+          let path = this.getFirebaseFilename(file);
+          this.fileUpload(file, path).then((url) => {
+            newObject.src = url;
+            newObject.path = path;
+          }).catch((err) => {
+            // TBD: Error handling
+            console.log(err);
+          });
           break;
       }
-      setTimeout((newObject) => {
-        newObject.loading(false);
-      }, 1000, newObject);
       channel.send('Viewport:focus', newObject);
     });
 
@@ -157,7 +167,8 @@ class DocumentController {
       // TBD: we have to hide things before capturing
       if (format == 'image') {
         html2canvas(this.page.node, {
-          allowTaint: true,
+          allowTaint: false,
+          useCORS: true,
           backgroundColor: this.page.color,
           scrollX: parseInt(window.scrollX),
           scrollY: -parseInt(window.scrollY),
@@ -177,11 +188,68 @@ class DocumentController {
       }
     });
 
-    channel.bind(this, 'Document:addDataSet', (name, url) => {
-      const newDataSet = this.doc.addDataSet(name, url);
-      channel.send('DataSetBox:addDataSet', newDataSet);
+    channel.bind(this, 'Document:addAsset', (type, name, meta) => {
+      console.log('addAsset', type, name, meta);
+      if (type === 'FILE') {
+        let path = this.getFirebaseFilename(meta);
+
+        this.fileUpload(meta, path).then((url) => {
+          console.log(url);
+
+          let asset = this.doc.addAsset();
+          asset.name = name;
+          asset.path = path;
+          asset.assetType = this.getExtension(meta);
+          asset.url = url;
+
+          channel.send('AssetList:addAsset', asset);
+        }).catch((err) => {
+          // TBD: Error handling
+          console.log(err);
+        });
+      }
+      //return this.fileUpload(file);
     });
 
+    channel.bind(this, 'Document:removeAsset', (asset) => {
+      this.doc.removeAsset(asset);
+    });
+
+    channel.bind(this, 'Document:getAssetList', () => {
+      return this.doc.assets;
+    });
+
+    channel.bind(this, 'Document:getAsset', (assetName) => {
+      let asset = this.doc.assets.findby((item) => {
+        return item.name == assetName;
+      });
+      return asset;
+    });
+  }
+
+  getExtension(file) {
+    let extension = /(?:\.([^.]+))?$/.exec(file.name)[1];
+    extension = extension ? '.' + extension : '';
+    return extension;
+  }
+
+  getFirebaseFilename(file) {
+    return 'slides/' + this.slideId + '/' + uuid() + this.getExtension(file);
+  }
+
+  fileUpload(file, path) {
+    return new Promise((resolve, reject) => {
+      let storageRef = this.firebase.storage.ref();
+      let fileRef = storageRef.child(path);
+      fileRef.put(file).then((snapshot) => {
+        snapshot.ref.getDownloadURL().then(function(downloadURL) {
+          resolve(downloadURL);
+        });
+      }).catch((err) => {
+        // TBD: error handling
+        console.log(err);
+      });;
+    });
   }
 }
 

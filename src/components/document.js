@@ -74,7 +74,8 @@ class Page extends BaseObject {
 
     const rect = this.node.getBoundingClientRect();
     html2canvas(this.node, {
-      allowTaint: true,
+      allowTaint: false,
+      useCORS: true,
       backgroundColor: this.color,
       scale: this.thumbnailScale,
       scrollX: parseInt(window.scrollX),
@@ -109,6 +110,40 @@ class Page extends BaseObject {
   }
 }
 
+class Asset extends State {
+  constructor(state) {
+    super({
+      type: 'Asset',
+      name: '',
+      path: '',
+      assetType: '',
+      url: '',
+      ...state,
+    });
+
+    this.node = null;
+    this.data = '';
+  }
+
+  update() {
+    const options = {
+      method: 'GET',
+      headers: {},
+    }
+    fetch(this.url, options).then((response) => {
+      if (response.ok) {
+        response.text().then((text) => {
+          this.data = text;
+          console.log(this.name, this.data.length);
+          if (this.node != null) {
+            this.node.loading(false);
+          }
+        });
+      }
+    });
+  }
+}
+
 class Document extends State {
   constructor(state) {
     super({
@@ -139,6 +174,21 @@ class Document extends State {
     let nextpage = this.pages.remove(page);
     return nextpage;
   }
+
+  addAsset() {
+    let asset = this.pages.spawn(Asset);
+    this.assets.append(asset);
+    return asset;
+  }
+
+  appendAsset(asset) {
+    this.assets.append(asset);
+  }
+
+  removeAsset(asset) {
+    let nextasset = this.assets.remove(asset);
+    return nextasset;
+  }
 }
 
-export { Document as default, Page }
+export { Document as default, Asset, Page }

@@ -93,6 +93,25 @@ class View extends State {
       this.node.appendChild(child);
     }
   }
+
+  // TBD: duplicated code from BaseObject
+  loading(isLoading) {
+    if (this.loadingNode) {
+      this.loadingNode.remove();
+      this.loadingNode = null;
+    }
+
+    if (isLoading === true) {
+      this.loadingNode = document.createElement('div');
+      this.loadingNode.className = 'vs-loading';
+
+      let icon = document.createElement('img');
+      icon.src = '/static/icons/loading.svg';
+
+      this.loadingNode.append(icon);
+      this.node.append(this.loadingNode);
+    }
+  }
 }
 
 class Horizon extends View {

@@ -7,6 +7,7 @@ import HGroup from './HGroup';
 import TitleBar from './TitleBar';
 import Text from './Text';
 import InputText from './InputText';
+import InputFile from './InputFile';
 import CheckBox from './CheckBox';
 import ColorButton from './ColorButton';
 import Select from './Select';
@@ -24,6 +25,7 @@ class UI {
     this.TitleBar = TitleBar;
     this.Text = Text;
     this.InputText = InputText;
+    this.InputFile = InputFile;
     this.CheckBox = CheckBox;
     this.ColorButton = ColorButton;
     this.Select = Select;

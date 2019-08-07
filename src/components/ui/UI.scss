@@ -1,15 +1,18 @@
 $button-radius: 5px;
 
 .vs-view {
+  position: relative;
 }
 
 .vs-vertical {
+  @extend .vs-view;
   display: flex;
   flex-direction: column;
   flex: 1;
 }
 
 .vs-horizon {
+  @extend .vs-view;
   display: flex;
   flex-direction: row;
   flex: 1;
@@ -20,8 +23,7 @@ $button-radius: 5px;
 }
 
 .vs-hgroup {
-  display: flex;
-  flex-direction: row;
+  @extend .vs-horizon;
   align-items: center;
 
   .vs-button {
@@ -134,6 +136,10 @@ $button-radius: 5px;
   height: 30px;
   width: 64px;
   border-radius: $button-radius;
+}
+
+.vs-inputfile input[type='file'] {
+  width: 180px;
 }
 
 .vs-select select {

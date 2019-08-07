@@ -1,12 +1,6 @@
-import State from '../../core/State.js';
+import State from '../../core/State';
+import { uuid } from '../../core/Util';
 import './BaseObject.scss';
-
-// code from https://stackoverflow.com/a/2117523/366908
-function uuid() {
-  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-  )
-}
 
 class Node extends State {
   constructor(state) {
@@ -33,6 +27,9 @@ class Node extends State {
 
   record() {
     this.content = this.node.innerHTML;
+    if (this.page != null) {
+      this.page.invalidate = true;
+    }
   }
 
   clear() {
@@ -61,7 +58,6 @@ class BaseObject extends Node {
     });
 
     this.page = null;
-    this.loadingNode = null;
   }
 
   contain(x, y) {

@@ -6,6 +6,7 @@
 }
 
 .vs-loading {
+  z-index: 9999;
   display: flex;
   position: absolute;
   align-items: center;
@@ -14,6 +15,8 @@
   height: 100%;
   background: #000000C0;
   color: black;
+  left: 0;
+  top: 0;
 
   img {
     width: 50%;

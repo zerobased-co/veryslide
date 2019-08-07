@@ -72,6 +72,11 @@ class State {
           } else if (k === 'objects') {
             let obj = this.addObject(item.type);
             obj.deserialize(item);
+          } else if (k === 'assets') {
+            let asset = this.addAsset();
+            asset.deserialize(item);
+            asset.update();
+            channel.send('AssetList:addAsset', asset);
           } else {
             this[k].push(item);
           }

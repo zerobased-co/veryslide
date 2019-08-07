@@ -1,5 +1,4 @@
 import View, { Vertical, Horizon } from './View';
-import Panel from './Panel';
 
 class Tab extends View {
   constructor(state) {
@@ -71,7 +70,7 @@ class TabGroup extends View {
 
     this.appendChild(new Vertical({children: [ 
       this.tabView = new Horizon(),
-      this.contentview = new Panel(),
+      this.contentview = new View(),
     ]}));
 
     if (this.tabs != null) {

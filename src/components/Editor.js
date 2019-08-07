@@ -4,6 +4,7 @@ import ui from './ui/UI';
 import View from './ui/View';
 import Panel from './ui/Panel';
 import PageList from './PageList';
+import { AssetList } from './Asset';
 import Handler from './Handler';
 import channel from '../core/Channel';
 
@@ -407,6 +408,7 @@ class PanelForPage extends Panel {
   render() {
     super.render();
     [
+      new ui.TitleBar({'title': 'Page style'}),
       ui.H(
         ui.createText('Background'),
         new ui.ColorButton({
@@ -423,6 +425,7 @@ class PanelForBox extends Panel {
   render() {
     super.render();
     [
+      new ui.TitleBar({'title': 'Object style'}),
       ui.H(
         ui.createText('Object'),
         ui.V(
@@ -494,6 +497,7 @@ class PanelForTextBox extends PanelForBox {
     super.render();
 
     [
+      new ui.TitleBar({'title': 'Text style'}),
       ui.H(
         ui.createText('Text'),
         new ui.InputText({
@@ -581,7 +585,12 @@ class PanelForImageBox extends PanelForBox {
       }, false);
       reader.readAsDataURL(file);
     });
-    this.node.appendChild(input);
+
+    this.titlebar = new ui.TitleBar();
+    this.titlebar.title = 'ImageBox';
+    this.appendChild(this.titlebar);
+
+    this.appendChild(input);
 
     return this.node;
   }
@@ -720,7 +729,6 @@ class Property extends View {
         this.panel = new PanelForDocument({object});
         break;
     }
-    this.titlebar.title = object.type + ' Property';
     this.appendChild(this.panel);
 
     channel.send('ToolBox:activeTab', 'Property');
@@ -730,54 +738,9 @@ class Property extends View {
   render() {
     super.render();
 
-    this.titlebar = new ui.TitleBar();
-    this.titlebar.title = 'Property';
     this.panel = new ui.Panel();
 
-    this.appendChild(this.titlebar);
     this.appendChild(this.panel);
-    return this.node;
-  }
-}
-
-class DataSetBox extends View {
-  constructor(state) {
-    super({
-      className: 'vs-datasetbox',
-      name: '',
-      url: '',
-      ...state,
-    });
-  }
-
-  addSet() {
-    console.log('addSet', this.name, this.url);
-    channel.send('Document:addDataSet', {
-      name: this.name,
-      url: this.url,
-    });
-
-    // TBD: How can I improve this with binding?
-    this.inputName.value = '';
-    this.inputUrl.value = '';
-  }
-
-  render() {
-    super.render();
-    this.node.className = '';
-
-    [
-      new ui.TitleBar({title: 'Data Sets'}),
-      ui.P(
-        ui.HGroup(
-          ui.createText('Name & URL'),
-          this.inputName = ui.createInputText(this, 'name'),
-          this.inputUrl = ui.createInputText(this, 'url'),
-          ui.createButton('Add', () => { this.addSet(); }),
-        ),
-      ),
-    ].forEach(item => this.appendChild(item));
-
     return this.node;
   }
 }
@@ -800,18 +763,10 @@ class ToolBox extends View {
     super.render();
     this.tabGroup = new ui.TabGroup({tabs: [
       ['Property', new Property()],
-      ['Assets', new AssetList()],
+      ['Asset', new AssetList()],
     ]});
 
     this.appendChild(this.tabGroup);
-    return this.node;
-  }
-}
-
-class AssetList extends View {
-  render() {
-    super.render();
-    this.node.className = 'vs-assetlist';
     return this.node;
   }
 }

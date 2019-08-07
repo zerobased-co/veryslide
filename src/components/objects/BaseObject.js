@@ -67,11 +67,13 @@ class BaseObject extends Node {
     }
   }
 
-  on() {
+  on(key, value) {
     if (this.page != null) {
       this.page.invalidate = true;
     } else if (this.state.type == 'Page') {
-      this.invalidate = true;
+      if (key !== 'thumbnail') {
+        this.invalidate = true;
+      }
     }
   }
 

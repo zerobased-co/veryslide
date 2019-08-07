@@ -18,14 +18,14 @@ class State {
           },
           set: function(value) {
             this.state[key] = value;
-            this.updateState(key);
+            this.updateState(key, value);
           }
         });
       });
     }
   }
 
-  updateState(key) { // if key is null, then update all states
+  updateState(key, value) { // if key is null, then update all states
     if (key != null) {
       let func = this['on_' + key];
       if (func != null) {
@@ -41,7 +41,7 @@ class State {
     }
 
     if (this['on'] != null) {
-      this['on'].bind(this)();
+      this['on'].bind(this)(key, value);
     }
   }
 

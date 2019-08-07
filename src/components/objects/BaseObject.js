@@ -70,6 +70,8 @@ class BaseObject extends Node {
   on() {
     if (this.page != null) {
       this.page.invalidate = true;
+    } else if (this.state.type == 'Page') {
+      this.invalidate = true;
     }
   }
 

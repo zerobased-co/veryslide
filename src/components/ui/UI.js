@@ -11,6 +11,7 @@ import CheckBox from './CheckBox';
 import ColorButton from './ColorButton';
 import Select from './Select';
 import Filter from './Filter';
+import { Tab, TabGroup } from './Tab';
 
 class UI {
   constructor() {
@@ -27,6 +28,8 @@ class UI {
     this.ColorButton = ColorButton;
     this.Select = Select;
     this.Filter = Filter;
+    this.Tab = Tab;
+    this.TabGroup = TabGroup;
   }
 
   /* shortcuts */

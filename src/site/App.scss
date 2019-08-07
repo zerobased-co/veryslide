@@ -34,289 +34,11 @@ body {
   }
 }
 
-a {
-  color: $color-alternative;
-}
-
-* {
-  box-sizing: border-box;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-}
-
-h1, h2, h3, h4 {
-  font-family: $font-brand;
-  letter-spacing: -0.15px;
-  font-weight: 700;
-}
-
-h1 {
-  font-size: 1.785em;
-}
-
-h2 {
-  font-size: 1.45em;
-}
-
-.VerySlideWeb {
+.Veryslide {
+  width: 100vw;
+  height: 100vh;
   display: flex;
-  flex-direction: column;
-}
-
-.Content {
-  margin: 0 2em;
-  min-height: 100vh;
-
-  & + & {
-    padding: 2em 0;
-  }
-
-  * + h1, * + h2 {
-    margin-top: 3em;
-  }
-}
-
-.Landing {
-  display: flex;
-  flex-grow: 1;
-
-  @media #{$small-screen} {
-    flex-direction: column;
-  }
-
-  .Title {
-    background: $color-gray-2;
-    display: flex;
-    width: 40%;
-    border-right: 1px solid $color-gray-3;
-
-    @media #{$small-screen} {
-      width: 100%;
-      border-right: none;
-      border-bottom: 1px solid $color-gray-3;
-    }
-
-    .Hero {
-      padding: 2em;
-      position: fixed;
-      margin-top: 20vh;
-
-      @media #{$small-screen} {
-        position: inherit;
-        margin-top: 0;
-      }
-
-      h1 {
-        color: $color-brand;
-        font-weight: 900;
-        font-size: 4.8em;
-        margin: 0;
-      }
-
-      h2 {
-        font-size: 1.2em;
-        margin: 0.25em 0 2.5em;
-        text-shadow: 1px 1px 0px $color-gray-1;
-      }
-    }
-  }
-
-  .Intro {
-    display: flex;
-    flex-direction: column;
-    overflow: auto;
-    flex-grow: 1;
-  }
-}
-
-.Center {
-  display: flex;
-  justify-content: center;
-}
-
-hr {
-  border: 0;
-  height: 1px;
-  color: $color-gray-3;
-  background: $color-gray-3;
-  margin: 2em 0;
-}
-
-form {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: flex-start;
-  
-  * + * {
-    margin-top: 0.5em;
-  }
-}
-
-form.Horizon {
-  flex-direction: row;
-  align-items: center;
-  
-  * + * {
-    margin-left: 0.5em;
-    margin-bottom: 0;
-  }
-}
-
-.InputGroup {
-  border: 1px solid $color-gray-3;
-  border-radius: 100px;
-  background: white;
-  padding: 0 0 0 1em;
-  display: inline-flex;
-  align-items: center;
-
-  svg {
-    margin: 0 0.5em;
-  }
-
-  input[type=text],
-  input[type=password] {
-    border: 0;
-    margin: 0;
-  }
-}
-
-.Label {
-  padding: 0.75em 1.5em;
-  border-radius: 100px;
-  border: 1px solid $color-gray-3;
-  background: $color-gray-2;
-
-  &.Error {
-    background: $color-secondary;
-    color: white;
-  }
-}
-
-input[type=text],
-input[type=password] {
-  width: 20em;
-  border: 1px solid $color-gray-3;
-  border-radius: 100px;
-  font-size: 0.8em;
-  padding: 0.8em 1em;
-  line-height: 1;
-}
-
-input::placeholder {
-}
-
-button, .Button {
-  color: $color-normal;
-  background: $color-gray-1;
-
-  border: 1px solid $color-gray-3;
-  border-radius: 100px;
-  align-items: center;
-  justify-content: center;
-  font-weight: 400;
-  user-select: none;
-  outline: none;
-  text-decoration: none;
-  display: inline-flex;
-
-  font-size: 0.8em;
-  padding: 0.8em 1em;
-
-  font-family: 'Montserrat';
-  font-weight: 600;
-  line-height: 1;
-
-  &.Primary {
-    color: $color-primary;
-    background: $color-gray-0;
-    border: 1px solid $color-primary;
-  }
-
-  &.Large {
-    font-size: 1em;
-    padding: 1em 2em;
-  }
-
-  &:hover {
-    background: $color-primary;
-    color: white;
-    cursor: pointer;
-    transition: all 0.2s ease-out;
-  }
-
-  &:active {
-    transform: scale(0.95, 0.95);
-    transition: all 0.2s ease-out;
-  }
-
-  &:disabled {
-    color: $color-gray-3;
-    background: $color-gray-2;
-    border-color: $color-gray-2;
-  }
-}
-
-.Navigation {
-  padding: 1em;
-  background: $color-gray-2;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  border-bottom: 1px solid $color-gray-3;
-
-  .Brand {
-    color: $color-brand;
-    font-family: $font-brand;
-    font-size: 2em;
-    font-weight: 900;
-    text-decoration: none;
-  }
-
-  ul {
-    display: flex;
-    flex-direction: row;
-    flex-grow: 1;
-    padding: 0 0 0 2em;
-    margin: 0;
-
-    li:last-child {
-      margin-left: auto;
-    }
-
-    li {
-      list-style: none;
-    }
-
-    li + li {
-      padding-left: 1em;
-    }
-  }
-
-  @media #{$small-screen} {
-    flex-direction: column;
-    align-items: inherit;
-
-    ul {
-      padding: 1em 0 0 0;
-    }
-  }
-}
-
-.Footer {
-  width: 100%;
-  background: $color-gray-2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  p {
-    font-size: 0.8em;
-    color: $color-normal;
-    font-family: $font-brand;
-    letter-spacing: -0.15px;
-  }
+  font-size: 16px;
 }
 
 .Loading {
@@ -336,9 +58,287 @@ button, .Button {
   background: $color-gray-2;
 }
 
-.Veryslide {
-  width: 100vw;
-  height: 100vh;
+.VerySlideWeb {
   display: flex;
-  font-size: 16px;
+  flex-direction: column;
+
+  * {
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+
+  a {
+    color: $color-alternative;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: $font-brand;
+    letter-spacing: -0.15px;
+    font-weight: 700;
+  }
+
+  h1 {
+    font-size: 1.785em;
+  }
+
+  h2 {
+    font-size: 1.45em;
+  }
+
+  .Content {
+    margin: 0 2em;
+    min-height: 100vh;
+
+    & + & {
+      padding: 2em 0;
+    }
+
+    * + h1, * + h2 {
+      margin-top: 3em;
+    }
+  }
+
+  .Landing {
+    display: flex;
+    flex-grow: 1;
+
+    @media #{$small-screen} {
+      flex-direction: column;
+    }
+
+    .Title {
+      background: $color-gray-2;
+      display: flex;
+      width: 40%;
+      border-right: 1px solid $color-gray-3;
+
+      @media #{$small-screen} {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid $color-gray-3;
+      }
+
+      .Hero {
+        padding: 2em;
+        position: fixed;
+        margin-top: 20vh;
+
+        @media #{$small-screen} {
+          position: inherit;
+          margin-top: 0;
+        }
+
+        h1 {
+          color: $color-brand;
+          font-weight: 900;
+          font-size: 4.8em;
+          margin: 0;
+        }
+
+        h2 {
+          font-size: 1.2em;
+          margin: 0.25em 0 2.5em;
+          text-shadow: 1px 1px 0px $color-gray-1;
+        }
+      }
+    }
+
+    .Intro {
+      display: flex;
+      flex-direction: column;
+      overflow: auto;
+      flex-grow: 1;
+    }
+  }
+
+  .Center {
+    display: flex;
+    justify-content: center;
+  }
+
+  hr {
+    border: 0;
+    height: 1px;
+    color: $color-gray-3;
+    background: $color-gray-3;
+    margin: 2em 0;
+  }
+
+  form {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    
+    * + * {
+      margin-top: 0.5em;
+    }
+  }
+
+  form.Horizon {
+    flex-direction: row;
+    align-items: center;
+    
+    * + * {
+      margin-left: 0.5em;
+      margin-bottom: 0;
+    }
+  }
+
+  .InputGroup {
+    border: 1px solid $color-gray-3;
+    border-radius: 100px;
+    background: white;
+    padding: 0 0 0 1em;
+    display: inline-flex;
+    align-items: center;
+
+    svg {
+      margin: 0 0.5em;
+    }
+
+    input[type=text],
+    input[type=password] {
+      border: 0;
+      margin: 0;
+    }
+  }
+
+  .Label {
+    padding: 0.75em 1.5em;
+    border-radius: 100px;
+    border: 1px solid $color-gray-3;
+    background: $color-gray-2;
+
+    &.Error {
+      background: $color-secondary;
+      color: white;
+    }
+  }
+
+  input[type=text],
+  input[type=password] {
+    width: 20em;
+    border: 1px solid $color-gray-3;
+    border-radius: 100px;
+    font-size: 0.8em;
+    padding: 0.8em 1em;
+    line-height: 1;
+  }
+
+  input::placeholder {
+  }
+
+  button, .Button {
+    color: $color-normal;
+    background: $color-gray-1;
+
+    border: 1px solid $color-gray-3;
+    border-radius: 100px;
+    align-items: center;
+    justify-content: center;
+    font-weight: 400;
+    user-select: none;
+    outline: none;
+    text-decoration: none;
+    display: inline-flex;
+
+    font-size: 0.8em;
+    padding: 0.8em 1em;
+
+    font-family: 'Montserrat';
+    font-weight: 600;
+    line-height: 1;
+
+    &.Primary {
+      color: $color-primary;
+      background: $color-gray-0;
+      border: 1px solid $color-primary;
+    }
+
+    &.Large {
+      font-size: 1em;
+      padding: 1em 2em;
+    }
+
+    &:hover {
+      background: $color-primary;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s ease-out;
+    }
+
+    &:active {
+      transform: scale(0.95, 0.95);
+      transition: all 0.2s ease-out;
+    }
+
+    &:disabled {
+      color: $color-gray-3;
+      background: $color-gray-2;
+      border-color: $color-gray-2;
+    }
+  }
+
+  .Navigation {
+    padding: 1em;
+    background: $color-gray-2;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border-bottom: 1px solid $color-gray-3;
+
+    .Brand {
+      color: $color-brand;
+      font-family: $font-brand;
+      font-size: 2em;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    ul {
+      display: flex;
+      flex-direction: row;
+      flex-grow: 1;
+      padding: 0 0 0 2em;
+      margin: 0;
+
+      li:last-child {
+        margin-left: auto;
+      }
+
+      li {
+        list-style: none;
+      }
+
+      li + li {
+        padding-left: 1em;
+      }
+    }
+
+    @media #{$small-screen} {
+      flex-direction: column;
+      align-items: inherit;
+
+      ul {
+        padding: 1em 0 0 0;
+      }
+    }
+  }
+
+  .Footer {
+    width: 100%;
+    background: $color-gray-2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    p {
+      font-size: 0.8em;
+      color: $color-normal;
+      font-family: $font-brand;
+      letter-spacing: -0.15px;
+    }
+  }
 }

@@ -115,7 +115,7 @@ class Document extends State {
       width: 1024,
       height: 768,
       pages: new List(),
-      dataSets: new List(),
+      assets: new List(),
       type: 'Document',
       ...state,
     });

@@ -52,8 +52,6 @@ class Menu extends View {
 
     channel.bind(this, 'Menu:resetZoom', this.resetZoom);
     channel.bind(this, 'Menu:toggleSnap', this.toggleSnap);
-
-    this.render();
   }
 
   openFileDialog() {
@@ -409,11 +407,13 @@ class PanelForPage extends Panel {
   render() {
     super.render();
     [
-      ui.createText('PanelForPage'),
-      new ui.ColorButton({ 
-        color: this.object.color,
-        onChange: value => { this.object.color = value; }, 
-      }),
+      ui.H(
+        ui.createText('Background'),
+        new ui.ColorButton({
+          color: this.object.color,
+          onChange: value => { this.object.color = value; },
+        }),
+      ),
     ].forEach(item => this.appendChild(item));
     return this.node;
   }
@@ -454,9 +454,9 @@ class PanelForBox extends Panel {
 
       ui.H(
         ui.createText('Background'),
-        new ui.ColorButton({ 
+        new ui.ColorButton({
           color: this.object.color,
-          onChange: value => { this.object.color = value; }, 
+          onChange: value => { this.object.color = value; },
         }),
       ),
 
@@ -722,6 +722,8 @@ class Property extends View {
     }
     this.titlebar.title = object.type + ' Property';
     this.appendChild(this.panel);
+
+    channel.send('ToolBox:activeTab', 'Property');
     return this.panel;
   }
 
@@ -781,9 +783,35 @@ class DataSetBox extends View {
 }
 
 class ToolBox extends View {
+  constructor(state) {
+    super({
+      className: 'vs-toolbox',
+      ...state,
+    });
+
+    channel.bind(this, 'ToolBox:activeTab', this.activeTab);
+  }
+
+  activeTab(name) {
+    this.tabGroup.selectTab(name);
+  }
+
   render() {
     super.render();
-    this.node.className = 'vs-toolbox';
+    this.tabGroup = new ui.TabGroup({tabs: [
+      ['Property', new Property()],
+      ['Assets', new AssetList()],
+    ]});
+
+    this.appendChild(this.tabGroup);
+    return this.node;
+  }
+}
+
+class AssetList extends View {
+  render() {
+    super.render();
+    this.node.className = 'vs-assetlist';
     return this.node;
   }
 }
@@ -805,10 +833,7 @@ class Editor extends View {
 
     row.appendChild(new Navigator());
     row.appendChild(new Viewport());
-    row.appendChild(new ToolBox({children: [
-      new Property(),
-      new DataSetBox(),
-    ]}));
+    row.appendChild(new ToolBox());
 
     return this.node;
   }

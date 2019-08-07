@@ -88,6 +88,7 @@ class ImageList extends Box {
 
   apply() {
     if (this.items.length == 0) return;
+    this.loading(true);
     console.log(this.filter);
 
     this.node.innerHTML = '';
@@ -108,6 +109,7 @@ class ImageList extends Box {
 
       this.node.appendChild(node);
     }
+    this.loading(false);
     this.record();
   }
 

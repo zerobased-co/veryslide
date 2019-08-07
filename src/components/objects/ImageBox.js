@@ -17,11 +17,13 @@ class ImageBox extends Box {
   }
 
   on_src(url) {
-    this.node.src = url;
+    this.imageNode.src = url;
   }
   
   render() {
-    let node = document.createElement('img');
+    let node = super.render();
+    this.imageNode = document.createElement('img');
+    node.append(this.imageNode);
     return node;
   }
 }

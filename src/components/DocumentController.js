@@ -43,6 +43,14 @@ class DocumentController {
     channel.bind(this, 'Document:addObject', (objType, states) => {
       if (this.page == null) return;
       let newObject = this.page.addObject(objType, states);
+      switch(newObject.type) {
+        case 'ImageBox':
+          newObject.loading(true);
+          break;
+      }
+      setTimeout((newObject) => {
+        newObject.loading(false);
+      }, 1000, newObject);
       channel.send('Viewport:focus', newObject);
     });
 

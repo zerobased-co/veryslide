@@ -63,6 +63,7 @@ class Menu extends View {
     input.addEventListener('change', event => {
       // TBD: duplicated code
       var file = event.target.files[0];
+      console.log(file);
       var reader = new FileReader();
       reader.addEventListener("load", () => {
         var image = new Image();

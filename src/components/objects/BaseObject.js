@@ -24,6 +24,20 @@ class Node extends State {
   on_className(className) {
     this.node.className = className;
   }
+
+  on_content(content) {
+    if (content != '') {
+      this.node.innerHTML = content;
+    }
+  }
+
+  record() {
+    this.content = this.node.innerHTML;
+  }
+
+  clear() {
+    this.content = '';
+  }
   
   render() {
     let node = document.createElement('div');
@@ -47,23 +61,29 @@ class BaseObject extends Node {
     });
 
     this.page = null;
+    this.loadingNode = null;
   }
 
   contain(x, y) {
     return (x >= this.x) && (x < this.x + this.width) && (y >= this.y) && (y < this.y + this.height);
   }
 
-  clear() {
-    this.content = '';
-  }
+  loading(isLoading) {
+    if (this.loadingNode) {
+      this.loadingNode.remove();
+      this.loadingNode = null;
+    }
 
-  record() {
-    this.content = this.node.innerHTML;
-  }
+    if (isLoading === true) {
+      this.loadingNode = document.createElement('div');
+      this.loadingNode.className = 'vs-loading';
+      this.loadingNode.setAttribute('data-html2canvas-ignore', 'true');
 
-  on_content(content) {
-    if (content != '') {
-      this.node.innerHTML = content;
+      let icon = document.createElement('img');
+      icon.src = '/static/icons/loading.svg';
+
+      this.loadingNode.append(icon);
+      this.node.append(this.loadingNode);
     }
   }
 

@@ -4,3 +4,21 @@
   align-items: center;
   justify-content: center;
 }
+
+.vs-loading {
+  display: flex;
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: #000000C0;
+  color: black;
+
+  img {
+    width: 50%;
+    height: 50%;
+    max-width: 64px;
+    max-height: 64px;
+  }
+}

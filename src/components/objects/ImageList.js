@@ -75,6 +75,7 @@ class ImageList extends Box {
 
     this.items = [];
     this.fields = [];
+    this.selectedItems = [];
   }
 
   deserialize(data) {
@@ -102,7 +103,9 @@ class ImageList extends Box {
 
   clear() {
     super.clear();
+    this.node.innerHTML = '';
     this.filter = [];
+    this.selectedItems = [];
   }
 
   shuffle() {
@@ -116,11 +119,16 @@ class ImageList extends Box {
 
   apply() {
     if (this.items.length == 0) return;
+    if (this.filter.length == 0) return;
 
     this.node.innerHTML = '';
+    this.selectedItems = [];
+
     for(var i = 0; i < this.items.length; i++) {
       var item = this.items[i];
       if (!isValidItem(item, this.filter)) continue;
+
+      this.selectedItems.push(item);
 
       let node = document.createElement('div');
       node.className = 'aligner';

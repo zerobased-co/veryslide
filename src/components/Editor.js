@@ -607,6 +607,10 @@ class PanelForImageList extends PanelForBox {
   render() {
     super.render();
 
+    if (this.object.items.length == 0) {
+      this.object.update();
+    }
+
     this.assets = channel.send('Document:getAssetList')[0];
     this.dataOptions = [['none', '----']].concat(this.assets.array.map(x => [x.name, x.name]));
 
@@ -622,7 +626,10 @@ class PanelForImageList extends PanelForBox {
             channel.send('Property:setPanelFor', this.object);
           },
         }),
-        this.itemCount = ui.createText('&nbsp;' + this.object.items.length + ' Item(s)'),
+        ui.createText(
+          '&nbsp;' + this.object.selectedItems.length + ' of ' + this.object.items.length + ' Item(s)',
+          'vs-text-140',
+        ),
       ),
 
       ui.H(
@@ -630,7 +637,7 @@ class PanelForImageList extends PanelForBox {
         ui.HGroup(
           ui.createButton('Clear', () => { this.object.clear(); }),
           ui.createButton('Shuffle', () => { this.object.shuffle(); }),
-          ui.createButton('Apply', () => { this.object.apply(); }),
+          ui.createButton('Apply', () => { this.object.apply(); channel.send('Property:setPanelFor', this.object); }),
         ),
       ),
 

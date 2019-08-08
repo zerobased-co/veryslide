@@ -27,6 +27,7 @@ class Handler extends View {
     this.basePos = undefined;
     this.baseSize = undefined;
     this.currentDot = null;
+    this.handling = false;
     this.snap = false;
     this.snapSize = 16;
 
@@ -168,6 +169,8 @@ class Handler extends View {
 
     this.removeEventListener('mousemove', window);
     this.removeEventListener('mouseup', window);
+
+    this.handling = false;
   }
 
   mousedown(event) {
@@ -196,6 +199,8 @@ class Handler extends View {
     }
     this.addEventListener('mousemove', this.mousemove, window);
     this.addEventListener('mouseup', this.mouseup, window);
+
+    this.handling = true;
   }
 
   render() {

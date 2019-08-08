@@ -138,6 +138,7 @@ class Viewport extends View {
 
   updateThumbnail() {
     if (this.page == null) return;
+    if (this.grab || this.drag || this.handler.handling) return;
     this.page.updateThumbnail();
   }
 

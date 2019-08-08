@@ -76,6 +76,7 @@ class ImageList extends Box {
     this.items = [];
     this.fields = [];
     this.selectedItems = [];
+    this.loadedCount = 0;
   }
 
   deserialize(data) {
@@ -106,6 +107,7 @@ class ImageList extends Box {
     this.node.innerHTML = '';
     this.filter = [];
     this.selectedItems = [];
+    this.loadedCount = 0;
   }
 
   shuffle() {
@@ -123,27 +125,50 @@ class ImageList extends Box {
 
     this.node.innerHTML = '';
     this.selectedItems = [];
+    this.loadedCount = 0;
+    this.page.invalidate = true;
 
-    for(var i = 0; i < this.items.length; i++) {
-      var item = this.items[i];
-      if (!isValidItem(item, this.filter)) continue;
 
-      this.selectedItems.push(item);
+    for(let i = 0; i < this.items.length; i++) {
+      let item = this.items[i];
+      if (isValidItem(item, this.filter)) {
+        this.selectedItems.push(item);
+      }
+    }
 
-      let node = document.createElement('div');
+    if (this.selectedItems.length > 0) {
+      this.loading(true);
+      // To prevent infinite loading
+      setTimeout(() => {this.loading(false);}, 5000);
+    }
+
+    for(let i = 0; i < this.selectedItems.length; i++) {
+      let item = this.selectedItems[i];
+      let node = document.createElement('a');
       node.className = 'aligner';
-      //node.href = item['Homepage'];
+      node.href = item['Homepage'];
       node.style.margin = this.itemMargin + 'px';
 
       let img = document.createElement('img');
       img.src = '/static/logo/' + item['UID'] + '.png';
       img.style.maxHeight = this.itemMaxHeight + 'px';
       img.style.maxWidth = this.itemMaxWidth + 'px';
-      node.appendChild(img);
+      img.onload = () => {
+        this.loaded();
+      }
 
+      node.appendChild(img);
       this.node.appendChild(node);
     }
+
     this.record();
+  }
+
+  loaded() {
+    this.loadedCount += 1;
+    if (this.loadedCount >= this.selectedItems.length) {
+      this.loading(false);
+    }
   }
 
   update() {

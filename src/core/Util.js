@@ -45,3 +45,13 @@ export function uuid() {
     (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
   )
 }
+
+export function fadeOutAndRemove(elem, duration) {
+  duration = duration || 500;
+  elem.style.transition = "opacity " + (duration / 1000) + "s ease";
+  elem.style.opacity = 0;
+
+  setTimeout(() => {
+    elem.remove()
+  }, duration);
+}

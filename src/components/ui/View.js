@@ -1,5 +1,6 @@
 import State from '../../core/State.js';
 import List from '../../core/List.js';
+import { fadeOutAndRemove } from '../../core/Util';
 
 class View extends State {
   constructor(state) {
@@ -97,7 +98,7 @@ class View extends State {
   // TBD: duplicated code from BaseObject
   loading(isLoading) {
     if (this.loadingNode) {
-      this.loadingNode.remove();
+      fadeOutAndRemove(this.loadingNode);
       this.loadingNode = null;
     }
 

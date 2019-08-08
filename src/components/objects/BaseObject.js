@@ -1,5 +1,5 @@
 import State from '../../core/State';
-import { uuid } from '../../core/Util';
+import { uuid, fadeOutAndRemove } from '../../core/Util';
 import './BaseObject.scss';
 
 class Node extends State {
@@ -66,7 +66,7 @@ class BaseObject extends Node {
 
   loading(isLoading) {
     if (this.loadingNode) {
-      this.loadingNode.remove();
+      fadeOutAndRemove(this.loadingNode);
       this.loadingNode = null;
     }
 

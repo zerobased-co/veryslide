@@ -266,12 +266,12 @@ class Viewport extends View {
     }
 
     // -
-    if (event.keyCode === 173 || event.keyCode === 189) {
+    if (event.metaKey === false && (event.keyCode === 173 || event.keyCode === 189)) {
       this.zoomOut();
     }
 
     // +
-    if (event.keyCode === 61 || event.keyCode === 187) {
+    if (event.metaKey === false && (event.keyCode === 61 || event.keyCode === 187)) {
       this.zoomIn();
     }
 
@@ -328,6 +328,22 @@ class Viewport extends View {
     if (event.keyCode === 83 && event.metaKey === true) {
       event.preventDefault();
       channel.send('Veryslide:save');
+    }
+
+    // meta + -: Smaller
+    if (event.metaKey === true && (event.keyCode === 173 || event.keyCode === 189)) {
+      event.preventDefault();
+      if (typeof this.object.smaller === 'function') {
+        this.object.smaller();
+      }
+    }
+
+    // meta + +: Bigger
+    if (event.metaKey === true && (event.keyCode === 61 || event.keyCode === 187)) {
+      event.preventDefault();
+      if (typeof this.object.bigger === 'function') {
+        this.object.bigger();
+      }
     }
   }
 
@@ -538,10 +554,7 @@ class PanelForTextBox extends PanelForBox {
 
       ui.H(
         ui.createText('Font'),
-        new ui.InputText({
-          value: this.object.size, 
-          onChange: value => { this.object.size = value },
-        }),
+        new ui.InputText().bind(this.object, 'size'),
         new ui.Select({
           options: [['serif', 'Serif'], ['sans-serif', 'Sans serif'], ['monospace', 'Monospace']],
           value: this.object.fontFamily,

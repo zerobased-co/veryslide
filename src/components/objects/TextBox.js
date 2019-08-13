@@ -50,6 +50,14 @@ class TextBox extends Box {
     this.node.style.color = color;
   }
 
+  smaller() {
+    this.size = parseInt(this.size) - 1;
+  }
+
+  bigger() {
+    this.size = parseInt(this.size) + 1;
+  }
+
   toggleBold() {
     this.bold = !this.bold;
   }

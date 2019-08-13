@@ -10,8 +10,8 @@ class CheckBox extends View {
     });
   }
 
-  onChange(checked) {
-    console.log('onChange', checked, this);
+  onBinding(value) {
+    this.checked = value;
   }
 
   on_checked(checked) {
@@ -22,8 +22,11 @@ class CheckBox extends View {
     this.label.innerText = title;
   }
 
-  change(/*event*/) {
-    this.onChange(this.input.checked);
+  onChange(/*event*/) {
+    this.checked = this.input.checked;
+    if (this.bindingTarget) {
+      this.bindingTarget[this.bindingKey] = this.checked;
+    }
   }
 
   render() {
@@ -31,7 +34,7 @@ class CheckBox extends View {
 
     this.input = document.createElement('input');
     this.input.type = 'checkbox';
-    this.input.addEventListener('change', this.change.bind(this));
+    this.input.addEventListener('change', this.onChange.bind(this));
     this.node.appendChild(this.input);
 
     this.label = document.createElement('label');

@@ -44,10 +44,7 @@ class UI {
   }
 
   createInputText(target, property) {
-    return new ui.InputText({
-      value: target[property], 
-      onChange: value => { target[property] = value },
-    });
+    return new ui.InputText().bind(target, property);
   }
 
   HGroup(...buttons) {

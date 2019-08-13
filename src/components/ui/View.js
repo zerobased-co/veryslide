@@ -20,6 +20,22 @@ class View extends State {
     this.updateState();
   }
 
+  bind(target, key) {
+    this.bindingTarget = target;
+    this.bindingKey = key;
+    target.addBinding(this);
+
+    // for initialize
+    this.onBinding(target[key]);
+    return this;
+  }
+
+  notify(from, key, value) {
+    if (from === this.bindingTarget && key === this.bindingKey) {
+      this.onBinding(value);
+    }
+  }
+
   addEventListener(eventType, handler, target) {
     if (target == null) {
       target = this.node;
@@ -55,6 +71,10 @@ class View extends State {
 
   destroy() {
     super.destroy();
+
+    if (this.target != null ) {
+      this.target.removeBinding(this);
+    }
 
     this.eventListeners.forEach(el => {
       el['target'].removeEventListener(el['eventType'], el['handler']);

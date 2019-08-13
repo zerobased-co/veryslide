@@ -29,7 +29,7 @@ class AssetList extends View {
         asset.update();
       }),
       ui.createButton('Remove', () => { 
-        channel.send('Document:removeAsset', asset);
+        channel.send('Controller:removeAsset', asset);
         assetItem.node.remove();
       })
     );
@@ -49,7 +49,7 @@ class AssetList extends View {
 
   onAddAsset() {
     this.loading(true);
-    channel.send('Document:addAsset', 'URL', this.inputName.value, this.inputUrl.value);
+    channel.send('Controller:addAsset', 'URL', this.inputName.value, this.inputUrl.value);
     this.inputName.value = '';
     this.inputUrl.value = '';
   }
@@ -82,7 +82,7 @@ class AssetList extends View {
 
     this.inputFile.onChange = (file) => {
       this.loading(true);
-      channel.send('Document:addAsset', 'FILE', this.inputName.value, file);
+      channel.send('Controller:addAsset', 'FILE', this.inputName.value, file);
       this.inputName.value = '';
       this.inputFile.reset();
     }

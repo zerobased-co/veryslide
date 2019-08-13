@@ -1,9 +1,11 @@
-import channel from '../core/Channel';
+import channel from './Channel';
+import List from './List';
 
 class State {
   constructor(state) {
     this.state = state;
     this.__TYPE__ = 'State';
+    this.bindings = new Array();
 
     if (this.state != null) {
       Object.getOwnPropertyNames(this.state).forEach(key => {
@@ -25,11 +27,24 @@ class State {
     }
   }
 
+  addBinding(binding) {
+    this.bindings.push(binding);
+  }
+
+  removeBinding(binding) {
+    this.bindings = this.bindings.filter(el => el !== binding);
+  }
+
   updateState(key, value) { // if key is null, then update all states
     if (key != null) {
       let func = this['on_' + key];
       if (func != null) {
         func.bind(this)(this.state[key]);
+      }
+      if (this.bindings.length) {
+        for(var i = 0; i < this.bindings.length; i++) {
+          this.bindings[i].notify(this, key, value);
+        }
       }
     } else {
       for (const [key, value] of Object.entries(this.state)) {

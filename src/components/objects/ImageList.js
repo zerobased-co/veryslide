@@ -92,7 +92,7 @@ class ImageList extends Box {
   }
 
   __waitAssetAndApply() {
-    let asset = channel.send('Document:getAsset', this.asset)[0];
+    let asset = channel.send('Controller:getAsset', this.asset)[0];
     if (asset == null || asset.data == '') {
       setTimeout(this.__waitAssetAndApply.bind(this), 500);
     } else {
@@ -172,7 +172,7 @@ class ImageList extends Box {
   }
 
   update() {
-    let asset = channel.send('Document:getAsset', this.asset)[0];
+    let asset = channel.send('Controller:getAsset', this.asset)[0];
     // TBD: ???
     if (asset == null) return;
 

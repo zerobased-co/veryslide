@@ -18,17 +18,17 @@ class DocumentController {
     this.firebase = null;
     this.slideId = null;
 
-    channel.bind(this, 'Document:addPage', () => {
+    channel.bind(this, 'Controller:addPage', () => {
       const newPage = this.doc.addPage();
       channel.send('PageList:addPage', newPage);
     });
 
-    channel.bind(this, 'Document:selectPage', (page) => {
+    channel.bind(this, 'Controller:selectPage', (page) => {
       this.page = page;
       this.object = null;
     });
 
-    channel.bind(this, 'Document:removePage', () => {
+    channel.bind(this, 'Controller:removePage', () => {
       if (this.page == null) return;
       if (this.page == this.clipboard) { this.clipboard = null };
 
@@ -44,7 +44,7 @@ class DocumentController {
       }
     });
 
-    channel.bind(this, 'Document:addObject', (objType, states, file) => {
+    channel.bind(this, 'Controller:addObject', (objType, states, file) => {
       if (this.page == null) return;
       let newObject = this.page.addObject(objType, states);
       switch(newObject.type) {
@@ -64,11 +64,11 @@ class DocumentController {
       channel.send('Viewport:focus', newObject);
     });
 
-    channel.bind(this, 'Document:selectObject', (object) => {
+    channel.bind(this, 'Controller:selectObject', (object) => {
       this.object = object;
     });
 
-    channel.bind(this, 'Document:removeObject', () => {
+    channel.bind(this, 'Controller:removeObject', () => {
       if (this.object == null) return;
       if (this.object == this.clipboard) { this.clipboard = null };
       this.page.removeObject(this.object);
@@ -77,35 +77,35 @@ class DocumentController {
       channel.send('Viewport:blur');
     });
 
-    channel.bind(this, 'Document:orderBack', (object) => {
+    channel.bind(this, 'Controller:orderBack', (object) => {
       if (object == null) return;
       if (this.page == null) return;
       this.page.objects.makeHead(object);
       this.page.reorder();
     });
 
-    channel.bind(this, 'Document:orderFront', (object) => {
+    channel.bind(this, 'Controller:orderFront', (object) => {
       if (object == null) return;
       if (this.page == null) return;
       this.page.objects.makeLast(object);
       this.page.reorder();
     });
 
-    channel.bind(this, 'Document:orderBackward', (object) => {
+    channel.bind(this, 'Controller:orderBackward', (object) => {
       if (object == null) return;
       if (this.page == null) return;
       this.page.objects.backward(object);
       this.page.reorder();
     });
 
-    channel.bind(this, 'Document:orderForward', (object) => {
+    channel.bind(this, 'Controller:orderForward', (object) => {
       if (object == null) return;
       if (this.page == null) return;
       this.page.objects.forward(object);
       this.page.reorder();
     });
 
-    channel.bind(this, 'Document:copy', () => {
+    channel.bind(this, 'Controller:copy', () => {
       if (this.object != null) {
         this.clipboard = this.object;
       } else if (this.page != null) {
@@ -113,7 +113,7 @@ class DocumentController {
       }
     });
 
-    channel.bind(this, 'Document:paste', () => {
+    channel.bind(this, 'Controller:paste', () => {
       if (this.clipboard == null) return;
 
       console.log('pasting', this.clipboard);
@@ -161,7 +161,7 @@ class DocumentController {
       }
     });
 
-    channel.bind(this, 'Document:savePage', (format) => {
+    channel.bind(this, 'Controller:savePage', (format) => {
       if (this.page == null) return;
 
       // TBD: we have to hide things before capturing
@@ -188,7 +188,7 @@ class DocumentController {
       }
     });
 
-    channel.bind(this, 'Document:addAsset', (type, name, meta) => {
+    channel.bind(this, 'Controller:addAsset', (type, name, meta) => {
       console.log('addAsset', type, name, meta);
       if (type === 'FILE') {
         let path = this.getFirebaseFilename(meta);
@@ -211,15 +211,15 @@ class DocumentController {
       //return this.fileUpload(file);
     });
 
-    channel.bind(this, 'Document:removeAsset', (asset) => {
+    channel.bind(this, 'Controller:removeAsset', (asset) => {
       this.doc.removeAsset(asset);
     });
 
-    channel.bind(this, 'Document:getAssetList', () => {
+    channel.bind(this, 'Controller:getAssetList', () => {
       return this.doc.assets;
     });
 
-    channel.bind(this, 'Document:getAsset', (assetName) => {
+    channel.bind(this, 'Controller:getAsset', (assetName) => {
       let asset = this.doc.assets.findby((item) => {
         return item.name == assetName;
       });

@@ -13,7 +13,9 @@ class InputText extends View {
     super.render();
     this.input = document.createElement('input');
     this.input.type = 'text';
-    this.input.addEventListener('input', this.handler.bind(this));
+    this.input.addEventListener('keydown', this.handler.bind(this));
+    this.input.addEventListener('focus', this.focus.bind(this));
+    this.input.addEventListener('blur', this.blur.bind(this));
     this.node.appendChild(this.input);
     return this.node;
   }
@@ -22,13 +24,36 @@ class InputText extends View {
     this.input.value = text;
   }
 
-  handler(/*event*/) {
-    this.value = this.input.value;
-    this.onChange(this.value);
+  focus(event) {
+    this.input.select();
+  }
+
+  blur(event) {
+    this.input.value = this.value;
+  }
+
+  handler(event) {
+    if (event.target !== this.input) {
+      return;
+    }
+
+    if (event.keyCode === 13) {
+      this.value = this.input.value;
+      this.input.select();
+      this.onChange(this.value);
+    }
+  }
+  
+  onBinding(value) {
+    this.value = value;
+    this.input.value = value;
   }
 
   onChange(value) {
-    console.log('onChange', value, this);
+    this.value = value;
+    if (this.bindingTarget) {
+      this.bindingTarget[this.bindingKey] = value;
+    }
   }
 }
 

@@ -18,8 +18,8 @@ class Menu extends View {
     [
       new ui.Text({'title': 'Page'}),
       ui.HGroup(
-        ui.createButton('Add',    () => { channel.send('Document:addPage'); }),
-        ui.createButton('Remove',   () => { channel.send('Document:removePage'); }),
+        ui.createButton('Add',    () => { channel.send('Controller:addPage'); }),
+        ui.createButton('Remove',   () => { channel.send('Controller:removePage'); }),
       ),
 
       new ui.Text({'title': 'Viewport'}),
@@ -31,16 +31,16 @@ class Menu extends View {
 
       new ui.Text({'title': 'Object'}),
       ui.HGroup(
-        ui.createButton('TextBox',   () => { channel.send('Document:addObject', 'TextBox'); }),
+        ui.createButton('TextBox',   () => { channel.send('Controller:addObject', 'TextBox'); }),
         ui.createButton('Image',     () => { this.openFileDialog(); }),
-        ui.createButton('ImageList', () => { channel.send('Document:addObject', 'ImageList'); }),
+        ui.createButton('ImageList', () => { channel.send('Controller:addObject', 'ImageList'); }),
       ),
-      ui.createButton('Remove', () => { channel.send('Document:removeObject'); }),
+      ui.createButton('Remove', () => { channel.send('Controller:removeObject'); }),
 
       new ui.Text({'title': 'Misc'}),
       ui.HGroup(
-        ui.createButton('Image', () => { channel.send('Document:savePage', 'image'); }),
-        //ui.createButton('PDF',   () => { channel.send('Document:savePage', 'pdf'); }),
+        ui.createButton('Image', () => { channel.send('Controller:savePage', 'image'); }),
+        //ui.createButton('PDF',   () => { channel.send('Controller:savePage', 'pdf'); }),
         ui.createButton('Save',   () => { channel.send('Veryslide:save'); }),
       ),
 
@@ -68,7 +68,7 @@ class Menu extends View {
         var image = new Image();
         image.src = reader.result;
         image.onload = () => {
-          channel.send('Document:addObject', 'ImageBox', {
+          channel.send('Controller:addObject', 'ImageBox', {
             width: image.width,
             height: image.height,
             src: image.src,
@@ -165,7 +165,7 @@ class Viewport extends View {
 
     this.updateTransform();
     this.setPageSnap();
-    channel.send('Document:selectPage', page);
+    channel.send('Controller:selectPage', page);
     channel.send('Property:setPanelFor', page);
   }
   
@@ -199,7 +199,7 @@ class Viewport extends View {
   focus(object) {
     this.object = object;
     this.handler.connect(object);
-    channel.send('Document:selectObject', this.object);
+    channel.send('Controller:selectObject', this.object);
     channel.send('Property:setPanelFor', this.object);
   }
 
@@ -221,7 +221,7 @@ class Viewport extends View {
 
     this.object = null;
     this.handler.show(false);
-    channel.send('Document:selectObject', null);
+    channel.send('Controller:selectObject', null);
     if (this.page) {
       channel.send('Property:setPanelFor', this.page);
     }
@@ -276,29 +276,58 @@ class Viewport extends View {
     }
 
     // s
-    if (event.keyCode === 83) {
+    if (event.keyCode === 83 && event.metaKey === false) {
       channel.send('Menu:toggleSnap', null);
     }
 
     // 0
-    if (event.keyCode === 48) {
+    if (event.keyCode === 48 && event.metaKey === false) {
       channel.send('Menu:resetZoom', null);
     }
 
     // delete
     if (event.keyCode === 46 || event.keyCode === 8) {
       event.preventDefault();
-      channel.send('Document:removeObject', this.object);
+      channel.send('Controller:removeObject', this.object);
     }
 
     // [
-    if (event.keyCode === 219) {
-      channel.send('Document:orderBackward', this.object);
+    if (event.keyCode === 219 && event.metaKey === false) {
+      channel.send('Controller:orderBackward', this.object);
     }
 
     // ]
-    if (event.keyCode === 221) {
-      channel.send('Document:orderForward', this.object);
+    if (event.keyCode === 221 && event.metaKey === false) {
+      channel.send('Controller:orderForward', this.object);
+    }
+
+    // meta + b: Bold
+    if (event.keyCode === 66 && event.metaKey === true) {
+      event.preventDefault();
+      if (typeof this.object.toggleBold === 'function') {
+        this.object.toggleBold();
+      }
+    }
+
+    // meta + i: Italic
+    if (event.keyCode === 73 && event.metaKey === true) {
+      event.preventDefault();
+      if (typeof this.object.toggleItalic === 'function') {
+        this.object.toggleItalic();
+      }
+    }
+
+    // meta + u: Underline
+    if (event.keyCode === 85 && event.metaKey === true) {
+      event.preventDefault();
+      if (typeof this.object.toggleUnderline === 'function') {
+        this.object.toggleUnderline();
+      }
+    }
+    // meta + s: Save
+    if (event.keyCode === 83 && event.metaKey === true) {
+      event.preventDefault();
+      channel.send('Veryslide:save');
     }
   }
 
@@ -311,11 +340,11 @@ class Viewport extends View {
   }
 
   copy(event) {
-    channel.send('Document:copy');
+    channel.send('Controller:copy');
   }
 
   paste(event) {
-    channel.send('Document:paste');
+    channel.send('Controller:paste');
   }
 
   render() {
@@ -446,12 +475,12 @@ class PanelForBox extends Panel {
         ui.createText('Order'),
         new ui.Vertical({children: [
           ui.HGroup(
-            ui.createButton('Back',       () => { channel.send('Document:orderBack', this.object); }),
-            ui.createButton('Front',      () => { channel.send('Document:orderFront', this.object); }),
+            ui.createButton('Back',       () => { channel.send('Controller:orderBack', this.object); }),
+            ui.createButton('Front',      () => { channel.send('Controller:orderFront', this.object); }),
           ),
           ui.HGroup(
-            ui.createButton('Backward',   () => { channel.send('Document:orderBackward', this.object); }),
-            ui.createButton('Forward',    () => { channel.send('Document:orderForward', this.object); }),
+            ui.createButton('Backward',   () => { channel.send('Controller:orderBackward', this.object); }),
+            ui.createButton('Forward',    () => { channel.send('Controller:orderForward', this.object); }),
           ),
         ]}),
       ),
@@ -500,14 +529,6 @@ class PanelForTextBox extends PanelForBox {
     [
       new ui.TitleBar({'title': 'Text style'}),
       ui.H(
-        ui.createText('Text'),
-        new ui.InputText({
-          value: this.object.text, 
-          onChange: value => { this.object.text = value },
-        }),
-      ),
-
-      ui.H(
         ui.createText('Color'),
         new ui.ColorButton({ 
           color: this.object.textColor,
@@ -536,14 +557,13 @@ class PanelForTextBox extends PanelForBox {
         ui.createText('Style'),
         new ui.CheckBox({
           title: 'Bold',
-          checked: this.object.bold,
-          onChange: value => { this.object.bold = value },
-        }),
+        }).bind(this.object, 'bold'),
         new ui.CheckBox({
           title: 'Italic',
-          checked: this.object.italic,
-          onChange: value => { this.object.italic = value },
-        }),
+        }).bind(this.object, 'italic'),
+        new ui.CheckBox({
+          title: 'Underline',
+        }).bind(this.object, 'underline'),
       ),
 
       ui.H(
@@ -612,7 +632,7 @@ class PanelForImageList extends PanelForBox {
       this.object.update();
     }
 
-    this.assets = channel.send('Document:getAssetList')[0];
+    this.assets = channel.send('Controller:getAssetList')[0];
     this.dataOptions = [['none', '----']].concat(this.assets.array.map(x => [x.name, x.name]));
 
     [

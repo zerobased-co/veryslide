@@ -12,6 +12,7 @@ class TextBox extends Box {
       size: 14,
       bold: false,
       italic: false,
+      underline: false,
       align: 'center',
       verticalAlign: 'middle',
       ...state,
@@ -49,6 +50,18 @@ class TextBox extends Box {
     this.node.style.color = color;
   }
 
+  toggleBold() {
+    this.bold = !this.bold;
+  }
+
+  toggleItalic() {
+    this.italic = !this.italic;
+  }
+
+  toggleUnderline() {
+    this.underline = !this.underline;
+  }
+
   on_bold(bold) {
     if (bold) {
       this.node.style.fontWeight = 700;
@@ -62,6 +75,14 @@ class TextBox extends Box {
       this.node.style.fontStyle = 'italic';
     } else {
       this.node.style.fontStyle = 'normal';
+    }
+  }
+
+  on_underline(underline) {
+    if (underline) {
+      this.node.style.textDecoration = 'underline';
+    } else {
+      this.node.style.textDecoration = 'none';
     }
   }
 

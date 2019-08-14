@@ -73,12 +73,12 @@ class PageList extends View {
     channel.bind(this, 'PageList:removePage', this.removePage);
   }
 
-  addPage(page) {
-    let pagethumb = this.pagethumbs.spawn(PageThumb);
+  addPage(page, at) {
+    let pagethumb = new PageThumb();
     pagethumb.page = page;
 
-    this.pagethumbs.append(pagethumb);
-    this.appendChild(pagethumb);
+    this.pagethumbs.insert(pagethumb, at);
+    this.node.insertBefore(pagethumb.node, this.node.children[at]);
 
     pagethumb.node.scrollIntoView();
     pagethumb.select();
@@ -86,7 +86,7 @@ class PageList extends View {
 
   selectPage(page) {
     let pagethumb = this.pagethumbs.findby((item) => {
-      return item.page.order == page.order;
+      return item.page == page;
     });
 
     if (pagethumb !== null) {
@@ -97,7 +97,7 @@ class PageList extends View {
 
   removePage(page) {
     let pagethumb = this.pagethumbs.findby((item) => {
-      return item.page.order == page.order;
+      return item.page == page;
     });
 
     if (pagethumb !== null) {

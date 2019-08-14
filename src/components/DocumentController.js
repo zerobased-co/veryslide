@@ -19,8 +19,8 @@ class DocumentController {
     this.slideId = null;
 
     channel.bind(this, 'Controller:addPage', () => {
-      const newPage = this.doc.addPage();
-      channel.send('PageList:addPage', newPage);
+      const newPage = this.doc.addPage(this.page);
+      channel.send('PageList:addPage', newPage, this.doc.pages.find(newPage));
     });
 
     channel.bind(this, 'Controller:selectPage', (page) => {
@@ -176,7 +176,7 @@ class DocumentController {
           var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
 
           var link = document.createElement("a");
-          link.download = 'veryslide' + (this.page.order + 1) + '.png';
+          link.download = 'veryslide' + (this.doc.pages.find(this.page) + 1) + '.png';
           link.href = image;
 
           document.body.appendChild(link);

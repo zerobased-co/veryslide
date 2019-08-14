@@ -1,21 +1,13 @@
 class List {
   constructor(...args) {
     this.__TYPE__ = 'List';
-    this.head = null;
-    this.tail = null;
     this.array = new Array();
-    this.count = 0;
 
     if (args != null) {
       for(var i = 0; i < args.length; i++) {
         this.append(args[i]);
       }
     }
-  }
-  
-  spawn(type, ...args) {
-    let node = new type(...args);
-    return node;
   }
   
   at(index) {
@@ -28,6 +20,13 @@ class List {
     }
   }
 
+  find(node) {
+    for(var i = 0; i < this.array.length; i++) {
+      if (this.array[i] === node) return i;
+    }
+    return -1;
+  }
+
   findby(func) {
     for(var i = 0; i < this.array.length; i++) {
       if (func(this.array[i]) === true) {
@@ -38,216 +37,81 @@ class List {
   }
 
   append(node) {
-    node.prev = null;
-    node.next = null;
-    node.order = null;
-    node.parent = this;
-
-    if (this.tail !== null) {
-      this.tail.next = node;
-    }
-    if (this.head === null) {
-      this.head = node;
-    }
-    node.prev = this.tail;
-    node.order = this.count;
-
     this.array.push(node);
-    this.tail = node;
-    this.count++;
   }
 
-  put(node, at) {
-    // TBD:
+  insert(node, at) {
+    this.array.splice(at, 0, node);
   }
 
   prepend(node) {
-    node.prev = null;
-    node.next = null;
-    node.order = null;
-    node.parent = this;
-
-    if (this.head !== null) {
-      this.head.prev = node;
-    }
-    if (this.tail === null) {
-      this.tail = node;
-    }
-    node.next = this.head;
-    node.order = 0;
-
     this.array.unshift(node);
-    this.head = node;
-    this.count++;
-
-    this.reorder(0);
   }
 
-  reorder(from, to) {
-    if (to === undefined) {
-      to = this.array.length;
+  removeAt(at) {
+    this.array = this.array.slice(0, at - 1).concat(this.array.slice(at, this.array.length))
+    if (at <= this.array.length) {
+      return this.array[at];
     }
-
-    for(var i = from; i < to; i++) {
-      this.array[i].order = i;
-    }
-  }
-
-  rearray() {
-    var node = this.head;
-    var order = 0;
-
-    while(node !== null) {
-      node.order = order;
-      this.array[order] = node;
-      
-      node = node.next;
-      order++;
-    }
+    return null;
   }
 
   remove(node) {
-    let nextnode = node.next;
-
-    if (this.head === node) {
-      this.head = node.next;
+    let at = this.find(node);
+    if (at !== -1) {
+      return this.removeAt(at);
     }
-    if (this.tail === node) {
-      this.tail = node.prev;
-      nextnode = node.prev;
-    }
-    if (node.prev !== null) {
-      node.prev.next = node.next;
-    }
-    if (node.next !== null) {
-      node.next.prev = node.prev;
-    }
-
-    this.array.splice(node.order, 1);
-    this.reorder(node.order);
-
-    node = undefined;
-    this.count--;
-    
-    return nextnode;
+    return null;
   }
 
   removeAll() {
-    /* not implemented yet */
+    this.array = new Array();
   }
 
   makeHead(node) {
-    if (this.head === node) return;
-    var target = this.head;
+    let at = this.find(node);
+    if (at === -1) return -1;
 
-    if (this.tail === node) {
-      this.tail = node.prev;
-    }
-    
-    if (node.next !== null) {
-      node.next.prev = node.prev;
-    }
-    node.prev.next = node.next;
+    this.removeAt(at);
+    this.prepend(node);
 
-    target.prev = node;
-
-    node.prev = null;
-    node.next = target;
-    this.head = node;
-
-    this.rearray(node);
-
-    return node.order;
+    return 0;
   }
 
   makeLast(node) {
-    if (this.tail === node) return;
-    var target = this.tail;
+    let at = this.find(node);
+    if (at === -1) return -1;
 
-    if (this.head === node) {
-      this.head = node.next;
-    }
-    
-    if (node.prev !== null) {
-      node.prev.next = node.next;
-    }
-    node.next.prev = node.prev;
+    this.removeAt(at);
+    this.append(node);
 
-    target.next = node;
-
-    node.prev = target;
-    node.next = null;
-    this.tail = node;
-
-    this.rearray();
-
-    return node.order;
+    return this.array.length;
   }
 
   forward(node) {
-    if (node.next === null) return;
-    var target = node.next;
-    
-    if (node.prev !== null) {
-      node.prev.next = target;
-    }
+    let at = this.find(node);
+    if (at === -1) return -1;
 
-    var _next = target.next;
-    target.prev = node.prev;
-    target.next = node;
-    
-    node.prev = target;
-    node.next = _next;
+    let target = at + 1;
+    if (target > this.array.length) return -1;
 
-    var _order = node.order;
-    node.order = target.order;
-    target.order = _order;
+    this.array[at] = this.array[target];
+    this.array[target] = node;
 
-    this.array[node.order] = node;
-    this.array[target.order] = target;
-
-    if (this.tail === target) {
-      this.tail = node;
-    }
-
-    if (this.head === node) {
-      this.head = target;
-    }
-
-    return node.order;
+    return target;
   }
 
   backward(node) {
-    if (node.prev === null) return;
-    var target = node.prev;
-    
-    if (node.next !== null) {
-      node.next.prev = target;
-    }
+    let at = this.find(node);
+    if (at === -1) return -1;
 
-    var _prev = target.prev;
-    target.prev = node;
-    target.next = node.next;
-    
-    node.prev = _prev;
-    node.next = target;
+    let target = at - 1;
+    if (target < 0) return -1;
 
-    var _order = node.order;
-    node.order = target.order;
-    target.order = _order;
+    this.array[at] = this.array[target];
+    this.array[target] = node;
 
-    this.array[node.order] = node;
-    this.array[target.order] = target;
-
-    if (this.head === target) {
-      this.head = node;
-    }
-
-    if (this.tail === node) {
-      this.tail = target;
-    }
-
-    return node.order;
+    return target;
   }
 }
 

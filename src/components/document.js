@@ -26,13 +26,13 @@ class Page extends BaseObject {
     let object = null;
     switch(type) {
       case 'TextBox':
-        object = this.objects.spawn(TextBox);
+        object = new TextBox();
         break;
       case 'ImageBox':
-        object = this.objects.spawn(ImageBox);
+        object = new ImageBox();
         break;
       case 'ImageList':
-        object = this.objects.spawn(ImageList);
+        object = new ImageList();
         break;
     }
     object.page = this;
@@ -95,8 +95,10 @@ class Page extends BaseObject {
   }
 
   reorder() {
+    let order = 0;
     this.objects.iter((object) => {
-      object.node.style.zIndex = object.order;
+      object.node.style.zIndex = order;
+      order += 1;
     });
     this.invalidate = true;
   }
@@ -156,12 +158,18 @@ class Document extends State {
     });
   }
 
-  addPage() {
-    let page = this.pages.spawn(Page);
-    this.pages.append(page);
-
+  addPage(after) {
+    let page = new Page();
     page.width = this.width;
     page.height = this.height;
+
+    if (after == null) {
+      this.pages.append(page);
+      console.log('addPage: just append');
+    } else {
+      console.log('addPage: ', this.pages.find(after) + 1);
+      this.pages.insert(page, this.pages.find(after) + 1);
+    }
 
     return page;
   }
@@ -176,7 +184,7 @@ class Document extends State {
   }
 
   addAsset() {
-    let asset = this.pages.spawn(Asset);
+    let asset = new Asset();
     this.assets.append(asset);
     return asset;
   }

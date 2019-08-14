@@ -1,6 +1,6 @@
 import State from '../../core/State.js';
 import List from '../../core/List.js';
-import { fadeOutAndRemove } from '../../core/Util';
+import { showLoadingIndicator } from '../../core/Util';
 
 class View extends State {
   constructor(state) {
@@ -115,23 +115,8 @@ class View extends State {
     }
   }
 
-  // TBD: duplicated code from BaseObject
   loading(isLoading) {
-    if (this.loadingNode) {
-      fadeOutAndRemove(this.loadingNode);
-      this.loadingNode = null;
-    }
-
-    if (isLoading === true) {
-      this.loadingNode = document.createElement('div');
-      this.loadingNode.className = 'vs-loading';
-
-      let icon = document.createElement('img');
-      icon.src = '/static/icons/loading.svg';
-
-      this.loadingNode.append(icon);
-      this.node.append(this.loadingNode);
-    }
+    showLoadingIndicator(this, isLoading);
   }
 }
 

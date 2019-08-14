@@ -47,11 +47,30 @@ export function uuid() {
 }
 
 export function fadeOutAndRemove(elem, duration) {
-  duration = duration || 500;
+  duration = duration || 250;
   elem.style.transition = "opacity " + (duration / 1000) + "s ease";
   elem.style.opacity = 0;
 
   setTimeout(() => {
     elem.remove()
   }, duration);
+}
+
+export function showLoadingIndicator(elem, isLoading, duration) {
+  if (elem.loadingNode) {
+    fadeOutAndRemove(elem.loadingNode, duration);
+    elem.loadingNode = null;
+  }
+
+  if (isLoading === true) {
+    elem.loadingNode = document.createElement('div');
+    elem.loadingNode.className = 'vs-loading';
+    elem.loadingNode.setAttribute('data-html2canvas-ignore', 'true');
+
+    let icon = document.createElement('img');
+    icon.src = '/static/icons/loading.svg';
+
+    elem.loadingNode.append(icon);
+    elem.node.append(elem.loadingNode);
+  }
 }

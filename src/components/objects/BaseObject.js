@@ -1,5 +1,5 @@
 import State from '../../core/State';
-import { uuid, fadeOutAndRemove } from '../../core/Util';
+import { uuid, showLoadingIndicator } from '../../core/Util';
 import './BaseObject.scss';
 
 class Node extends State {
@@ -65,22 +65,7 @@ class BaseObject extends Node {
   }
 
   loading(isLoading) {
-    if (this.loadingNode) {
-      fadeOutAndRemove(this.loadingNode);
-      this.loadingNode = null;
-    }
-
-    if (isLoading === true) {
-      this.loadingNode = document.createElement('div');
-      this.loadingNode.className = 'vs-loading';
-      this.loadingNode.setAttribute('data-html2canvas-ignore', 'true');
-
-      let icon = document.createElement('img');
-      icon.src = '/static/icons/loading.svg';
-
-      this.loadingNode.append(icon);
-      this.node.append(this.loadingNode);
-    }
+    showLoadingIndicator(this, isLoading);
   }
 
   on(key, value) {

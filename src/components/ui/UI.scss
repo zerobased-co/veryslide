@@ -2,6 +2,7 @@ $button-radius: 5px;
 
 .vs-view {
   position: relative;
+  overflow: auto;
 }
 
 .vs-vertical {
@@ -53,13 +54,13 @@ $button-radius: 5px;
   height: 30px;
   font-size: 0.8em;
 
-  border: 1px solid #ccc;
+  border: 1px solid #bec0c1;
   border-radius: $button-radius;
 
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #efefef;
+  background: #f2f3f3;
   font-weight: 400;
   user-select: none;
 

@@ -1,3 +1,5 @@
+$border-color: #afafb2;
+
 @mixin no-select {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -24,7 +26,7 @@
 
 .vs-navigator {
   width: 160px;
-  border: 1px solid gray;
+  border: 1px solid $border-color;
   height: 100%;
   position: relative;
 }
@@ -75,13 +77,13 @@
 }
 
 .vs-menu {
-  background: white;
   display: flex;
   flex-direction: row;
   flex-shrink: 0;
-  height: 54px;
   align-items: center;
   overflow: auto;
+  padding: 8px;
+  background: linear-gradient(180deg, #d8dbdd, #c5c7c9);
 
   > * {
     margin-left: 10px;
@@ -93,14 +95,14 @@
   overflow: hidden;
   position: relative;
   outline: none;
-  border: 1px solid gray;
+  border: 1px solid $border-color;
   border-width: 1px 0;
   background: #C7CDD4;
 }
 
 .vs-toolbox {
   width: 320px;
-  border: 1px solid gray;
+  border: 1px solid $border-color;
   overflow-y: auto;
   display: flex;
   flex-direction: column;

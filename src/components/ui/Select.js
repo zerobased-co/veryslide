@@ -10,8 +10,9 @@ class Select extends View {
     });
   }
 
-  onChange(value) {
-    console.log('onChange', value, this);
+  onBinding(value) {
+    this.value = value;
+    this.select.value = value;
   }
 
   on_value(value) {

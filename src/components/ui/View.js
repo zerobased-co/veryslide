@@ -36,6 +36,12 @@ class View extends State {
     }
   }
 
+  onChange(value) {
+    if (this.bindingTarget) {
+      this.bindingTarget[this.bindingKey] = value;
+    }
+  }
+
   addEventListener(eventType, handler, target) {
     if (target == null) {
       target = this.node;
@@ -104,8 +110,8 @@ class View extends State {
   }
 
   appendChild(child) {
-    // TODO: only View can be added as child
-    // TODO: add children at once
+    // TBD: only View can be added as child
+    // TBD: add children at once
     if (child.hasOwnProperty('children') && child.hasOwnProperty('state')) {
       child.parent = this;
       this.children.push(child);

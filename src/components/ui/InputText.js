@@ -29,7 +29,10 @@ class InputText extends View {
   }
 
   blur(event) {
-    this.input.value = this.value;
+    if (this.value != this.input.value) {
+      this.value = this.input.value;
+      this.onChange(this.value);
+    }
   }
 
   handler(event) {
@@ -47,13 +50,6 @@ class InputText extends View {
   onBinding(value) {
     this.value = value;
     this.input.value = value;
-  }
-
-  onChange(value) {
-    this.value = value;
-    if (this.bindingTarget) {
-      this.bindingTarget[this.bindingKey] = value;
-    }
   }
 }
 

@@ -60,7 +60,6 @@ class Menu extends View {
     input.style.visibility = 'hidden';
     input.type = 'file';
     input.addEventListener('change', event => {
-      // TBD: duplicated code
       var file = event.target.files[0];
       console.log(file);
       var reader = new FileReader();
@@ -134,6 +133,70 @@ class Viewport extends View {
     channel.bind(this, 'Viewport:toggleSnap', this.toggleSnap);
 
     this.interval = setInterval(this.updateThumbnail.bind(this), 2000);
+    this.keydownEvents = [
+    // shift, ctrl,  alt,   meta,  keycodes, func
+      [false, false, false, false, [32], () => this.beginGrab()],
+      [false, false, false, false, [173, 189], () => this.zoomOut()],
+      [false, false, false, false, [61, 187], () => this.zoomIn()],
+      [false, false, false, false, [83], () => channel.send('Menu:toggleSnap', null)],
+      [false, false, false, false, [48], () => channel.send('Menu:resetZoom', null)],
+      [false, false, false, false, [46, 8], () => channel.send('Controller:removeObject', this.object)],
+      [false, false, false, false, [219], () => channel.send('Controller:orderBackward', this.object)],
+      [false, false, false, false, [221], () => channel.send('Controller:orderForward', this.object)],
+      [false, false, false, true,  [66], () => this.applyStyle('Bold')],
+      [false, false, false, true,  [73], () => this.applyStyle('Italic')],
+      [false, false, false, true,  [85], () => this.applyStyle('Underline')],
+      [false, false, false, true,  [83], () => channel.send('Veryslide:save')],
+      [false, false, false, true,  [173, 189], () => this.applyStyle('Smaller')],
+      [false, false, false, true,  [61, 187], () => this.applyStyle('Bigger')],
+    ];
+    this.keyupEvents = [
+    // shift, ctrl,  alt,   meta,  keycodes, func
+      [false, false, false, false, [32], () => this.endGrab()],
+    ];
+  }
+
+  beginGrab() {
+    if (this.grab === false) {
+      this.node.style.cursor = 'grab';
+      this.grab = true;
+      this.blur();
+    }
+  }
+
+  endGrab() {
+    this.node.style.cursor = 'default';
+    this.grab = false;
+  }
+
+  applyStyle(style) {
+    switch(style) {
+      case 'Bold':
+        if (typeof this.object.toggleBold === 'function') {
+          this.object.toggleBold();
+        }
+        break;
+      case 'Italic':
+        if (typeof this.object.toggleItalic === 'function') {
+          this.object.toggleItalic();
+        }
+        break;
+      case 'Underline':
+        if (typeof this.object.toggleUnderline === 'function') {
+          this.object.toggleUnderline();
+        }
+        break;
+      case 'Bigger':
+        if (typeof this.object.bigger === 'function') {
+          this.object.bigger();
+        }
+        break;
+      case 'Smaller':
+        if (typeof this.object.smaller === 'function') {
+          this.object.smaller();
+        }
+        break;
+    }
   }
 
   updateThumbnail() {
@@ -255,104 +318,29 @@ class Viewport extends View {
       return;
     }
 
-    // space
-    if (event.keyCode === 32) {
-      event.preventDefault();
-      if (this.grab === false) {
-        this.node.style.cursor = 'grab';
-        this.grab = true;
-        this.blur();
+    this.keydownEvents.forEach(item => {
+      if (event.shiftKey === item[0] && event.ctrlKey === item[1] &&
+          event.altKey === item[2] && event.metaKey === item[3] &&
+          item[4].indexOf(event.keyCode) !== -1) {
+        event.preventDefault();
+        item[5](event);
       }
-    }
-
-    // -
-    if (event.metaKey === false && (event.keyCode === 173 || event.keyCode === 189)) {
-      this.zoomOut();
-    }
-
-    // +
-    if (event.metaKey === false && (event.keyCode === 61 || event.keyCode === 187)) {
-      this.zoomIn();
-    }
-
-    // s
-    if (event.keyCode === 83 && event.metaKey === false) {
-      channel.send('Menu:toggleSnap', null);
-    }
-
-    // 0
-    if (event.keyCode === 48 && event.metaKey === false) {
-      channel.send('Menu:resetZoom', null);
-    }
-
-    // delete
-    if (event.keyCode === 46 || event.keyCode === 8) {
-      event.preventDefault();
-      channel.send('Controller:removeObject', this.object);
-    }
-
-    // [
-    if (event.keyCode === 219 && event.metaKey === false) {
-      channel.send('Controller:orderBackward', this.object);
-    }
-
-    // ]
-    if (event.keyCode === 221 && event.metaKey === false) {
-      channel.send('Controller:orderForward', this.object);
-    }
-
-    // meta + b: Bold
-    if (event.keyCode === 66 && event.metaKey === true) {
-      event.preventDefault();
-      if (typeof this.object.toggleBold === 'function') {
-        this.object.toggleBold();
-      }
-    }
-
-    // meta + i: Italic
-    if (event.keyCode === 73 && event.metaKey === true) {
-      event.preventDefault();
-      if (typeof this.object.toggleItalic === 'function') {
-        this.object.toggleItalic();
-      }
-    }
-
-    // meta + u: Underline
-    if (event.keyCode === 85 && event.metaKey === true) {
-      event.preventDefault();
-      if (typeof this.object.toggleUnderline === 'function') {
-        this.object.toggleUnderline();
-      }
-    }
-    // meta + s: Save
-    if (event.keyCode === 83 && event.metaKey === true) {
-      event.preventDefault();
-      channel.send('Veryslide:save');
-    }
-
-    // meta + -: Smaller
-    if (event.metaKey === true && (event.keyCode === 173 || event.keyCode === 189)) {
-      event.preventDefault();
-      if (typeof this.object.smaller === 'function') {
-        this.object.smaller();
-      }
-    }
-
-    // meta + +: Bigger
-    if (event.metaKey === true && (event.keyCode === 61 || event.keyCode === 187)) {
-      event.preventDefault();
-      if (typeof this.object.bigger === 'function') {
-        this.object.bigger();
-      }
-    }
+    });
   }
 
   keyup(event) {
-    if (event.keyCode === 32) {
-      event.preventDefault();
-      this.node.style.cursor = 'default';
-      this.grab = false;
+    if (event.target !== document.body && event.target !== this.node) {
+      return;
     }
+
+    this.keyupEvents.forEach(item => {
+      if (event.shiftKey === item[0] && event.ctrlKey === item[1] &&
+          event.altKey === item[2] && event.metaKey === item[3] &&
+          item[4].indexOf(event.keyCode) !== -1) {
+        event.preventDefault();
+        item[5](event);
+      }
+    });
   }
 
   copy(event) {
@@ -560,10 +548,6 @@ class PanelForTextBox extends PanelForBox {
           value: this.object.fontFamily,
           onChange: value => { this.object.fontFamily = value },
         }),
-        new ui.ColorButton({
-          color: this.object.textColor,
-          onChange: value => { this.object.textColor = value },
-        }),
       ),
 
       ui.H(
@@ -603,26 +587,6 @@ class PanelForImageBox extends PanelForBox {
     super.render();
 
     // TBD: We cannot change image after creation
-    /*
-    var input = document.createElement('input');
-    input.type = 'file';
-    input.addEventListener('change', event => {
-      var file = event.target.files[0];
-      var reader = new FileReader();
-      reader.addEventListener("load", () => {
-        var image = new Image();
-        image.src = reader.result;
-        image.onload =  () => {
-          this.object.width = image.width;
-          this.object.height = image.height;
-          this.object.src = image.src;
-          channel.send('Viewport:focus', this.object);
-        }
-      }, false);
-      reader.readAsDataURL(file);
-    });
-    */
-
     [
       new ui.TitleBar({'title': 'Image'}),
       ui.H(

@@ -15,6 +15,7 @@ class TextBox extends Box {
       underline: false,
       align: 'center',
       verticalAlign: 'middle',
+      wordBreak: 'normal',
       ...state,
     });
   }
@@ -112,6 +113,10 @@ class TextBox extends Box {
     } else if (align == 'middle') {
       this.node.style.alignItems = 'center';
     }
+  }
+
+  on_wordBreak(value) {
+    this.node.style.wordBreak = value;
   }
 }
 

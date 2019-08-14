@@ -564,6 +564,13 @@ class PanelForTextBox extends PanelForBox {
       ),
 
       ui.H(
+        ui.createText('Word Break'),
+        new ui.Select({
+          options: [['normal', 'Normal'], ['break-all', 'Break All'], ['keep-all', 'Keep All'], ['break-word', 'Break Word']],
+        }).bind(this.object, 'wordBreak'),
+      ),
+
+      ui.H(
         ui.createText('Alignment'),
         new ui.Select({
           options: [['left', 'Left'], ['center', 'Center'], ['right', 'Right']],

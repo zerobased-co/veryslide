@@ -97,6 +97,20 @@ $border-color: #afafb2;
   border: 1px solid $border-color;
   border-width: 1px 0;
   background: #C7CDD4;
+
+  &.Playing {
+    background: black;
+
+    .vs-page {
+      box-shadow: none;
+    }
+
+    .vs-pageholder {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  }
 }
 
 .vs-toolbox {

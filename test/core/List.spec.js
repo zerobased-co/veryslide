@@ -218,4 +218,20 @@ describe('List', () => {
     assert.deepEqual([0, 1, 3, 4, 2], list.array);
     assert.equal(3, pos);
   });
+
+  it('prev should return the previous item', () => {
+    let list = new List(0, 1, 2, 3, 4);
+
+    assert.equal(3, list.prev(4));
+    assert.equal(1, list.prev(2));
+    assert.equal(null, list.prev(0));
+  });
+
+  it('next should return the next item', () => {
+    let list = new List(0, 1, 2, 3, 4);
+
+    assert.equal(4, list.next(3));
+    assert.equal(2, list.next(1));
+    assert.equal(null, list.next(4));
+  });
 });

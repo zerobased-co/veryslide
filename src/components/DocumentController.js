@@ -24,6 +24,26 @@ class DocumentController {
       channel.send('PageList:addPage', newPage, this.doc.pages.find(newPage));
     });
 
+    channel.bind(this, 'Controller:prevPage', () => {
+      let prevPage = this.doc.pages.prev(this.page);
+      if (prevPage) {
+        this.page = prevPage;
+        channel.send('PageList:selectPage', this.page);
+      } else {
+        channel.send('Viewport:togglePlay', false);
+      }
+    });
+
+    channel.bind(this, 'Controller:nextPage', () => {
+      let nextPage = this.doc.pages.next(this.page);
+      if (nextPage) {
+        this.page = nextPage;
+        channel.send('PageList:selectPage', this.page);
+      } else {
+        channel.send('Viewport:togglePlay', false);
+      }
+    });
+
     channel.bind(this, 'Controller:selectPage', (page) => {
       this.page = page;
       this.object = null;

@@ -43,7 +43,7 @@ class Menu extends View {
         ui.createButton('Image', () => { channel.send('Controller:savePage', 'image'); }),
         //ui.createButton('PDF',   () => { channel.send('Controller:savePage', 'pdf'); }),
         ui.createButton('Save',   () => { channel.send('Veryslide:save'); }),
-        ui.createButton('Play',   () => { channel.send('Veryslide:play'); }),
+        ui.createButton('Play',   () => { channel.send('Viewport:togglePlay', true); }),
       ),
 
       ui.createButton('Close',   () => { 
@@ -125,6 +125,7 @@ class Viewport extends View {
     this.translate = {x: 0, y: 0};
     this.scale = 1.0;
     //this.zoomLevel = [10, 25, 50, 75, 100, 200, 400];
+    this.isPlaying = false;
 
     channel.bind(this, 'Viewport:selectPage', this.selectPage);
     channel.bind(this, 'Viewport:clear', this.clear);
@@ -133,6 +134,7 @@ class Viewport extends View {
     channel.bind(this, 'Viewport:focus', this.focus);
     channel.bind(this, 'Viewport:blur', this.blur);
     channel.bind(this, 'Viewport:toggleSnap', this.toggleSnap);
+    channel.bind(this, 'Viewport:togglePlay', this.togglePlay);
 
     this.interval = setInterval(this.updateThumbnail.bind(this), 2000);
     this.keydownEvents = [
@@ -151,6 +153,15 @@ class Viewport extends View {
       [false, false, false, true,  [83], () => channel.send('Veryslide:save')],
       [false, false, false, true,  [173, 189], () => this.applyStyle('Smaller')],
       [false, false, false, true,  [61, 187], () => this.applyStyle('Bigger')],
+      [false, false, false, false, [27], () => channel.send('Editor:togglePlay', false)],
+      [false, false, false, false, [37], () => this.applyMove('Left')],
+      [false, false, false, false, [38], () => this.applyMove('Up')],
+      [false, false, false, false, [39], () => this.applyMove('Right')],
+      [false, false, false, false, [40], () => this.applyMove('Down')],
+      [true,  false, false, false, [37], () => this.applyMove('BigLeft')],
+      [true,  false, false, false, [38], () => this.applyMove('BigUp')],
+      [true,  false, false, false, [39], () => this.applyMove('BigRight')],
+      [true,  false, false, false, [40], () => this.applyMove('BigDown')],
     ];
     this.keyupEvents = [
     // shift, ctrl,  alt,   meta,  keycodes, func
@@ -176,7 +187,7 @@ class Viewport extends View {
     });
 
     this.addEventListener('mousedown', event => {
-
+      if (this.isPlaying) return;
       if (this.page == null) return;
       if (this.grab === true) {
         event.preventDefault();
@@ -225,6 +236,17 @@ class Viewport extends View {
       this.drag = false;
     });
 
+    window.addEventListener('resize', () => {
+      if (this.isPlaying) {
+        this.updateTransform();
+      }
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+      if (document.fullscreenElement == null) {
+        this.togglePlay(false);
+      }
+    }, false);
   }
 
   beginGrab() {
@@ -242,10 +264,28 @@ class Viewport extends View {
 
   applyStyle(style) {
     if (this.object == null) return;
-    if (this.object.hasOwnProperty('apply') === false) return;
-    if (typeof this.object.apply !== 'function') return;
+    if (typeof this.object['apply'] !== 'function') return;
 
     this.object.apply(style);
+  }
+
+  applyMove(direction) {
+    if (this.isPlaying) {
+      switch(direction) {
+        case 'Left':
+        case 'Up':
+          channel.send('Controller:prevPage');
+          break;
+        case 'Right':
+        case 'Down':
+          channel.send('Controller:nextPage');
+          break;
+      }
+    } else {
+      if (this.object == null) return;
+      if (typeof this.object['apply'] !== 'function') return;
+      this.object.apply(direction);
+    }
   }
 
   updateThumbnail() {
@@ -302,9 +342,21 @@ class Viewport extends View {
   }
 
   updateTransform() {
-    if (this.page == null) return;
-    this.pageHolder.style.transform = 'translate(' + this.translate.x + 'px, ' + this.translate.y + 'px) scale(' + this.scale + ')';
-    this.handler.updateTransform();
+    if (this.isPlaying) {
+      let width = window.innerWidth;
+      let height = window.innerHeight;
+      let top = 0;
+      let scale = 1;
+      
+      if (this.page) {
+        scale = width / this.page.width;
+        top = (height - this.page.height * scale) / 2;
+        this.pageHolder.style.transform = 'translate(0px, ' + top + 'px) scale(' + scale + ')';
+      }
+    } else {
+      this.pageHolder.style.transform = 'translate(' + this.translate.x + 'px, ' + this.translate.y + 'px) scale(' + this.scale + ')';
+      this.handler.updateTransform();
+    }
   }
 
   focus(object) {
@@ -399,6 +451,21 @@ class Viewport extends View {
     channel.send('Controller:paste');
   }
 
+  togglePlay(playing) {
+    this.isPlaying = (playing == null) ? !this.isPlaying : playing;
+
+    if (this.isPlaying) {
+      this.toggleSnap(false);
+      this.blur();
+      this.node.classList.add('Playing');
+      this.node.requestFullscreen();
+    } else {
+      this.node.classList.remove('Playing');
+      document.exitFullscreen();
+    }
+    this.updateTransform();
+  }
+
   render() {
     super.render();
     this.node.tabIndex = '0';
@@ -455,14 +522,14 @@ class Editor extends View {
 
   render() {
     super.render();
-    this.appendChild(new Menu());
+    this.appendChild(this.menu = new Menu());
 
     let row = new ui.Horizon();
     this.appendChild(row);
 
-    row.appendChild(new Navigator());
-    row.appendChild(new Viewport());
-    row.appendChild(new ToolBox());
+    row.appendChild(this.navigator = new Navigator());
+    row.appendChild(this.viewport = new Viewport());
+    row.appendChild(this.toolbox = new ToolBox());
 
     return this.node;
   }

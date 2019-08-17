@@ -36,6 +36,21 @@ class View extends State {
     }
   }
 
+  show(isShow) {
+    isShow = (isShow == null) ? true : isShow;
+    if (isShow) {
+      console.log('show', this.className);
+      this.node.classList.remove('vs-hidden');
+    } else {
+      console.log('hide', this.className);
+      this.node.classList.add('vs-hidden');
+    }
+  }
+
+  hide() {
+    return this.show(false);
+  }
+
   onChange(value) {
     if (this.bindingTarget) {
       this.bindingTarget[this.bindingKey] = value;

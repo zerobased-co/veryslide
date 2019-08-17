@@ -1,4 +1,5 @@
 import State from 'core/State';
+import channel from 'core/Channel';
 import { uuid, showLoadingIndicator } from 'core/Util';
 import './BaseObject.scss';
 
@@ -100,6 +101,39 @@ class BaseObject extends Node {
 
   on_color(color) {
     this.node.style.backgroundColor = color;
+  }
+
+  apply(style) {
+    switch(style) {
+      case 'Left':
+        this.x = parseInt(this.x) - 1;
+        break;
+      case 'Right':
+        this.x = parseInt(this.x) + 1;
+        break;
+      case 'Up':
+        this.y = parseInt(this.y) - 1;
+        break;
+      case 'Down':
+        this.y = parseInt(this.y) + 1;
+        break;
+      case 'BigLeft':
+        this.x = parseInt(this.x) - 16;
+        break;
+      case 'BigRight':
+        this.x = parseInt(this.x) + 16;
+        break;
+      case 'BigUp':
+        this.y = parseInt(this.y) - 16;
+        break;
+      case 'BigDown':
+        this.y = parseInt(this.y) + 16;
+        break;
+      default:
+        return false;
+    }
+    channel.send('Handler:connect', this);
+    return true;
   }
 }
 

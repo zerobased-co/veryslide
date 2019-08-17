@@ -40,6 +40,22 @@ class List {
     return null;
   }
 
+  prev(node) {
+    let at = this.find(node);
+    if (at == -1 || at == 0) {
+      return null;
+    }
+    return this.array[at - 1];
+  }
+
+  next(node) {
+    let at = this.find(node);
+    if (at == -1 || at == (this.array.length - 1)) {
+      return null;
+    }
+    return this.array[at + 1];
+  }
+
   append(node) {
     this.array.push(node);
   }

@@ -1,3 +1,4 @@
+import channel from 'core/Channel';
 import './TextBox.scss';
 import Box from './Box';
 
@@ -52,6 +53,8 @@ class TextBox extends Box {
   }
 
   apply(style) {
+    super.apply(style);
+
     switch(style) {
       case 'Smaller':
         this.size = parseInt(this.size) - 1;
@@ -68,7 +71,11 @@ class TextBox extends Box {
       case 'Underline':
         this.underline = !this.underline;
         break;
+      default:
+        return false;
     }
+    channel.send('Handler:connect', this);
+    return true;
   }
 
   on_bold(bold) {

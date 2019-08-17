@@ -9,6 +9,10 @@ class List {
       }
     }
   }
+
+  get length() {
+    return this.array.length;
+  }
   
   at(index) {
     return this.array[index];
@@ -49,9 +53,17 @@ class List {
   }
 
   removeAt(at) {
-    this.array = this.array.slice(0, at - 1).concat(this.array.slice(at, this.array.length))
-    if (at <= this.array.length) {
+    if (at < 0 || at >= this.array.length) {
+      return null;
+    }
+
+    this.array = this.array.slice(0, at).concat(this.array.slice(at + 1, this.array.length))
+    if (at < this.array.length) {
       return this.array[at];
+    } else {
+      if (this.array.length > 0) {
+        return this.array[this.array.length - 1];
+      }
     }
     return null;
   }
@@ -68,7 +80,7 @@ class List {
     this.array = new Array();
   }
 
-  makeHead(node) {
+  makeFirst(node) {
     let at = this.find(node);
     if (at === -1) return -1;
 
@@ -93,7 +105,7 @@ class List {
     if (at === -1) return -1;
 
     let target = at + 1;
-    if (target > this.array.length) return -1;
+    if (target >= this.array.length) return at;
 
     this.array[at] = this.array[target];
     this.array[target] = node;
@@ -106,7 +118,7 @@ class List {
     if (at === -1) return -1;
 
     let target = at - 1;
-    if (target < 0) return -1;
+    if (target < 0) return 0;
 
     this.array[at] = this.array[target];
     this.array[target] = node;

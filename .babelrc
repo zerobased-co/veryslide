@@ -5,11 +5,15 @@
         node: 'current',
       },
       useBuiltIns: 'entry',
+      corejs: '3.0.0',
     }],
     "@babel/preset-react",
   ],
   "plugins": [
     "@babel/plugin-proposal-class-properties",
     "@babel/plugin-proposal-object-rest-spread",
+    ["module-resolver", {
+      "root": ["./src", "./"]
+    }],
   ]
 }

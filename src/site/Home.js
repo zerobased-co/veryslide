@@ -73,7 +73,13 @@ class HomeBase extends Component {
                   <li key={slide.id}>
                     <Link to={url}>
                       {slide.data.info != null ?
-                      <span>{slide.data.info.title} (ID: {slide.id})</span>
+                      <span>{slide.data.info.title} ({slide.data.data.pages.length} page(s))
+                        {slide.data.data.pages.length > 0 ?
+                        <img src={slide.data.data.pages[0].thumbnail} />
+                        :
+                        ''
+                        }
+                      </span>
                       :
                       <span>ID: {slide.id}</span>
                       }

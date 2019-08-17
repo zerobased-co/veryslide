@@ -170,9 +170,7 @@ class Document extends State {
 
     if (after == null) {
       this.pages.append(page);
-      console.log('addPage: just append');
     } else {
-      console.log('addPage: ', this.pages.find(after) + 1);
       this.pages.insert(page, this.pages.find(after) + 1);
     }
 

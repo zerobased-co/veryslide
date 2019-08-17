@@ -20,6 +20,8 @@ class Veryslide extends State {
       ...state,
     });
 
+    document.body.style.overflow = 'hidden';
+
     // TBD: every veryslide uses their own channel, not a singleton.
     channel.cleanup();
 
@@ -64,6 +66,7 @@ class Veryslide extends State {
   }
 
   destroy() {
+    document.body.style.overflow = 'auto';
     this.editor.destroy();
   }
 

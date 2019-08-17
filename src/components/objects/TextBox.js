@@ -51,24 +51,24 @@ class TextBox extends Box {
     this.node.style.color = color;
   }
 
-  smaller() {
-    this.size = parseInt(this.size) - 1;
-  }
-
-  bigger() {
-    this.size = parseInt(this.size) + 1;
-  }
-
-  toggleBold() {
-    this.bold = !this.bold;
-  }
-
-  toggleItalic() {
-    this.italic = !this.italic;
-  }
-
-  toggleUnderline() {
-    this.underline = !this.underline;
+  apply(style) {
+    switch(style) {
+      case 'Smaller':
+        this.size = parseInt(this.size) - 1;
+        break;
+      case 'Bigger':
+        this.size = parseInt(this.size) + 1;
+        break;
+      case 'Bold':
+        this.bold = !this.bold;
+        break;
+      case 'Italic':
+        this.italic = !this.italic;
+        break;
+      case 'Underline':
+        this.underline = !this.underline;
+        break;
+    }
   }
 
   on_bold(bold) {

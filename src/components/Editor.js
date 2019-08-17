@@ -239,33 +239,11 @@ class Viewport extends View {
   }
 
   applyStyle(style) {
-    switch(style) {
-      case 'Bold':
-        if (typeof this.object.toggleBold === 'function') {
-          this.object.toggleBold();
-        }
-        break;
-      case 'Italic':
-        if (typeof this.object.toggleItalic === 'function') {
-          this.object.toggleItalic();
-        }
-        break;
-      case 'Underline':
-        if (typeof this.object.toggleUnderline === 'function') {
-          this.object.toggleUnderline();
-        }
-        break;
-      case 'Bigger':
-        if (typeof this.object.bigger === 'function') {
-          this.object.bigger();
-        }
-        break;
-      case 'Smaller':
-        if (typeof this.object.smaller === 'function') {
-          this.object.smaller();
-        }
-        break;
-    }
+    if (this.object == null) return;
+    if (this.object.hasOwnProperty('apply') === false) return;
+    if (typeof this.object.apply !== 'function') return;
+
+    this.object.apply(style);
   }
 
   updateThumbnail() {

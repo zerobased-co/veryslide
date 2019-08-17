@@ -17,6 +17,7 @@ class DocumentController {
     this.clipboard = null;
     this.firebase = null;
     this.slideId = null;
+    this.pasted = 0;
 
     channel.bind(this, 'Controller:addPage', () => {
       const newPage = this.doc.addPage(this.page);
@@ -108,6 +109,7 @@ class DocumentController {
     channel.bind(this, 'Controller:copy', () => {
       if (this.object != null) {
         this.clipboard = this.object;
+        this.pasted = 0;
       } else if (this.page != null) {
         this.clipboard = this.page;
       }
@@ -150,10 +152,10 @@ class DocumentController {
           if (this.page != null) {
             this.page.appendObject(newObject);
             if (this.page == this.clipboard.page) {
-              newObject.x += 10;
-              newObject.y += 10;
+              this.pasted += 1;
+              newObject.x += this.pasted * 10;
+              newObject.y += this.pasted * 10;
             }
-            this.clipboard = newObject;
             this.object = newObject;
             channel.send('Handler:connect', newObject);
           }

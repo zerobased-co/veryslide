@@ -154,6 +154,75 @@ class Viewport extends View {
     // shift, ctrl,  alt,   meta,  keycodes, func
       [false, false, false, false, [32], () => this.endGrab()],
     ];
+
+    ['copy', 'paste', 'keydown', 'keyup'].forEach(e => {
+      this.addEventListener(e, this[e], window);
+    }, this);
+
+    this.addEventListener('mousemove', event => {
+      event.preventDefault();
+
+      if (this.page == null) return;
+      if (this.drag === true) {
+        let dx = event.clientX - this.dragStart.x;
+        let dy = event.clientY - this.dragStart.y;
+
+        this.translate.x = dx;
+        this.translate.y = dy;
+        this.updateTransform();
+      }
+    });
+
+    this.addEventListener('mousedown', event => {
+
+      if (this.page == null) return;
+      if (this.grab === true) {
+        event.preventDefault();
+
+        this.node.style.cursor = 'grabbing';
+        this.drag = true;
+        this.dragStart = {
+          x: event.clientX - this.translate.x,
+          y: event.clientY - this.translate.y,
+        }
+      } else {
+        let rect = this.page.node.getBoundingClientRect();
+        let x = (event.clientX - rect.x) / this.scale;
+        let y = (event.clientY - rect.y) / this.scale;
+
+        let pickedObject = this.page.findObject(x, y);
+        if (pickedObject != null) {
+          if (event.detail >= 2) {
+            // edit if available
+            event.preventDefault();
+            this.editable(pickedObject);
+          } else {
+            if (pickedObject != this.object) {
+              event.preventDefault();
+              this.focus(pickedObject);
+              // pass event to handler for allowing drag instantly
+              this.handler.mousedown(event);
+            }
+          }
+        } else {
+          this.blur();
+        }
+      }
+    });
+
+    this.addEventListener('mouseup', () => {
+      if (this.grab === true) {
+        this.node.style.cursor = 'grab';
+        this.drag = false;
+      }
+    });
+
+    this.addEventListener('mouseleave', () => {
+      this.node.style.cursor = 'default';
+      this.grab = false;
+      this.drag = false;
+    });
+
   }
 
   beginGrab() {
@@ -354,75 +423,6 @@ class Viewport extends View {
   render() {
     super.render();
     this.node.tabIndex = '0';
-
-    ['copy', 'paste', 'keydown', 'keyup'].forEach(e => {
-      this.addEventListener(e, this[e], window);
-    }, this);
-
-    this.addEventListener('mousemove', event => {
-      event.preventDefault();
-
-      if (this.page == null) return;
-      if (this.drag === true) {
-        let dx = event.clientX - this.dragStart.x;
-        let dy = event.clientY - this.dragStart.y;
-
-        this.translate.x = dx;
-        this.translate.y = dy;
-        this.updateTransform();
-      }
-    });
-
-    this.addEventListener('mousedown', event => {
-
-      if (this.page == null) return;
-      if (this.grab === true) {
-        event.preventDefault();
-
-        this.node.style.cursor = 'grabbing';
-        this.drag = true;
-        this.dragStart = {
-          x: event.clientX - this.translate.x,
-          y: event.clientY - this.translate.y,
-        }
-      } else {
-        let rect = this.page.node.getBoundingClientRect();
-        let x = (event.clientX - rect.x) / this.scale;
-        let y = (event.clientY - rect.y) / this.scale;
-
-        let pickedObject = this.page.findObject(x, y);
-        if (pickedObject != null) {
-          if (event.detail >= 2) {
-            // edit if available
-            event.preventDefault();
-            this.editable(pickedObject);
-          } else {
-            if (pickedObject != this.object) {
-              event.preventDefault();
-              this.focus(pickedObject);
-              // pass event to handler for allowing drag instantly
-              this.handler.mousedown(event);
-            }
-          }
-        } else {
-          this.blur();
-        }
-      }
-    });
-
-    this.addEventListener('mouseup', () => {
-      if (this.grab === true) {
-        this.node.style.cursor = 'grab';
-        this.drag = false;
-      }
-    });
-
-    this.addEventListener('mouseleave', () => {
-      this.node.style.cursor = 'default';
-      this.grab = false;
-      this.drag = false;
-    });
-
     this.handler = new Handler();
     this.handler.viewport = this;
 

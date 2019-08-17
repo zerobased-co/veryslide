@@ -261,7 +261,7 @@ class Viewport extends View {
     if (this.page == null) return;
 
     this.blur();
-    this.node.removeChild(this.page.node);
+    this.pageHolder.removeChild(this.page.node);
     delete this.page;
     this.page = null;
   }
@@ -270,8 +270,7 @@ class Viewport extends View {
     this.clear();
     this.page = page;
 
-    this.node.append(this.page.node);
-    this.page.node.appendChild(this.handler.node);
+    this.pageHolder.append(this.page.node);
 
     this.updateTransform();
     this.setPageSnap();
@@ -282,9 +281,9 @@ class Viewport extends View {
   setPageSnap() {
     if (this.page) {
       if (this.snap) {
-        this.page.node.classList.add('snap');
+        this.page.node.appendChild(this.pageSnap);
       } else {
-        this.page.node.classList.remove('snap');
+        this.pageSnap.remove();
       }
     }
   }
@@ -302,7 +301,7 @@ class Viewport extends View {
 
   updateTransform() {
     if (this.page == null) return;
-    this.page.node.style.transform = 'translate(' + this.translate.x + 'px, ' + this.translate.y + 'px) scale(' + this.scale + ')';
+    this.pageHolder.style.transform = 'translate(' + this.translate.x + 'px, ' + this.translate.y + 'px) scale(' + this.scale + ')';
     this.handler.updateTransform();
   }
 
@@ -401,8 +400,18 @@ class Viewport extends View {
   render() {
     super.render();
     this.node.tabIndex = '0';
+    this.pageHolder = document.createElement('div');
+    this.pageHolder.className = 'vs-pageholder';
+    this.node.appendChild(this.pageHolder);
+
+    this.pageSnap = document.createElement('div');
+    this.pageSnap.className = 'vs-pagesnap';
+    // To be ignored
+    this.pageSnap.setAttribute('data-html2canvas-ignore', 'true');
+
     this.handler = new Handler();
     this.handler.viewport = this;
+    this.pageHolder.appendChild(this.handler.node);
 
     return this.node;
   }

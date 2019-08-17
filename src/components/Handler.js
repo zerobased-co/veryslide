@@ -145,10 +145,10 @@ class Handler extends View {
       this.node.style.width = w + 'px';
       this.node.style.height = h + 'px';
 
-      this.object.x = x;
-      this.object.y = y;
-      this.object.width = w;
-      this.object.height = h;
+      this.object.x = parseInt(x);
+      this.object.y = parseInt(y);
+      this.object.width = parseInt(w);
+      this.object.height = parseInt(h);
     }
   }
 

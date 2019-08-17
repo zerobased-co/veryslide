@@ -65,15 +65,14 @@ $border-color: #afafb2;
   border: 1px solid gray;
   box-shadow: 0 0 5px 3px #aaa;
   position: absolute;
+}
 
-  &.snap {
-    background:
-      linear-gradient(90deg, #FFF 14px, transparent 0) center,
-      linear-gradient(#FFF 14px, transparent 0) center,
-      #ddd !important;
-    background-size: 16px 16px !important;
-    background-position: 1px 1px !important;
-  }
+.vs-pagesnap {
+  width: 100%;
+  height: 100%;
+  background-color: #FFFFFF20;
+  background-image: url('/static/dots.svg');
+  background-size: 16px 16px;
 }
 
 .vs-menu {

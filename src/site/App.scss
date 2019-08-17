@@ -18,7 +18,7 @@ $font-primary: 'Helvetica Neue', 'Arial', sans-serif;
 $small-screen: screen and (max-width: 1024px);
 $large-screen: screen and (min-width: 1920px);
 
-body {
+html, body {
   margin: 0;
   padding: 0;
   background: $color-gray-1;
@@ -27,10 +27,10 @@ body {
   font-size: 1.4vw;
 
   @media #{$large-screen} {
-    font-size: 24px;
+    font-size: 28px;
   }
   @media #{$small-screen} {
-    font-size: 16px;
+    font-size: 14px;
   }
 }
 
@@ -52,7 +52,7 @@ body {
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 2em;
+  font-size: 2rem;
   color: $color-brand;
   font-family: $font-brand;
   background: $color-gray-2;
@@ -80,15 +80,15 @@ body {
   }
 
   h1 {
-    font-size: 1.785em;
+    font-size: 1.785rem;
   }
 
   h2 {
-    font-size: 1.45em;
+    font-size: 1.45rem;
   }
 
   .Content {
-    margin: 0 2em;
+    margin: 0 2rem;
     min-height: 100vh;
 
     & + & {
@@ -96,7 +96,7 @@ body {
     }
 
     * + h1, * + h2 {
-      margin-top: 3em;
+      margin-top: 3rem;
     }
   }
 
@@ -121,7 +121,7 @@ body {
       }
 
       .Hero {
-        padding: 2em;
+        padding: 2rem;
         position: fixed;
         margin-top: 20vh;
 
@@ -133,13 +133,13 @@ body {
         h1 {
           color: $color-brand;
           font-weight: 900;
-          font-size: 4.8em;
+          font-size: 4.8rem;
           margin: 0;
         }
 
         h2 {
-          font-size: 1.2em;
-          margin: 0.25em 0 2.5em;
+          font-size: 1.2rem;
+          margin: 0.25rem 0 2.5rem;
           text-shadow: 1px 1px 0px $color-gray-1;
         }
       }
@@ -171,8 +171,8 @@ body {
     flex-direction: column;
     align-items: flex-start;
     
-    * + * {
-      margin-top: 0.5em;
+    & > * + * {
+      margin-top: 0.5rem;
     }
   }
 
@@ -180,9 +180,9 @@ body {
     flex-direction: row;
     align-items: center;
     
-    * + * {
-      margin-left: 0.5em;
-      margin-bottom: 0;
+    & > * + * {
+      margin-top: 0;
+      margin-left: 0.5rem;
     }
   }
 
@@ -190,23 +190,26 @@ body {
     border: 1px solid $color-gray-3;
     border-radius: 100px;
     background: white;
-    padding: 0 0 0 1em;
+    padding: 0 0 0 1rem;
     display: inline-flex;
     align-items: center;
+    overflow: hidden;
+    font-size: 1rem;
+    width: 20rem;
 
-    svg {
-      margin: 0 0.5em;
-    }
-
+    select,
     input[type=text],
+    input[type=number],
     input[type=password] {
+      background: transparent;
       border: 0;
       margin: 0;
+      flex-grow: 1;
     }
   }
 
   .Label {
-    padding: 0.75em 1.5em;
+    padding: 0.75rem 1.5rem;
     border-radius: 100px;
     border: 1px solid $color-gray-3;
     background: $color-gray-2;
@@ -217,14 +220,26 @@ body {
     }
   }
 
+  select,
   input[type=text],
+  input[type=number],
   input[type=password] {
-    width: 20em;
+    width: 5rem;
     border: 1px solid $color-gray-3;
     border-radius: 100px;
-    font-size: 0.8em;
-    padding: 0.8em 1em;
-    line-height: 1;
+    background: transparent;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    height: 2.8rem;
+    outline: none;
+  }
+
+  input[type=number] {
+    text-align: center;
+
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+    }
   }
 
   input::placeholder {
@@ -244,12 +259,13 @@ body {
     text-decoration: none;
     display: inline-flex;
 
-    font-size: 0.8em;
-    padding: 0.8em 1em;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
 
     font-family: 'Montserrat';
     font-weight: 600;
     line-height: 1;
+    height: 2.8rem;
 
     &.Primary {
       color: $color-primary;
@@ -258,8 +274,8 @@ body {
     }
 
     &.Large {
-      font-size: 1em;
-      padding: 1em 2em;
+      font-size: 1rem;
+      padding: 1rem 2rem;
     }
 
     &:hover {
@@ -279,10 +295,20 @@ body {
       background: $color-gray-2;
       border-color: $color-gray-2;
     }
+
+    svg {
+      margin-left: 0;
+      margin-right: 0.5rem;
+    }
+
+    svg.right {
+      margin-left: 0.5rem;
+      margin-right: 0;
+    }
   }
 
   .Navigation {
-    padding: 1em;
+    padding: 1rem;
     background: $color-gray-2;
     display: flex;
     flex-direction: row;
@@ -292,7 +318,7 @@ body {
     .Brand {
       color: $color-brand;
       font-family: $font-brand;
-      font-size: 2em;
+      font-size: 2rem;
       font-weight: 900;
       text-decoration: none;
     }
@@ -301,7 +327,7 @@ body {
       display: flex;
       flex-direction: row;
       flex-grow: 1;
-      padding: 0 0 0 2em;
+      padding: 0 0 0 2rem;
       margin: 0;
 
       li:last-child {
@@ -313,7 +339,7 @@ body {
       }
 
       li + li {
-        padding-left: 1em;
+        padding-left: 1rem;
       }
     }
 
@@ -335,7 +361,7 @@ body {
     justify-content: center;
 
     p {
-      font-size: 0.8em;
+      font-size: 1rem;
       color: $color-normal;
       font-family: $font-brand;
       letter-spacing: -0.15px;

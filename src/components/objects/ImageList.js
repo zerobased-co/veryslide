@@ -1,8 +1,8 @@
 import './ImageList.scss';
 import { parse } from 'papaparse';
-import channel from '../../core/Channel';
+import channel from 'core/Channel';
 import Box from './Box';
-import { randomInt } from '../../core/Util';
+import { randomInt } from 'core/Util';
 
 function isValidItem(item, filter) {
   let valid = true;

@@ -1,7 +1,7 @@
 import html2canvas from 'html2canvas';
 
-import State from '../core/State.js';
-import List from '../core/List';
+import State from 'core/State.js';
+import List from 'core/List';
 import BaseObject from './objects/BaseObject';
 import TextBox from './objects/TextBox';
 import ImageBox from './objects/ImageBox';

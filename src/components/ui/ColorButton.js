@@ -1,7 +1,7 @@
 import View from './View.js';
 import '@easylogic/colorpicker/dist/colorpicker.css';
 import ColorPickerUI from '@easylogic/colorpicker'
-import { properTextColor } from '../../core/Util';
+import { properTextColor } from 'core/Util';
 
 class ColorButton extends View {
   constructor(state) {

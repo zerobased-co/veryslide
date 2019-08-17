@@ -1,5 +1,5 @@
-import State from '../core/State';
-import channel from '../core/Channel';
+import State from 'core/State';
+import channel from 'core/Channel';
 import View from './ui/View';
 import ui from './ui/UI';
 

@@ -5,7 +5,7 @@ import Panel from './ui/Panel';
 import PageList from './PageList';
 import AssetList from './AssetList';
 import Handler from './Handler';
-import channel from '../core/Channel';
+import channel from 'core/Channel';
 
 
 class Menu extends View {

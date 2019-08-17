@@ -1,5 +1,5 @@
 import './UI.scss';
-import List from '../../core/List.js';
+import List from 'core/List.js';
 import View, { Vertical, Horizon } from './View';
 import Panel from './Panel';
 import Button from './Button';

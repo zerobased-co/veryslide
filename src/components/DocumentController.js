@@ -1,7 +1,7 @@
 import html2canvas from 'html2canvas';
 
-import { uuid } from '../core/Util';
-import channel from '../core/Channel';
+import { uuid } from 'core/Util';
+import channel from 'core/Channel';
 
 import { Page } from './Document';
 import TextBox from './objects/TextBox';
@@ -80,7 +80,7 @@ class DocumentController {
     channel.bind(this, 'Controller:orderBack', (object) => {
       if (object == null) return;
       if (this.page == null) return;
-      this.page.objects.makeHead(object);
+      this.page.objects.makeFirst(object);
       this.page.reorder();
     });
 

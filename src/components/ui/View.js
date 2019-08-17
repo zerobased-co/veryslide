@@ -1,6 +1,6 @@
-import State from '../../core/State.js';
-import List from '../../core/List.js';
-import { showLoadingIndicator } from '../../core/Util';
+import State from 'core/State.js';
+import List from 'core/List.js';
+import { showLoadingIndicator } from 'core/Util';
 
 class View extends State {
   constructor(state) {

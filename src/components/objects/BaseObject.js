@@ -1,5 +1,5 @@
-import State from '../../core/State';
-import { uuid, showLoadingIndicator } from '../../core/Util';
+import State from 'core/State';
+import { uuid, showLoadingIndicator } from 'core/Util';
 import './BaseObject.scss';
 
 class Node extends State {

@@ -1,6 +1,6 @@
 import './Box.scss';
 import BaseObject from './BaseObject';
-import { randomColor, randomInt } from '../../core/Util';
+import { randomColor, randomInt } from 'core/Util';
 
 class Box extends BaseObject {
   constructor(state) {

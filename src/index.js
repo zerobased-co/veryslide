@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+// TBD: Too big library size
 import '@fortawesome/fontawesome-free/js/all';
 import '@fortawesome/fontawesome-free/js/solid';
 

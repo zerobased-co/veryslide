@@ -71,7 +71,13 @@ class HomeBase extends Component {
                 const url = generatePath(ROUTES.SLIDE, { id: slide.id });
                 return (
                   <li key={slide.id}>
-                    <Link to={url}>ID: {slide.id}</Link>
+                    <Link to={url}>
+                      {slide.data.info != null ?
+                      <span>{slide.data.info.title} (ID: {slide.id})</span>
+                      :
+                      <span>ID: {slide.id}</span>
+                      }
+                    </Link>
                     <IconTrash size="20" onClick={() => this.deleteSlide(slide.id)} />
                   </li>
                 ) 

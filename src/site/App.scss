@@ -179,6 +179,7 @@ html, body {
   form.Horizon {
     flex-direction: row;
     align-items: center;
+    width: 100%;
     
     & > * + * {
       margin-top: 0;
@@ -189,7 +190,7 @@ html, body {
   .InputGroup {
     border: 1px solid $color-gray-3;
     border-radius: 100px;
-    background: white;
+    background: $color-gray-0;
     padding: 0 0 0 1rem;
     display: inline-flex;
     align-items: center;
@@ -204,7 +205,6 @@ html, body {
       background: transparent;
       border: 0;
       margin: 0;
-      flex-grow: 1;
     }
   }
 
@@ -216,7 +216,7 @@ html, body {
 
     &.Error {
       background: $color-secondary;
-      color: white;
+      color: $color-gray-0;
     }
   }
 
@@ -225,9 +225,11 @@ html, body {
   input[type=number],
   input[type=password] {
     width: 5rem;
+    max-width: 20rem;
+    flex-grow: 1;
     border: 1px solid $color-gray-3;
     border-radius: 100px;
-    background: transparent;
+    background: $color-gray-0;
     font-size: 1rem;
     padding: 0.5rem 1rem;
     height: 2.8rem;
@@ -280,7 +282,7 @@ html, body {
 
     &:hover {
       background: $color-primary;
-      color: white;
+      color: $color-gray-0;
       cursor: pointer;
       transition: all 0.2s ease-out;
     }

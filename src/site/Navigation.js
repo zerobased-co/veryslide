@@ -21,7 +21,7 @@ const NavigationAuth = () => (
   <ul>
     <li>
       <Link className="Button Primary" to={ROUTES.SLIDE_NEW}>
-        <i className="fas fa-plus-circle"/>&nbsp;New Slide
+        <i className="fas fa-plus-circle"/>New Slide
       </Link>
     </li>
     <li>

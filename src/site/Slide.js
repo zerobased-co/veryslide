@@ -25,9 +25,21 @@ class SlideBase extends Component {
         this.setState({loaded: true});
 
         const data = doc.data();
+        let slideData = data.data;
+
+        if (slideData != null) {
+          if (typeof slideData === 'string') {
+            // for old type
+            slideData = JSON.parse(slideData);
+          }
+        } else {
+          slideData = {}
+        }
+
         this.veryslide = new Veryslide({
           target: this.veryslideRef.current,
-          data: (data.data != null) ? JSON.parse(data.data) : null,
+          info: data.info || {},
+          data: slideData,
           slideId: this.slideId,
           firebase: this.props.firebase,
         });
@@ -57,17 +69,110 @@ class SlideBase extends Component {
   }
 }
 
+class SlideNewForm extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      width: 1024,
+      height: 768,
+      title: '',
+      customSize: false,
+    };
+  }
+
+  onSubmit = (event) => {
+    let info = {
+      title: this.state.title,
+      width: parseInt(this.state.width),
+      height: parseInt(this.state.height),
+    };
+    this.props.action(info);
+  }
+
+  handleSize = (event) => {
+    let size = event.target.value;
+    if (size === 'custom') {
+      this.setState({customSize: true});
+    } else {
+      let [width, height] = size.split('x');
+
+      this.setState({
+        customSize: false,
+        width,
+        height,
+      });
+    }
+  }
+
+  handleTitle = (event) => {
+    this.setState({title: event.target.value});
+  }
+
+  handleWidth = (event) => {
+    this.setState({width: event.target.value});
+  }
+
+  handleHeight = (event) => {
+    this.setState({height: event.target.value});
+  }
+
+  render() {
+    const sizeList = [
+        {'width': 1024, 'height': 768, 'name': 'Standard'},
+        {'width': 1024, 'height': 1024, 'name': 'Square'},
+        {'width': 1600, 'height': 900, 'name': 'Wide'},
+        {'width': 1920, 'height': 1200, 'name': 'HD'},
+      ].map((size) =>
+      <option key={size.name} value={`${size.width}x${size.height}`}>{size.width} x {size.height} ({size.name})</option>
+    );
+
+    return (
+      <div>
+        <form onSubmit={this.onSubmit}>
+          <div className="InputGroup">
+            <i className="fas fa-edit"/>
+            <input name="title" value={this.state.title} onChange={this.handleTitle} type="text" placeholder="Slide Title" />
+          </div>
+          <div className="InputGroup">
+            <i className="fas fa-arrows-alt"/>
+            <select name="size" onChange={this.handleSize}>
+              {sizeList}
+              <option value="custom">Custom size...</option>
+            </select>
+          </div>
+          {this.state.customSize &&
+            <div className="InputGroup">
+              <i className="fas fa-expand"/>
+              <input name="width" value={this.state.width} onChange={this.handleWidth} type="number" placeholder="Width" />
+              <i className="fas fa-times"/>
+              <input name="height" value={this.state.height} onChange={this.handleHeight} type="number" placeholder="Height" />
+            </div>
+          }
+          <button className="Primary" type="submit">
+            <i className="fas fa-magic"/>
+            Create
+          </button>
+        </form>
+      </div>
+    );
+  }
+}
+
+
 class SlideNewBase extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      slideId: null,
+      loading: false,
     };
   }
 
-  componentDidMount() {
-    this.props.firebase.newSlide().then(slide => {
+  createSlide = (info) => {
+    this.setState({loading: true});
+
+    this.props.firebase.newSlide(info).then(slide => {
       const url = generatePath(ROUTES.SLIDE, { id: slide.id });
       this.props.history.replace(url);
     }).catch(function(error) {
@@ -77,8 +182,19 @@ class SlideNewBase extends Component {
 
   render() {
     return (
+      this.state.loading ?
+
       <div className="Loading">
-        Now creating a new document...{this.state.slideId}
+        Now creating a new document...
+      </div>
+
+      :
+
+      <div className="Center">
+        <div>
+          <h2>Create new slide</h2>
+          <SlideNewForm action={this.createSlide}/>
+        </div>
       </div>
     );
   }

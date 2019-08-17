@@ -37,8 +37,9 @@ class Firebase {
   mySlides = () => this.db.collection('slides').where(
     'uid', '==', this.auth.currentUser.uid
   );
-  newSlide = () => this.db.collection('slides').add({
+  newSlide = (info) => this.db.collection('slides').add({
     uid: this.auth.currentUser.uid,
+    info: info,
   });
 }
 

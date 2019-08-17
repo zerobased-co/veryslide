@@ -19,7 +19,7 @@ const Landing = () => (
               <div>
                 <p>Welcome back, {authUser.displayName}.</p>
                 <Link to={ROUTES.HOME} className="Button Primary Large">
-                  Go to my page&nbsp;<i className="fas fa-arrow-circle-right"></i>
+                  Go to my page<i className="fas fa-arrow-circle-right right"></i>
                 </Link>
               </div>
 
@@ -27,7 +27,7 @@ const Landing = () => (
 
               <div>
                 <Link to={ROUTES.SIGNUP} className="Button Primary Large">
-                  Sign up&nbsp;<i className="fas fa-arrow-circle-right"></i>
+                  Sign up<i className="fas fa-arrow-circle-right right"></i>
                 </Link>
                 <SignInLink />
               </div>

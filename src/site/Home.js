@@ -72,8 +72,8 @@ class HomeBase extends Component {
                 return (
                   <li key={slide.id}>
                     <Link to={url}>
-                      {slide.data.info != null ?
-                      <span>{slide.data.info.title} ({slide.data.data.pages.length} page(s))
+                      {(slide.data.info != null && slide.data.data != null) ?
+                      <span>{slide.data.info.title || slide.id} ({slide.data.data.pages.length} page(s))
                         {slide.data.data.pages.length > 0 ?
                         <img src={slide.data.data.pages[0].thumbnail} />
                         :
@@ -81,7 +81,7 @@ class HomeBase extends Component {
                         }
                       </span>
                       :
-                      <span>ID: {slide.id}</span>
+                      <span>{slide.id}</span>
                       }
                     </Link>
                     <IconTrash size="20" onClick={() => this.deleteSlide(slide.id)} />

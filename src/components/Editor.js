@@ -42,6 +42,7 @@ class Menu extends View {
         ui.createButton('Image', () => { channel.send('Controller:savePage', 'image'); }),
         //ui.createButton('PDF',   () => { channel.send('Controller:savePage', 'pdf'); }),
         ui.createButton('Save',   () => { channel.send('Veryslide:save'); }),
+        ui.createButton('Play',   () => { channel.send('Veryslide:play'); }),
       ),
 
       ui.createButton('Close',   () => { 

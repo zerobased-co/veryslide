@@ -70,6 +70,7 @@ class PageList extends View {
     this.pagethumbs = new List();
     channel.bind(this, 'PageList:addPage', this.addPage);
     channel.bind(this, 'PageList:selectPage', this.selectPage);
+    channel.bind(this, 'PageList:selectPageAt', this.selectPageAt);
     channel.bind(this, 'PageList:removePage', this.removePage);
   }
 
@@ -77,11 +78,25 @@ class PageList extends View {
     let pagethumb = new PageThumb();
     pagethumb.page = page;
 
-    this.pagethumbs.insert(pagethumb, at);
-    this.node.insertBefore(pagethumb.node, this.node.children[at]);
+    if (at == null) {
+      this.pagethumbs.append(pagethumb);
+      this.node.appendChild(pagethumb.node);
+    } else {
+      this.pagethumbs.insert(pagethumb, at);
+      this.node.insertBefore(pagethumb.node, this.node.children[at]);
+    }
+
 
     pagethumb.node.scrollIntoView();
-    pagethumb.select();
+    return pagethumb;
+  }
+
+  selectPageAt(at) {
+    let pagethumb = this.pagethumbs.at(at);
+
+    if (pagethumb !== null) {
+      pagethumb.select();
+    }
   }
 
   selectPage(page) {
@@ -91,7 +106,6 @@ class PageList extends View {
 
     if (pagethumb !== null) {
       pagethumb.select();
-      pagethumb.node.scrollIntoView();
     }
   }
 

@@ -154,6 +154,7 @@ class Document extends State {
       pages: new List(),
       assets: new List(),
       type: 'Document',
+      selectedPageIndex: -1,
       ...state,
     });
 
@@ -199,6 +200,15 @@ class Document extends State {
   removeAsset(asset) {
     let nextasset = this.assets.remove(asset);
     return nextasset;
+  }
+
+  deserialize(data) {
+    super.deserialize(data);
+    
+    // for legacy document
+    if (this.selectedPageIndex == -1 && this.pages.length > 0) {
+      this.selectedPageIndex = 0;
+    }
   }
 }
 

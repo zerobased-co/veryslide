@@ -522,8 +522,19 @@ class Editor extends View {
   constructor(state) {
     super({
       className: 'vs-editor',
+      document: null,
       ...state,
     });
+  }
+
+  init() {
+    if (this.document == null) {
+      return;
+    }
+
+    if (this.document.selectedPageIndex >= 0) {
+      channel.send('PageList:selectPageAt', this.document.selectedPageIndex);
+    }
   }
 
   render() {

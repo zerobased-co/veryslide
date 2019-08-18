@@ -21,7 +21,10 @@ class DocumentController {
 
     channel.bind(this, 'Controller:addPage', () => {
       const newPage = this.doc.addPage(this.page);
-      channel.send('PageList:addPage', newPage, this.doc.pages.find(newPage));
+      const pagethumb = channel.send('PageList:addPage', newPage, this.doc.pages.find(newPage))[0];
+      if (pagethumb != null) {
+        pagethumb.select();
+      }
     });
 
     channel.bind(this, 'Controller:prevPage', () => {
@@ -45,6 +48,7 @@ class DocumentController {
     });
 
     channel.bind(this, 'Controller:selectPage', (page) => {
+      this.doc.selectedPageIndex = this.doc.pages.find(page);
       this.page = page;
       this.object = null;
     });
@@ -59,6 +63,7 @@ class DocumentController {
       this.page = nextpage;
 
       if (nextpage == null) {
+        this.doc.selectedPageIndex = -1;
         channel.send('Viewport:clear', nextpage);
       } else {
         channel.send('PageList:selectPage', nextpage);

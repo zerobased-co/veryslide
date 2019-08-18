@@ -35,8 +35,8 @@ class Veryslide extends State {
     this.target.appendChild(this.editor.node);
     if (this.data != null) {
       this.deserialize(this.data);
+      this.editor.init();
     }
-
     channel.bind(this, 'Veryslide:save', this.save);
   }
 

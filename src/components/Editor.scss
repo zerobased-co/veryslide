@@ -100,6 +100,7 @@ $border-color: #afafb2;
 
   &.Playing {
     background: black;
+    border: 0;
 
     .vs-page {
       box-shadow: none;

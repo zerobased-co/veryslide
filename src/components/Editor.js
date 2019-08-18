@@ -346,12 +346,18 @@ class Viewport extends View {
       let width = window.innerWidth;
       let height = window.innerHeight;
       let top = 0;
+      let left = 0;
       let scale = 1;
       
       if (this.page) {
-        scale = width / this.page.width;
-        top = (height - this.page.height * scale) / 2;
-        this.pageHolder.style.transform = 'translate(0px, ' + top + 'px) scale(' + scale + ')';
+        if ( width / this.page.width < height / this.page.height) {
+          scale = width / this.page.width;
+          top = (height - this.page.height * scale) / 2;
+        } else {
+          scale = height / this.page.height;
+          left = (width - this.page.width * scale) / 2;
+        }
+        this.pageHolder.style.transform = 'translate(' + left + 'px, ' + top + 'px) scale(' + scale + ')';
       }
     } else {
       this.pageHolder.style.transform = 'translate(' + this.translate.x + 'px, ' + this.translate.y + 'px) scale(' + this.scale + ')';

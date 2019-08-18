@@ -25,7 +25,8 @@ class Select extends View {
     options.forEach(option => {
       let tag = document.createElement('option');
       tag.value = option[0];
-      tag.innerText = option[1];
+      tag.innerText = option[((option.length == 2) ? 1 : 0)];
+
       if (this.value == tag.value) {
         tag.selected = true;
       }
@@ -34,6 +35,10 @@ class Select extends View {
   }
 
   change(event) {
+    if (this.select.value === '') {
+      return;
+    }
+
     this.value = this.select.value;
     this.onChange(this.select.value);
   }

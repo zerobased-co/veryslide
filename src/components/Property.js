@@ -3,6 +3,23 @@ import View from './ui/View';
 import Panel from './ui/Panel';
 import channel from 'core/Channel';
 
+const FONTLIST = [
+  ['serif', 'Serif'],
+  ['sans-serif', 'Sans serif'],
+  ['monospace', 'Monospace'],
+  ['', '----'],
+  ['Inconsolata'],
+  ['Lato'],
+  ['Merriweather'],
+  ['Montserrat'],
+  ['Open Sans'],
+  ['Roboto'],
+  ['', '----'],
+  ['Noto Sans KR', '노토 산스'],
+  ['Nanum Gothic', '나눔 고딕'],
+  ['Nanum Myeongjo', '나눔 명조'],
+];
+
 class PanelForDocument extends Panel {
   render() {
     super.render();
@@ -88,6 +105,11 @@ class PanelForBox extends Panel {
       ),
 
       ui.H(
+        ui.createText('Opacity'),
+        new ui.InputText().bind(this.object, 'opacity'),
+      ),
+
+      ui.H(
         ui.createText('Padding'),
         new ui.InputText({
           value: this.object.padding, 
@@ -117,7 +139,7 @@ class PanelForTextBox extends PanelForBox {
         ui.createText('Font'),
         new ui.InputText().bind(this.object, 'size'),
         new ui.Select({
-          options: [['serif', 'Serif'], ['sans-serif', 'Sans serif'], ['monospace', 'Monospace']],
+          options: FONTLIST,
           value: this.object.fontFamily,
           onChange: value => { this.object.fontFamily = value },
         }),

@@ -55,6 +55,7 @@ class BaseObject extends Node {
       height: 0,
       color: '#FFFFFF',
       order: 0,
+      opacity: 1.0,
       ...state,
     });
 
@@ -101,6 +102,10 @@ class BaseObject extends Node {
 
   on_color(color) {
     this.node.style.backgroundColor = color;
+  }
+
+  on_opacity(opacity) {
+    this.node.style.opacity = opacity;
   }
 
   apply(style) {

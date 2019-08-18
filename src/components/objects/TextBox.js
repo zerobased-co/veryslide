@@ -24,12 +24,21 @@ class TextBox extends Box {
   editable() {
     this.node.contentEditable = 'true';
     this.node.focus();
+    this.node.addEventListener('keydown', this.keydown.bind(this));
     document.execCommand('selectAll', false, null);
+  }
+
+  keydown(event) {
+    if (event.keyCode === 13 && event.shiftKey === false) {
+      event.preventDefault();
+      this.blur();
+    }
   }
 
   blur() {
     this.node.contentEditable = 'false';
     this.node.blur();
+    this.node.removeEventListener('keydown', this.keydown.bind(this));
     window.getSelection().removeAllRanges();
 
     // copy text from node
@@ -104,10 +113,13 @@ class TextBox extends Box {
 
   on_align(align) {
     if (align == 'left') {
+      this.node.style.textAlign = 'left';
       this.node.style.justifyContent = 'flex-start';
     } else if (align == 'right') {
+      this.node.style.textAlign = 'right';
       this.node.style.justifyContent = 'flex-end';
     } else if (align == 'center') {
+      this.node.style.textAlign = 'center';
       this.node.style.justifyContent = 'center';
     }
   }

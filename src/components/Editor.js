@@ -43,7 +43,7 @@ class Menu extends View {
         ui.createButton('Image', () => { channel.send('Controller:savePage', 'image'); }),
         //ui.createButton('PDF',   () => { channel.send('Controller:savePage', 'pdf'); }),
         ui.createButton('Save',   () => { channel.send('Veryslide:save'); }),
-        ui.createButton('Play',   () => { channel.send('Viewport:togglePlay', true); }),
+        ui.createButton('Play',   () => { channel.send('Viewport:setPresentationMode', true); }),
       ),
 
       ui.createButton('Close',   () => { 
@@ -134,7 +134,7 @@ class Viewport extends View {
     channel.bind(this, 'Viewport:focus', this.focus);
     channel.bind(this, 'Viewport:blur', this.blur);
     channel.bind(this, 'Viewport:toggleSnap', this.toggleSnap);
-    channel.bind(this, 'Viewport:togglePlay', this.togglePlay);
+    channel.bind(this, 'Viewport:setPresentationMode', this.setPresentationMode);
 
     this.interval = setInterval(this.updateThumbnail.bind(this), 2000);
     this.keydownEvents = [
@@ -153,7 +153,7 @@ class Viewport extends View {
       [false, false, false, true,  [83], () => channel.send('Veryslide:save')],
       [false, false, false, true,  [173, 189], () => this.applyStyle('Smaller')],
       [false, false, false, true,  [61, 187], () => this.applyStyle('Bigger')],
-      [false, false, false, false, [27], () => channel.send('Editor:togglePlay', false)],
+      [false, false, false, false, [27], () => this.setPresentationMode(false)],
       [false, false, false, false, [37], () => this.applyMove('Left')],
       [false, false, false, false, [38], () => this.applyMove('Up')],
       [false, false, false, false, [39], () => this.applyMove('Right')],
@@ -162,6 +162,7 @@ class Viewport extends View {
       [true,  false, false, false, [38], () => this.applyMove('BigUp')],
       [true,  false, false, false, [39], () => this.applyMove('BigRight')],
       [true,  false, false, false, [40], () => this.applyMove('BigDown')],
+      [false, false, true, false,  [78], () => channel.send('Controller:addPage')],
     ];
     this.keyupEvents = [
     // shift, ctrl,  alt,   meta,  keycodes, func
@@ -248,7 +249,7 @@ class Viewport extends View {
 
   onFullscreenChange = () => {
     if (document.fullscreenElement == null) {
-      this.togglePlay(false);
+      this.setPresentationMode(false);
     }
   }
 
@@ -285,9 +286,19 @@ class Viewport extends View {
           break;
       }
     } else {
-      if (this.object == null) return;
-      if (typeof this.object['apply'] !== 'function') return;
-      this.object.apply(direction);
+      if (this.object == null) {
+        switch(direction) {
+          case 'Up':
+            channel.send('Controller:prevPage');
+            break;
+          case 'Down':
+            channel.send('Controller:nextPage');
+            break;
+        }
+      } else {
+        if (typeof this.object['apply'] !== 'function') return;
+        this.object.apply(direction);
+      }
     }
   }
 
@@ -463,8 +474,11 @@ class Viewport extends View {
     channel.send('Controller:paste');
   }
 
-  togglePlay(playing) {
-    this.isPlaying = (playing == null) ? !this.isPlaying : playing;
+  setPresentationMode(playing) {
+    if (playing === this.isPlaying) {
+      return;
+    }
+    this.isPlaying = playing;
 
     if (this.isPlaying) {
       this.toggleSnap(false);

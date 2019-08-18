@@ -33,7 +33,7 @@ class DocumentController {
         this.page = prevPage;
         channel.send('PageList:selectPage', this.page);
       } else {
-        channel.send('Viewport:togglePlay', false);
+        channel.send('Viewport:setPresentationMode', false);
       }
     });
 
@@ -43,7 +43,7 @@ class DocumentController {
         this.page = nextPage;
         channel.send('PageList:selectPage', this.page);
       } else {
-        channel.send('Viewport:togglePlay', false);
+        channel.send('Viewport:setPresentationMode', false);
       }
     });
 

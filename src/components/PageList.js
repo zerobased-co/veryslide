@@ -44,6 +44,7 @@ class PageThumb extends View {
 
   select() {
     channel.send('PageThumb:deselect');
+    this.node.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
     this.node.classList.toggle('focus');
     channel.send('Viewport:selectPage', this.page);
   }

@@ -204,7 +204,7 @@ class Document extends State {
 
   deserialize(data) {
     super.deserialize(data);
-    
+
     // for legacy document
     if (this.selectedPageIndex == -1 && this.pages.length > 0) {
       this.selectedPageIndex = 0;

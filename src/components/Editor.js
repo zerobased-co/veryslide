@@ -467,6 +467,7 @@ class Viewport extends View {
       this.node.requestFullscreen();
     } else {
       this.node.classList.remove('Playing');
+      // TBD: this makes `Document not active` error occasionally, but I'm not sure how to prevent it.
       document.exitFullscreen();
     }
     this.updateTransform();

@@ -51,8 +51,10 @@ class Veryslide extends State {
   save() {
     this.editor.loading(true);
     // TBD: On Firestore, we don't have to bake into string and make it back to json object again.
-    let data = JSON.parse(this.document.serialize());
-    console.log(data.length);
+    let json = this.document.serialize();
+    console.log(json.length);
+
+    let data = JSON.parse(json);
 
     // TBD: permission check
     this.firebase.slide(this.slideId).update({data}).then(() => {

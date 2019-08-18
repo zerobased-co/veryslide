@@ -81,7 +81,7 @@ class Page extends BaseObject {
       scrollX: parseInt(window.scrollX),
       scrollY: -parseInt(window.scrollY),
     }).then((canvas) => {
-      this.thumbnail = canvas.toDataURL();
+      this.thumbnail = canvas.toDataURL('image/jpeg', 0.4);
       if (this.pagethumb != null) {
         this.pagethumb.updateThumbnail();
       }

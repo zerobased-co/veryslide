@@ -158,7 +158,7 @@ class DocumentController {
           newObject = new TextBox();
           break;
         case 'Page':
-          newObject = new Page();
+          newObject = this.doc.addPage(this.page);
           break;
           /*
         case 'Document':
@@ -172,7 +172,13 @@ class DocumentController {
 
         if (newObject.type == 'Page') {
           this.doc.appendPage(newObject);
+
+          const pagethumb = channel.send('PageList:addPage', newObject, this.doc.pages.find(newObject))[0];
           channel.send('PageList:addPage', newObject);
+
+          if (pagethumb != null) {
+            pagethumb.select();
+          }
         } else {
           if (this.page != null) {
             this.page.appendObject(newObject);

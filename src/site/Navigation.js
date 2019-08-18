@@ -25,7 +25,7 @@ const NavigationAuth = () => (
       </Link>
     </li>
     <li>
-      <Link className="Button" to={ROUTES.HOME}>My page</Link>
+      <Link className="Button" to={ROUTES.HOME}>My Page</Link>
     </li>
     <li>
       <Link className="Button" to={ROUTES.ACCOUNT}>Account</Link>

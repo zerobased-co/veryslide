@@ -236,17 +236,20 @@ class Viewport extends View {
       this.drag = false;
     });
 
-    window.addEventListener('resize', () => {
-      if (this.isPlaying) {
-        this.updateTransform();
-      }
-    });
+    window.addEventListener('resize', this.onResize);
+    document.addEventListener('fullscreenchange', this.onFullscreenChange);
+  }
 
-    document.addEventListener('fullscreenchange', () => {
-      if (document.fullscreenElement == null) {
-        this.togglePlay(false);
-      }
-    }, false);
+  onResize = () => {
+    if (this.isPlaying) {
+      this.updateTransform();
+    }
+  }
+
+  onFullscreenChange = () => {
+    if (document.fullscreenElement == null) {
+      this.togglePlay(false);
+    }
   }
 
   beginGrab() {
@@ -296,6 +299,9 @@ class Viewport extends View {
 
   destroy() {
     super.destroy();
+
+    window.removeEventListener('resize', this.onResize);
+    document.removeEventListener('fullscreenchange', this.onFullscreenChange);
     clearInterval(this.interval);
   }
 
@@ -468,7 +474,7 @@ class Viewport extends View {
     } else {
       this.node.classList.remove('Playing');
       // TBD: this makes `Document not active` error occasionally, but I'm not sure how to prevent it.
-      document.exitFullscreen();
+      document.exitFullscreen().catch(() => {});;
     }
     this.updateTransform();
   }

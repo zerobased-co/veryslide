@@ -153,7 +153,7 @@ describe('List', () => {
     assert.equal(0, list.length);
   });
 
-  it('makeFirst should be place a item at the first', () => {
+  it('makeFirst should place a item at the first', () => {
     let list = new List(0, 1, 2, 3, 4);
 
     list.makeFirst(4);
@@ -166,7 +166,7 @@ describe('List', () => {
     assert.deepEqual([2, 4, 0, 1, 3], list.array);
   });
 
-  it('makeLast should be place a item at the end', () => {
+  it('makeLast should place a item at the end', () => {
     let list = new List(0, 1, 2, 3, 4);
 
     list.makeLast(0);
@@ -199,7 +199,7 @@ describe('List', () => {
     assert.equal(3, pos);
   });
 
-  it('Backword should move a item one step backword', () => {
+  it('Backward should move a item one step backward', () => {
     let list = new List(0, 1, 2, 3, 4);
 
     let pos = list.backward(3);

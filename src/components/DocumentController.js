@@ -171,11 +171,7 @@ class DocumentController {
         newObject.deserialize(JSON.parse(data));
 
         if (newObject.type == 'Page') {
-          this.doc.appendPage(newObject);
-
           const pagethumb = channel.send('PageList:addPage', newObject, this.doc.pages.find(newObject))[0];
-          channel.send('PageList:addPage', newObject);
-
           if (pagethumb != null) {
             pagethumb.select();
           }

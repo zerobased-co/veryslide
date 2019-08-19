@@ -125,7 +125,7 @@ class Viewport extends View {
     this.translate = {x: 0, y: 0};
     this.scale = 1.0;
     //this.zoomLevel = [10, 25, 50, 75, 100, 200, 400];
-    this.isPlaying = false;
+    this.isPresentationMode = false;
 
     channel.bind(this, 'Viewport:selectPage', this.selectPage);
     channel.bind(this, 'Viewport:clear', this.clear);
@@ -188,7 +188,7 @@ class Viewport extends View {
     });
 
     this.addEventListener('mousedown', event => {
-      if (this.isPlaying) return;
+      if (this.isPresentationMode) return;
       if (this.page == null) return;
       if (this.grab === true) {
         event.preventDefault();
@@ -242,7 +242,7 @@ class Viewport extends View {
   }
 
   onResize = () => {
-    if (this.isPlaying) {
+    if (this.isPresentationMode) {
       this.updateTransform();
     }
   }
@@ -274,7 +274,7 @@ class Viewport extends View {
   }
 
   applyMove(direction) {
-    if (this.isPlaying) {
+    if (this.isPresentationMode) {
       switch(direction) {
         case 'Left':
         case 'Up':
@@ -304,6 +304,7 @@ class Viewport extends View {
 
   updateThumbnail() {
     if (this.page == null) return;
+    if (this.isPresentationMode) return;
     if (this.grab || this.drag || this.handler.handling) return;
     this.page.updateThumbnail();
   }
@@ -359,7 +360,7 @@ class Viewport extends View {
   }
 
   updateTransform() {
-    if (this.isPlaying) {
+    if (this.isPresentationMode) {
       let width = window.innerWidth;
       let height = window.innerHeight;
       let top = 0;
@@ -477,21 +478,22 @@ class Viewport extends View {
     channel.send('Controller:paste');
   }
 
-  setPresentationMode(playing) {
-    if (playing === this.isPlaying) {
+  setPresentationMode(mode) {
+    if (mode === this.isPresentationMode) {
       return;
     }
-    this.isPlaying = playing;
+    this.isPresentationMode = mode;
 
-    if (this.isPlaying) {
+    if (this.isPresentationMode) {
       this.toggleSnap(false);
       this.blur();
-      this.node.classList.add('Playing');
+      this.editor.node.classList.add('Presentation');
       this.node.requestFullscreen();
     } else {
-      this.node.classList.remove('Playing');
+      this.editor.node.classList.remove('Presentation');
       // TBD: this makes `Document not active` error occasionally, but I'm not sure how to prevent it.
       document.exitFullscreen().catch(() => {});;
+      channel.send('PageList:selectPage', this.page, false);
     }
     this.updateTransform();
   }
@@ -557,7 +559,7 @@ class Editor extends View {
     }
 
     if (this.document.selectedPageIndex >= 0) {
-      channel.send('PageList:selectPageAt', this.document.selectedPageIndex);
+      channel.send('PageList:selectPageAt', this.document.selectedPageIndex, false);
     }
   }
 
@@ -571,6 +573,8 @@ class Editor extends View {
     row.appendChild(this.navigator = new Navigator());
     row.appendChild(this.viewport = new Viewport());
     row.appendChild(this.toolbox = new ToolBox());
+
+    this.viewport.editor = this;
 
     return this.node;
   }

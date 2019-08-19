@@ -42,9 +42,10 @@ class PageThumb extends View {
     this.img.src = this.page.thumbnail;
   }
 
-  select() {
+  select(smooth) {
     channel.send('PageThumb:deselect');
-    this.node.scrollIntoView({behavior: "smooth", block: "nearest", inline: "nearest"});
+    let behavior = smooth !== false ? 'smooth' : 'auto';
+    this.node.scrollIntoView({behavior: behavior, block: 'nearest', inline: 'nearest'});
     this.node.classList.toggle('focus');
     channel.send('Viewport:selectPage', this.page);
   }
@@ -92,32 +93,24 @@ class PageList extends View {
     return pagethumb;
   }
 
-  selectPageAt(at) {
+  selectPageAt(at, smooth) {
     let pagethumb = this.pagethumbs.at(at);
 
     if (pagethumb !== null) {
-      pagethumb.select();
+      pagethumb.select(smooth);
     }
   }
 
-  selectPage(page) {
-    let pagethumb = this.pagethumbs.findby((item) => {
-      return item.page == page;
-    });
-
-    if (pagethumb !== null) {
-      pagethumb.select();
+  selectPage(page, smooth) {
+    if (page.pagethumb !== null) {
+      page.pagethumb.select(smooth);
     }
   }
 
   removePage(page) {
-    let pagethumb = this.pagethumbs.findby((item) => {
-      return item.page == page;
-    });
-
-    if (pagethumb !== null) {
-      this.pagethumbs.remove(pagethumb);
-      pagethumb.destroy();
+    if (page.pagethumb !== null) {
+      this.pagethumbs.remove(page.pagethumb);
+      page.pagethumb.destroy();
     }
   }
 }

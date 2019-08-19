@@ -203,7 +203,6 @@ class DocumentController {
               newObject.y += this.pasted * 10;
             }
             this.object = newObject;
-            channel.send('Handler:connect', newObject);
             channel.send('Viewport:focus', newObject);
           }
         }

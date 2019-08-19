@@ -137,7 +137,6 @@ class BaseObject extends Node {
       default:
         return false;
     }
-    channel.send('Handler:connect', this);
     return true;
   }
 }

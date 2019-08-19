@@ -34,7 +34,6 @@ class ImageBox extends Box {
   resetSize() {
     this.width = this.imageNode.naturalWidth;
     this.height = this.imageNode.naturalHeight;
-    channel.send('Handler:connect', this);
   }
   
   render() {

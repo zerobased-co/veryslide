@@ -83,7 +83,6 @@ class TextBox extends Box {
       default:
         return false;
     }
-    channel.send('Handler:connect', this);
     return true;
   }
 

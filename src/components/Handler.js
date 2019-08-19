@@ -1,7 +1,7 @@
 import View from './ui/View'
 import channel from 'core/Channel';
     
-const minSize = 24;
+const minSize = 0;
 const dotPreset = {
   'n': 'translate(-50%, -50%)',
   'e': 'translate(50%, -50%)',
@@ -36,9 +36,23 @@ class Handler extends View {
   }
 
   connect(object) {
+    if (this.object != null) {
+      this.object.removeBinding(this);
+    }
     this.object = object;
+    this.object.addBinding(this);
     this.show(true);
 
+    this.alignToObject(this.object);
+  }
+
+  notify(from, key, value) {
+    if (from === this.object) {
+      this.alignToObject(this.object);
+    }
+  }
+
+  alignToObject(object) {
     this.node.style.left = object.x + 'px';
     this.node.style.top = object.y + 'px';
     this.node.style.width = object.width + 'px';
@@ -140,10 +154,13 @@ class Handler extends View {
       w = Math.max(w, minSize);
       h = Math.max(h, minSize);
 
+/*
+      // This will be done by 'binding'
       this.node.style.left = x + 'px';
       this.node.style.top = y + 'px';
       this.node.style.width = w + 'px';
       this.node.style.height = h + 'px';
+*/
 
       this.object.x = parseInt(x);
       this.object.y = parseInt(y);

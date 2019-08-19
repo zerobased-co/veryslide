@@ -145,8 +145,8 @@ class Viewport extends View {
       [false, false, false, false, [83], () => channel.send('Menu:toggleSnap', null)],
       [false, false, false, false, [48], () => channel.send('Menu:resetZoom', null)],
       [false, false, false, false, [46, 8], () => channel.send('Controller:removeObject', this.object)],
-      [false, false, false, false, [219], () => channel.send('Controller:orderBackward', this.object)],
-      [false, false, false, false, [221], () => channel.send('Controller:orderForward', this.object)],
+      [false, false, false, false, [219], () => channel.send('Controller:order', this.object, 'backward')],
+      [false, false, false, false, [221], () => channel.send('Controller:order', this.object, 'forward')],
       [false, false, false, true,  [66], () => this.applyStyle('Bold')],
       [false, false, false, true,  [73], () => this.applyStyle('Italic')],
       [false, false, false, true,  [85], () => this.applyStyle('Underline')],
@@ -328,12 +328,13 @@ class Viewport extends View {
 
   selectPage(page) {
     this.clear();
-    this.page = page;
 
+    this.page = page;
     this.pageHolder.append(this.page.node);
 
     this.updateTransform();
     this.setPageSnap();
+
     channel.send('Controller:selectPage', page);
     channel.send('Property:setPanelFor', page);
   }

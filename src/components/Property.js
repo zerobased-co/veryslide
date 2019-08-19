@@ -69,14 +69,30 @@ class PanelForBox extends Panel {
         ui.createText('Order'),
         new ui.Vertical({children: [
           ui.HGroup(
-            ui.createButton('Back',       () => { channel.send('Controller:orderBack', this.object); }),
-            ui.createButton('Front',      () => { channel.send('Controller:orderFront', this.object); }),
+            ui.createButton('Back', () => { channel.send('Controller:order', this.object, 'back'); }),
+            ui.createButton('Front', () => { channel.send('Controller:order', this.object, 'front'); }),
           ),
           ui.HGroup(
-            ui.createButton('Backward',   () => { channel.send('Controller:orderBackward', this.object); }),
-            ui.createButton('Forward',    () => { channel.send('Controller:orderForward', this.object); }),
+            ui.createButton('Backward', () => { channel.send('Controller:order', this.object, 'backward'); }),
+            ui.createButton('Forward', () => { channel.send('Controller:order', this.object, 'forward'); }),
           ),
         ]}),
+      ),
+      ui.H(
+        ui.createText('Vertical'),
+        ui.HGroup(
+          ui.createButton('Top', () => { channel.send('Controller:align', this.object, 'top'); }),
+          ui.createButton('Middle', () => { channel.send('Controller:align', this.object, 'middle'); }),
+          ui.createButton('Bottom', () => { channel.send('Controller:align', this.object, 'bottom'); }),
+        ),
+      ),
+      ui.H(
+        ui.createText('Horizon'),
+        ui.HGroup(
+          ui.createButton('Left', () => { channel.send('Controller:align', this.object, 'left'); }),
+          ui.createButton('Center', () => { channel.send('Controller:align', this.object, 'center'); }),
+          ui.createButton('Right', () => { channel.send('Controller:align', this.object, 'right'); }),
+        ),
       ),
 
       ui.H(

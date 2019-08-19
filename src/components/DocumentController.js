@@ -103,32 +103,51 @@ class DocumentController {
       channel.send('Viewport:blur');
     });
 
-    channel.bind(this, 'Controller:orderBack', (object) => {
+    channel.bind(this, 'Controller:align', (object, align) => {
       if (object == null) return;
-      if (this.page == null) return;
-      this.page.objects.makeFirst(object);
-      this.page.reorder();
+      if (object.page == null) return;
+
+      switch(align) {
+        case 'left':
+          object.x = 0;
+          break;
+        case 'center':
+          object.x = parseInt((object.page.width - object.width) / 2);
+          break;
+        case 'right':
+          object.x = parseInt(object.page.width - object.width);
+          break;
+        case 'top':
+          object.y = 0;
+          break;
+        case 'middle':
+          object.y = parseInt((object.page.height - object.height) / 2);
+          break;
+        case 'bottom':
+          object.y = parseInt(object.page.height - object.height);
+          break;
+      }
     });
 
-    channel.bind(this, 'Controller:orderFront', (object) => {
+    channel.bind(this, 'Controller:order', (object, order) => {
       if (object == null) return;
-      if (this.page == null) return;
-      this.page.objects.makeLast(object);
-      this.page.reorder();
-    });
+      if (object.page == null) return;
 
-    channel.bind(this, 'Controller:orderBackward', (object) => {
-      if (object == null) return;
-      if (this.page == null) return;
-      this.page.objects.backward(object);
-      this.page.reorder();
-    });
-
-    channel.bind(this, 'Controller:orderForward', (object) => {
-      if (object == null) return;
-      if (this.page == null) return;
-      this.page.objects.forward(object);
-      this.page.reorder();
+      switch(order) {
+        case 'back':
+          object.page.objects.makeFirst(object);
+          break;
+        case 'front':
+          object.page.objects.makeLast(object);
+          break;
+        case 'backward':
+          object.page.objects.backward(object);
+          break;
+        case 'forward':
+          object.page.objects.forward(object);
+          break;
+      }
+      object.page.reorder();
     });
 
     channel.bind(this, 'Controller:copy', () => {

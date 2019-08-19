@@ -19,6 +19,8 @@ class TextBox extends Box {
       wordBreak: 'normal',
       ...state,
     });
+
+    this.addNumberState('size');
   }
 
   editable() {

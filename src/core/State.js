@@ -5,6 +5,7 @@ class State {
   constructor(state) {
     this.state = state;
     this.__TYPE__ = 'State';
+    this.__NUMBER_STATE__ = [];
     this.bindings = new Array();
 
     if (this.state != null) {
@@ -19,12 +20,19 @@ class State {
             }
           },
           set: function(value) {
+            if (isNaN(value) == false && this.__NUMBER_STATE__.indexOf(key) != -1) {
+              value = Number(value);
+            }
             this.state[key] = value;
             this.updateState(key, value);
           }
         });
       });
     }
+  }
+
+  addNumberState(...keys) {
+    this.__NUMBER_STATE__ = this.__NUMBER_STATE__.concat(Array.from(keys));
   }
 
   addBinding(binding) {

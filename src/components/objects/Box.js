@@ -16,6 +16,8 @@ class Box extends BaseObject {
       padding: 10,
       ...state,
     });
+
+    this.addNumberState('borderWidth', 'padding');
   }
 
   on_borderStyle(style) {

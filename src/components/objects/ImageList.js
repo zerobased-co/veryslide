@@ -73,6 +73,7 @@ class ImageList extends Box {
       ...state,
     });
 
+    this.addNumberState('itemMaxWidth', 'itemMaxHeight', 'itemMargin');
     this.items = [];
     this.fields = [];
     this.selectedItems = [];

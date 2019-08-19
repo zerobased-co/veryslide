@@ -60,6 +60,7 @@ class BaseObject extends Node {
     });
 
     this.page = null;
+    this.addNumberState('x', 'y', 'width', 'height', 'order', 'opacity');
   }
 
   contain(x, y) {

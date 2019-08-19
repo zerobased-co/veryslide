@@ -112,10 +112,28 @@ class Handler extends View {
       }
 
       if (event.shiftKey) {
-        if (Math.abs(w) / (this.baseSize.width / this.baseSize.height) > Math.abs(h)) {
-          h = w * (this.baseSize.height / this.baseSize.width);
+        if (this.transform === 'move') {
+          // Bound to 45 degree
+          if (Math.min(Math.abs(x), Math.abs(y)) / Math.max(Math.abs(x), Math.abs(y)) > 0.82) {
+            if (Math.abs(x) > Math.abs(y)) {
+              y = Math.sign(y) * Math.abs(x);
+            } else {
+              x = Math.sign(x) * Math.abs(y);
+            }
+          } else {
+            if (Math.abs(x) > Math.abs(y)) {
+              y = 0;
+            } else {
+              x = 0;
+            }
+          }
         } else {
-          w = h * (this.baseSize.width / this.baseSize.height);
+          // Preserving ratio
+          if (Math.abs(w) / (this.baseSize.width / this.baseSize.height) > Math.abs(h)) {
+            h = w * (this.baseSize.height / this.baseSize.width);
+          } else {
+            w = h * (this.baseSize.width / this.baseSize.height);
+          }
         }
       }
 

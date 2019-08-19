@@ -1,4 +1,4 @@
-import html2canvas from 'html2canvas';
+import domtoimage from 'dom-to-image';
 
 import { uuid } from 'core/Util';
 import channel from 'core/Channel';
@@ -213,27 +213,20 @@ class DocumentController {
       if (this.page == null) return;
 
       // TBD: we have to hide things before capturing
-      if (format == 'image') {
-        html2canvas(this.page.node, {
-          allowTaint: false,
-          useCORS: true,
-          backgroundColor: this.page.color,
-          scrollX: parseInt(window.scrollX),
-          scrollY: -parseInt(window.scrollY),
-        }).then((canvas) => {
-          var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
-
+      domtoimage.toPng(this.page.node)
+        .then((dataUrl) => {
           var link = document.createElement("a");
           link.download = 'veryslide' + (this.doc.pages.find(this.page) + 1) + '.png';
-          link.href = image;
+          link.href = dataUrl;
 
           document.body.appendChild(link);
           link.click();
 
           // Cleanup the DOM
           document.body.removeChild(link);
+        }).catch((error) => {
+          console.log('Error on while saving:', error);
         });
-      }
     });
 
     channel.bind(this, 'Controller:addAsset', (type, name, meta) => {

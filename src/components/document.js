@@ -1,4 +1,4 @@
-import html2canvas from 'html2canvas';
+import domtoimage from 'dom-to-image';
 
 import State from 'core/State.js';
 import List from 'core/List';
@@ -72,20 +72,24 @@ class Page extends BaseObject {
     if (this.invalidate != true && force != true) return;
     this.invalidate = false;
 
-    const rect = this.node.getBoundingClientRect();
-    html2canvas(this.node, {
-      allowTaint: false,
-      useCORS: true,
-      backgroundColor: this.color,
-      scale: this.thumbnailScale,
-      scrollX: parseInt(window.scrollX),
-      scrollY: -parseInt(window.scrollY),
-    }).then((canvas) => {
-      this.thumbnail = canvas.toDataURL('image/jpeg', 0.4);
-      if (this.pagethumb != null) {
-        this.pagethumb.updateThumbnail();
-      }
-    });
+    domtoimage.toJpeg(this.node.parentElement, {
+      quality: 0.5,
+      width: parseInt(this.width * this.thumbnailScale),
+      height: parseInt(this.height * this.thumbnailScale),
+      style: {
+        'transform': 'scale(' + this.thumbnailScale + ')',
+        'transform-origin': 'top left',
+        'background-color': this.color,
+      },
+    })
+      .then((dataUrl) => {
+        this.thumbnail = dataUrl;
+        if (this.pagethumb != null) {
+          this.pagethumb.updateThumbnail();
+        }
+      }).catch((error) => {
+        console.log('Error on while creating thumbnail:', error);
+      });
   }
 
   removeObject(object) {

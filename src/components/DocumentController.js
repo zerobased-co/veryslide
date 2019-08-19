@@ -185,6 +185,7 @@ class DocumentController {
             }
             this.object = newObject;
             channel.send('Handler:connect', newObject);
+            channel.send('Viewport:focus', newObject);
           }
         }
       }

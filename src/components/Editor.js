@@ -471,6 +471,9 @@ class Viewport extends View {
   }
 
   paste(event) {
+    if (event.target !== document.body && event.target !== this.node) {
+      return;
+    }
     channel.send('Controller:paste');
   }
 

@@ -248,6 +248,12 @@ class DocumentController {
           // TBD: Error handling
           console.log(err);
         });
+      } else if (type === 'URL') {
+        let asset = this.doc.addAsset();
+        asset.name = name;
+        asset.assetType = 'URL';
+        asset.url = meta;
+        channel.send('AssetList:addAsset', asset);
       }
       //return this.fileUpload(file);
     });

@@ -249,6 +249,13 @@ class PanelForImageList extends PanelForBox {
       ),
 
       ui.H(
+        ui.createText('Image Base'),
+        new ui.Select({
+          options: this.dataOptions,
+        }).bind(this.object, 'imageBase'),
+      ),
+
+      ui.H(
         ui.createText('Control'),
         ui.HGroup(
           ui.createButton('Clear', () => { this.object.clear(); }),

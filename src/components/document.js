@@ -132,21 +132,23 @@ class Asset extends State {
   }
 
   update() {
-    const options = {
-      method: 'GET',
-      headers: {},
-    }
-    fetch(this.url, options).then((response) => {
-      if (response.ok) {
-        response.text().then((text) => {
-          this.data = text;
-          console.log(this.name, this.data.length);
-          if (this.node != null) {
-            this.node.loading(false);
-          }
-        });
+    if (this.assetType !== 'URL') {
+      const options = {
+        method: 'GET',
+        headers: {},
       }
-    });
+      fetch(this.url, options).then((response) => {
+        if (response.ok) {
+          response.text().then((text) => {
+            this.data = text;
+            console.log(this.name, this.data.length);
+            if (this.node != null) {
+              this.node.loading(false);
+            }
+          });
+        }
+      });
+    }
   }
 }
 

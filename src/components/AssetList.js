@@ -36,8 +36,10 @@ class AssetList extends View {
 
     // Update asset
     asset.node = assetItem;
-    asset.node.loading(true);
-    asset.update();
+    if (asset.assetType !== 'URL') {
+      asset.node.loading(true);
+      asset.update();
+    }
 
     this.loading(false);
     this.assetList.appendChild(assetItem);

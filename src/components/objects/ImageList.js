@@ -60,6 +60,7 @@ class ImageList extends Box {
       color: '#FFFFFF',
       borderStyle: 'solid',
       asset: '',
+      imageBase: '',
 
       filter: [],
 
@@ -129,6 +130,8 @@ class ImageList extends Box {
     this.loadedCount = 0;
     this.page.invalidate = true;
 
+    let imageBaseAsset = channel.send('Controller:getAsset', this.imageBase)[0];
+    if (imageBaseAsset == null) return;
 
     for(let i = 0; i < this.items.length; i++) {
       let item = this.items[i];
@@ -151,7 +154,7 @@ class ImageList extends Box {
       node.style.margin = this.itemMargin + 'px';
 
       let img = document.createElement('img');
-      img.src = '/static/logo/' + item['UID'] + '.png';
+      img.src = imageBaseAsset.url + item['UID'] + '.png';
       img.style.maxHeight = this.itemMaxHeight + 'px';
       img.style.maxWidth = this.itemMaxWidth + 'px';
       img.onload = () => {

@@ -209,14 +209,16 @@ class DocumentController {
       }
     });
 
-    channel.bind(this, 'Controller:savePage', (format) => {
-      if (this.page == null) return;
-
+    this.savePage = (page) => {
       // TBD: we have to hide things before capturing
-      domtoimage.toPng(this.page.node)
+      domtoimage.toPng(page.node)
         .then((dataUrl) => {
-          var link = document.createElement("a");
-          link.download = 'veryslide' + (this.doc.pages.find(this.page) + 1) + '.png';
+          // TBD: Why should we get page number here? Too slow.
+          let pageNo = this.doc.pages.find(page) + 1;
+          let filename = 'veryslide-' + this.slideId + '-' + String(pageNo).padStart(3, '0');
+
+          let link = document.createElement("a");
+          link.download = filename + '.png';
           link.href = dataUrl;
 
           document.body.appendChild(link);
@@ -227,6 +229,23 @@ class DocumentController {
         }).catch((error) => {
           console.log('Error on while saving:', error);
         });
+    }
+
+    channel.bind(this, 'Controller:savePage', (format) => {
+      if (this.page == null) return;
+      this.savePage(this.page);
+    });
+
+    // TBD: NOT LIKE THIS AT ALL
+    channel.bind(this, 'Controller:saveAllPage', (format) => {
+      this.doc.pages.iter((page, i) => {
+        setTimeout(() => {
+          channel.send('PageList:selectPage', page);
+          setTimeout(() => {
+            this.savePage(page);
+          }, 500);
+        }, i * 2000);
+      });
     });
 
     channel.bind(this, 'Controller:addAsset', (type, name, meta) => {

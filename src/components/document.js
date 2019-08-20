@@ -165,6 +165,7 @@ class Document extends State {
     });
 
     if (info != null) {
+      this.info = info;
       if (info.width != null) this.width = info.width;
       if (info.height != null) this.height = info.height;
     }

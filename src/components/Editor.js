@@ -41,7 +41,7 @@ class Menu extends View {
       new ui.Text({'title': 'Misc'}),
       ui.HGroup(
         ui.createButton('Image', () => { channel.send('Controller:savePage', 'image'); }),
-        //ui.createButton('PDF',   () => { channel.send('Controller:savePage', 'pdf'); }),
+        ui.createButton('All',   () => { channel.send('Controller:saveAllPage', 'image'); }),
         ui.createButton('Save',   () => { channel.send('Veryslide:save'); }),
         ui.createButton('Play',   () => { channel.send('Viewport:setPresentationMode', true); }),
       ),

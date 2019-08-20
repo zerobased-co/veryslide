@@ -20,7 +20,7 @@ class List {
 
   iter(func) {
     for(var i = 0; i < this.array.length; i++) {
-      func(this.array[i]);
+      func(this.array[i], i);
     }
   }
 

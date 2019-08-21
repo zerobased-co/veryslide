@@ -211,7 +211,9 @@ class DocumentController {
 
     this.savePage = (page) => {
       // TBD: we have to hide things before capturing
-      domtoimage.toPng(page.node)
+      domtoimage.toPng(page.node, {
+        imagePlaceholder: '/static/icons/notfound.svg',
+      })
         .then((dataUrl) => {
           // TBD: Why should we get page number here? Too slow.
           let pageNo = this.doc.pages.find(page) + 1;

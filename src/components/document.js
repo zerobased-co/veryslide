@@ -73,6 +73,7 @@ class Page extends BaseObject {
     this.invalidate = false;
 
     domtoimage.toJpeg(this.node.parentElement, {
+      imagePlaceholder: '/static/icons/notfound.svg',
       quality: 0.5,
       width: parseInt(this.width * this.thumbnailScale),
       height: parseInt(this.height * this.thumbnailScale),

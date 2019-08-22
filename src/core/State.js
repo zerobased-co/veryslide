@@ -48,6 +48,10 @@ class State {
     this.__NUMBER_STATE__ = this.__NUMBER_STATE__.concat(Array.from(keys));
   }
 
+  addIgnoreState(...keys) {
+    this.__IGNORE_STATE__ = this.__IGNORE_STATE__.concat(Array.from(keys));
+  }
+
   addPairing(pair) {
     this.pairings.push(pair);
   }

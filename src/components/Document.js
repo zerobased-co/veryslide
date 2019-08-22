@@ -154,8 +154,9 @@ class Asset extends State {
 }
 
 class Document extends State {
-  constructor(state, info) {
+  constructor(state) {
     super({
+      info: null,
       width: 1024,
       height: 768,
       pages: new List(),
@@ -166,10 +167,10 @@ class Document extends State {
     });
 
     if (info != null) {
-      this.info = info;
       if (info.width != null) this.width = info.width;
       if (info.height != null) this.height = info.height;
     }
+    this.addIgnoreState('info');
   }
 
   addPage(after) {

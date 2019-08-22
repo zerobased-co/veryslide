@@ -88,10 +88,6 @@ class Filter extends View {
     this.onChange(this.filter);
   }
 
-  onChange(value) {
-    console.log('onChange', value, this);
-  }
-
   get_currentFilter(idx, type) {
     let val = '';
     this.filter.forEach((f) => {

@@ -28,10 +28,6 @@ class InputFile extends View {
     this.input.addEventListener('change', this.handler.bind(this));
     this.node.appendChild(this.input);
   }
-
-  onChange(file) {
-    console.log('onChange', file, this);
-  }
 }
 
 export default InputFile

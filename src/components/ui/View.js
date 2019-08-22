@@ -51,10 +51,14 @@ class View extends State {
     return this.show(false);
   }
 
+  afterChange(value) {
+  }
+
   onChange(value) {
     if (this.pairTarget) {
       this.pairTarget[this.pairKey] = value;
     }
+    this.afterChange(value);
   }
 
   addEventListener(eventType, handler, target) {

@@ -23,9 +23,9 @@ class CheckBox extends View {
     this.text.nodeValue = title;
   }
 
-  onChange(/*event*/) {
-    super.onChange(this.checked);
+  onCheck(event) {
     this.checked = this.input.checked;
+    this.onChange(this.checked);
   }
 
   render() {
@@ -33,7 +33,7 @@ class CheckBox extends View {
 
     this.input = document.createElement('input');
     this.input.type = 'checkbox';
-    this.input.addEventListener('change', this.onChange.bind(this));
+    this.input.addEventListener('change', this.onCheck.bind(this));
 
     this.text = document.createTextNode(this.title);
 

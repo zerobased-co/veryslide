@@ -210,8 +210,7 @@ class PanelForImageList extends PanelForBox {
         ui.createText('Data Asset'),
         new ui.Select({
           options: this.dataOptions,
-          onChange: (value) => { 
-            super.onChange(value);
+          afterChange: (value) => { 
             this.send('Property:setPanelFor', this.object);
           },
         }).pair(this.object, 'asset'),

@@ -1,6 +1,6 @@
 import domtoimage from 'dom-to-image';
 
-import { uuid } from 'core/Util';
+import { uuid, defaultDomToImageOption } from 'core/Util';
 import State from 'core/State';
 
 import { Page } from './Document';
@@ -214,9 +214,13 @@ class DocumentController extends State {
 
     this.savePage = (page) => {
       // TBD: we have to hide things before capturing
-      domtoimage.toPng(page.node, {
-        imagePlaceholder: '/static/icons/notfound.svg',
-      })
+      domtoimage.toPng(page.node.parentElement, Object.assign(defaultDomToImageOption, {
+        width: page.width,
+        height: page.height,
+        style: {
+          'transform': 'scale(1)',
+        },
+      }))
         .then((dataUrl) => {
           // TBD: Why should we get page number here? Too slow.
           let pageNo = this.doc.pages.find(page) + 1;

@@ -507,8 +507,7 @@ class Viewport extends View {
 
     this.pageSnap = document.createElement('div');
     this.pageSnap.className = 'vs-pagesnap';
-    // To be ignored
-    this.pageSnap.setAttribute('data-html2canvas-ignore', 'true');
+    this.pageSnap.setAttribute('data-render-ignore', 'true');
 
     this.handler = new Handler();
     this.handler.viewport = this;

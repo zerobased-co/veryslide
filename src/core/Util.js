@@ -65,7 +65,7 @@ export function showLoadingIndicator(elem, isLoading, duration) {
   if (isLoading === true) {
     elem.loadingNode = document.createElement('div');
     elem.loadingNode.className = 'vs-loading';
-    elem.loadingNode.setAttribute('data-html2canvas-ignore', 'true');
+    elem.loadingNode.setAttribute('data-render-ignore', 'true');
 
     let icon = document.createElement('img');
     icon.src = '/static/icons/loading.svg';
@@ -73,4 +73,13 @@ export function showLoadingIndicator(elem, isLoading, duration) {
     elem.loadingNode.append(icon);
     elem.node.append(elem.loadingNode);
   }
+}
+
+export const defaultDomToImageOption = {
+  imagePlaceholder: '/static/icons/notfound.svg',
+  filter: (node) => {
+    if (node.nodeName === "#text")
+      return true;
+    return (!node.hasAttribute('data-render-ignore'));
+  },
 }

@@ -242,7 +242,7 @@ class Handler extends View {
     });
 
     // To be ignored
-    this.node.setAttribute('data-html2canvas-ignore', 'true');
+    this.node.setAttribute('data-render-ignore', 'true');
     return this.node;
   }
 }

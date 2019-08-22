@@ -1,5 +1,6 @@
 import domtoimage from 'dom-to-image';
 
+import { defaultDomToImageOption } from 'core/Util.js';
 import State from 'core/State.js';
 import List from 'core/List';
 import BaseObject from './objects/BaseObject';
@@ -72,8 +73,7 @@ class Page extends BaseObject {
     if (this.invalidate != true && force != true) return;
     this.invalidate = false;
 
-    domtoimage.toJpeg(this.node.parentElement, {
-      imagePlaceholder: '/static/icons/notfound.svg',
+    domtoimage.toJpeg(this.node.parentElement, Object.assign(defaultDomToImageOption, {
       quality: 0.5,
       width: parseInt(this.width * this.thumbnailScale),
       height: parseInt(this.height * this.thumbnailScale),
@@ -82,7 +82,7 @@ class Page extends BaseObject {
         'transform-origin': 'top left',
         'background-color': this.color,
       },
-    })
+    }))
       .then((dataUrl) => {
         this.thumbnail = dataUrl;
         if (this.pagethumb != null) {
@@ -156,7 +156,7 @@ class Asset extends State {
 class Document extends State {
   constructor(state) {
     super({
-      info: null,
+      title: '',
       width: 1024,
       height: 768,
       pages: new List(),
@@ -165,12 +165,6 @@ class Document extends State {
       selectedPageIndex: -1,
       ...state,
     });
-
-    if (info != null) {
-      if (info.width != null) this.width = info.width;
-      if (info.height != null) this.height = info.height;
-    }
-    this.addIgnoreState('info');
   }
 
   addPage(after) {

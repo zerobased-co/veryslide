@@ -25,7 +25,7 @@ class Veryslide extends State {
     // TBD: every veryslide uses their own channel, not a singleton.
     channel.cleanup();
 
-    const doc = this.doc = new Document({ info: this.info });
+    const doc = this.doc = new Document(this.info);
     const editor = this.editor = new Editor({ doc });
 
     this.documentController = new DocumentController({ doc, editor });

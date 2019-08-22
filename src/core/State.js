@@ -33,15 +33,15 @@ class State {
   }
 
   listen() {
-    channel.listen.apply(channel, arguments);
+    return channel.listen.apply(channel, arguments);
   }
 
   send() {
-    channel.send.apply(channel, arguments);
+    return channel.send.apply(channel, arguments);
   }
 
   dismiss() {
-    channel.dismiss.apply(channel, arguments);
+    return channel.dismiss.apply(channel, arguments);
   }
 
   addNumberState(...keys) {

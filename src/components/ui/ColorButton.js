@@ -7,7 +7,7 @@ class ColorButton extends View {
   constructor(state) {
     super({
       className: 'vs-colorbutton',
-      color: '#ffffff',
+      color: '#FFFFFF',
       ...state,
     });
 
@@ -21,8 +21,9 @@ class ColorButton extends View {
     this.node.addEventListener('click', this.showPicker.bind(this));
   }
 
-  onChange(color) {
-    console.log('onChange', color, this);
+  onNotify(value) {
+    this.state.color = value;
+    this.on_color(value);
   }
 
   showPicker(event) {
@@ -38,7 +39,7 @@ class ColorButton extends View {
 
   on_color(color) {
     this.node.style.backgroundColor = color;
-    this.node.innerText = color;
+    this.node.innerText = color.toUpperCase();
     this.node.style.color = properTextColor(color);
   }
 }

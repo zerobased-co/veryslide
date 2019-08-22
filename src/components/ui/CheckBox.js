@@ -10,8 +10,9 @@ class CheckBox extends View {
     });
   }
 
-  onBinding(value) {
-    this.checked = value;
+  onNotify(value) {
+    this.state.checked = value;
+    this.on_checked(value);
   }
 
   on_checked(checked) {

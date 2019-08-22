@@ -18,15 +18,14 @@ class Menu extends View {
 
     [
       new ui.Text({'title': 'Page'}),
-      ui.HGroup(
-        ui.createButton('Add',    () => { channel.send('Controller:addPage'); }),
-        ui.createButton('Remove',   () => { channel.send('Controller:removePage'); }),
-      ),
+      ui.createButton('Add',    () => { channel.send('Controller:addPage'); }),
+      //ui.HGroup(
+        //ui.createButton('Remove',   () => { channel.send('Controller:removePage'); }),
+      //),
 
       new ui.Text({'title': 'Viewport'}),
       ui.HGroup(
         ui.createButton('Reset zoom',    () => { this.resetZoom(); }),
-        this.btnSnap = 
         ui.createButton('Snap Off',      () => { this.toggleSnap(); }),
       ),
 
@@ -35,8 +34,8 @@ class Menu extends View {
         ui.createButton('TextBox',   () => { channel.send('Controller:addObject', 'TextBox'); }),
         ui.createButton('Image',     () => { this.openFileDialog(); }),
         ui.createButton('ImageList', () => { channel.send('Controller:addObject', 'ImageList'); }),
+        //ui.createButton('Remove', () => { channel.send('Controller:removeObject'); }),
       ),
-      ui.createButton('Remove', () => { channel.send('Controller:removeObject'); }),
 
       new ui.Text({'title': 'Misc'}),
       ui.HGroup(

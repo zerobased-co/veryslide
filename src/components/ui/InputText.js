@@ -47,8 +47,8 @@ class InputText extends View {
     }
   }
   
-  onBinding(value) {
-    this.value = value;
+  onNotify(value) {
+    this.state.value = value;
     this.input.value = value;
   }
 }

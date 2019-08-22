@@ -35,10 +35,7 @@ class PanelForPage extends Panel {
       new ui.TitleBar({'title': 'Page style'}),
       ui.H(
         ui.createText('Background'),
-        new ui.ColorButton({
-          color: this.object.color,
-          onChange: value => { this.object.color = value; },
-        }),
+        new ui.ColorButton().bind(this.object, 'color'),
       ),
     ].forEach(item => this.appendChild(item));
     return this.node;
@@ -97,27 +94,16 @@ class PanelForBox extends Panel {
 
       ui.H(
         ui.createText('Background'),
-        new ui.ColorButton({
-          color: this.object.color,
-          onChange: value => { this.object.color = value; },
-        }),
+        new ui.ColorButton().bind(this.object, 'color'),
       ),
 
       ui.H(
         ui.createText('Border'),
         new ui.Select({
           options: [['none', '----'], ['solid', 'Solid'], ['dashed', 'Dashed']],
-          value: this.object.borderStyle,
-          onChange: value => { this.object.borderStyle = value },
-        }),
-        new ui.InputText({
-          value: this.object.borderWidth, 
-          onChange: value => { this.object.borderWidth = value },
-        }),
-        new ui.ColorButton({ 
-          color: this.object.borderColor,
-          onChange: value => { this.object.borderColor = value; }, 
-        }),
+        }).bind(this.object, 'borderStyle'),
+        new ui.InputText().bind(this.object, 'borderWidth'),
+        new ui.ColorButton().bind(this.object, 'borderColor'),
       ),
 
       ui.H(
@@ -127,10 +113,7 @@ class PanelForBox extends Panel {
 
       ui.H(
         ui.createText('Padding'),
-        new ui.InputText({
-          value: this.object.padding, 
-          onChange: value => { this.object.padding = value },
-        }),
+        new ui.InputText().bind(this.object, 'padding'),
       ),
     ].forEach(item => this.appendChild(item));
     return this.node;
@@ -145,10 +128,7 @@ class PanelForTextBox extends PanelForBox {
       new ui.TitleBar({'title': 'Text style'}),
       ui.H(
         ui.createText('Color'),
-        new ui.ColorButton({ 
-          color: this.object.textColor,
-          onChange: value => { this.object.textColor = value; }, 
-        }),
+        new ui.ColorButton().bind(this.object, 'textColor'),
       ),
 
       ui.H(
@@ -156,9 +136,7 @@ class PanelForTextBox extends PanelForBox {
         new ui.InputText().bind(this.object, 'size'),
         new ui.Select({
           options: FONTLIST,
-          value: this.object.fontFamily,
-          onChange: value => { this.object.fontFamily = value },
-        }),
+        }).bind(this.object, 'fontFamily'),
       ),
 
       ui.H(
@@ -185,14 +163,10 @@ class PanelForTextBox extends PanelForBox {
         ui.createText('Alignment'),
         new ui.Select({
           options: [['left', 'Left'], ['center', 'Center'], ['right', 'Right']],
-          value: this.object.align,
-          onChange: value => { this.object.align = value },
-        }),
+        }).bind(this.object, 'align'),
         new ui.Select({
           options: [['top', 'Top'], ['middle', 'Middle'], ['bottom', 'Bottom']],
-          value: this.object.verticalAlign,
-          onChange: value => { this.object.verticalAlign = value },
-        }),
+        }).bind(this.object, 'verticalAlign'),
       ),
     ].forEach(item => this.appendChild(item));
 
@@ -228,20 +202,19 @@ class PanelForImageList extends PanelForBox {
     }
 
     this.assets = channel.send('Controller:getAssetList')[0];
-    this.dataOptions = [['none', '----']].concat(this.assets.array.map(x => [x.name, x.name]));
+    this.dataOptions = [['', '----']].concat(this.assets.array.map(x => [x.name, x.name]));
 
     [
       new ui.TitleBar({title: 'List Property'}),
       ui.H(
         ui.createText('Data Asset'),
         new ui.Select({
-          value: this.object.asset,
           options: this.dataOptions,
           onChange: (value) => { 
-            this.object.asset = value;
+            super.onChange(value);
             channel.send('Property:setPanelFor', this.object);
           },
-        }),
+        }).bind(this.object, 'asset'),
         ui.createText(
           '&nbsp;' + this.object.selectedItems.length + ' of ' + this.object.items.length + ' Item(s)',
           'vs-text-140',
@@ -269,29 +242,18 @@ class PanelForImageList extends PanelForBox {
         ui.V(
           ui.H(
             ui.createText('Size'),
-            new ui.InputText({
-              value: this.object.itemMaxWidth, 
-              onChange: value => { this.object.itemMaxWidth = value },
-            }),
-            new ui.InputText({
-              value: this.object.itemMaxHeight, 
-              onChange: value => { this.object.itemMaxHeight = value },
-            }),
+            new ui.InputText().bind(this.object, 'itemMaxWidth'),
+            new ui.InputText().bind(this.object, 'itemMaxHeight'),
           ),
           ui.H(
             ui.createText('Margin'),
-            new ui.InputText({
-              value: this.object.itemMargin, 
-              onChange: value => { this.object.itemMargin = value },
-            }),
+            new ui.InputText().bind(this.object, 'itemMargin'),
           ),
           ui.H(
             ui.createText('Arrange'),
             new ui.Select({
               options: [['row', 'Row'], ['column', 'Column']],
-              value: this.object.itemDirection,
-              onChange: value => { this.object.itemDirection = value },
-            }),
+            }).bind(this.object, 'itemDirection'),
 
             new ui.Select({
               options: [
@@ -302,9 +264,7 @@ class PanelForImageList extends PanelForBox {
                 ['space-around', 'Around'],
                 ['space-evenly', 'Evenly']
               ],
-              value: this.object.itemAlign,
-              onChange: value => { this.object.itemAlign = value },
-            }),
+            }).bind(this.object, 'itemAlign'),
           ),
         ),
       ),

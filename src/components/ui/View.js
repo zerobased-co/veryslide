@@ -26,13 +26,13 @@ class View extends State {
     target.addBinding(this);
 
     // for initialize
-    this.onBinding(target[key]);
+    this.onNotify(target[key]);
     return this;
   }
 
   notify(from, key, value) {
     if (from === this.bindingTarget && key === this.bindingKey) {
-      this.onBinding(value);
+      this.onNotify(value);
     }
   }
 

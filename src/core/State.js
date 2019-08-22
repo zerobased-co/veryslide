@@ -6,7 +6,8 @@ class State {
     this.state = state;
     this.__TYPE__ = 'State';
     this.__NUMBER_STATE__ = [];
-    this.bindings = new Array();
+    this.__IGNORE_STATE__ = [];
+    this.pairings = new Array();
 
     if (this.state != null) {
       Object.getOwnPropertyNames(this.state).forEach(key => {
@@ -31,16 +32,28 @@ class State {
     }
   }
 
+  listen() {
+    channel.listen.apply(channel, arguments);
+  }
+
+  send() {
+    channel.send.apply(channel, arguments);
+  }
+
+  dismiss() {
+    channel.dismiss.apply(channel, arguments);
+  }
+
   addNumberState(...keys) {
     this.__NUMBER_STATE__ = this.__NUMBER_STATE__.concat(Array.from(keys));
   }
 
-  addBinding(binding) {
-    this.bindings.push(binding);
+  addPairing(pair) {
+    this.pairings.push(pair);
   }
 
-  removeBinding(binding) {
-    this.bindings = this.bindings.filter(el => el !== binding);
+  removePairing(pair) {
+    this.pairings = this.pairings.filter(el => el !== pair);
   }
 
   updateState(key, value) { // if key is null, then update all states
@@ -49,11 +62,9 @@ class State {
       if (func != null) {
         func.bind(this)(this.state[key]);
       }
-      if (this.bindings.length) {
-        for(var i = 0; i < this.bindings.length; i++) {
-          this.bindings[i].notify(this, key, value);
-        }
-      }
+      this.pairings.forEach((pair) => {
+        pair.notify(this, key, value);
+      });
     } else {
       for (const [key, value] of Object.entries(this.state)) {
         let func = this['on_' + key];
@@ -80,7 +91,23 @@ class State {
       }
       return v;
     };
-    return JSON.stringify(this.state, replacer);
+
+    let ignored = {};
+
+    // Backup values
+    this.__IGNORE_STATE__.forEach((k) => {
+      ignored[k] = this.state[k];
+      delete this.state[k];
+    });
+
+    const str = JSON.stringify(this.state, replacer);
+
+    // Restore values
+    this.__IGNORE_STATE__.forEach((k) => {
+      this.state[k] = ignored[k];
+    });
+
+    return str;
   }
 
   deserialize(data) {
@@ -91,14 +118,14 @@ class State {
             let page = this.addPage();
             // TBD: without using channel
             page.deserialize(item);
-            channel.send('PageList:addPage', page);
+            this.send('PageList:addPage', page);
           } else if (k === 'objects') {
             let obj = this.addObject(item.type);
             obj.deserialize(item);
           } else if (k === 'assets') {
             let asset = this.addAsset();
             asset.deserialize(item);
-            channel.send('AssetList:addAsset', asset);
+            this.send('AssetList:addAsset', asset);
           } else {
             this[k].push(item);
           }
@@ -110,7 +137,7 @@ class State {
   }
 
   destroy() {
-    channel.unbind(this);
+    channel.dismiss(this);
   }
 }
 

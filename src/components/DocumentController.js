@@ -1,76 +1,79 @@
 import domtoimage from 'dom-to-image';
 
 import { uuid } from 'core/Util';
-import channel from 'core/Channel';
+import State from 'core/State';
 
 import { Page } from './Document';
 import TextBox from './objects/TextBox';
 import ImageBox from './objects/ImageBox';
 import ImageList from './objects/ImageList';
 
-class DocumentController {
-  constructor(doc, editor) {
-    this.doc = doc;
-    this.editor = editor;
-    this.page = null;
-    this.object = null;
-    this.clipboard = null;
-    this.firebase = null;
-    this.slideId = null;
-    this.pasted = 0;
+class DocumentController extends State {
+  constructor(state) {
+    super({
+      doc: null,
+      editor: null,
+      page: null,
+      object: null,
+      clipboard: null,
+      firebase: null,
+      slideId: null,
+      pasted: 0,
+      ...state,
+    });
 
-    channel.bind(this, 'Controller:addPage', () => {
+    this.listen(this, 'Controller:addPage', () => {
       const newPage = this.doc.addPage(this.page);
-      const pagethumb = channel.send('PageList:addPage', newPage, this.doc.pages.find(newPage))[0];
+      const pagethumb = this.send('PageList:addPage', newPage, this.doc.pages.find(newPage))[0];
       if (pagethumb != null) {
         pagethumb.select();
       }
     });
 
-    channel.bind(this, 'Controller:prevPage', () => {
+    this.listen(this, 'Controller:prevPage', () => {
       let prevPage = this.doc.pages.prev(this.page);
       if (prevPage) {
         this.page = prevPage;
-        channel.send('PageList:selectPage', this.page);
+        this.send('PageList:selectPage', this.page);
       } else {
-        channel.send('Viewport:setPresentationMode', false);
+        this.send('Viewport:setPresentationMode', false);
       }
     });
 
-    channel.bind(this, 'Controller:nextPage', () => {
+    this.listen(this, 'Controller:nextPage', () => {
       let nextPage = this.doc.pages.next(this.page);
       if (nextPage) {
         this.page = nextPage;
-        channel.send('PageList:selectPage', this.page);
+        this.send('PageList:selectPage', this.page);
       } else {
-        channel.send('Viewport:setPresentationMode', false);
+        this.send('Viewport:setPresentationMode', false);
       }
     });
 
-    channel.bind(this, 'Controller:selectPage', (page) => {
+    this.listen(this, 'Controller:selectPage', (page) => {
       this.doc.selectedPageIndex = this.doc.pages.find(page);
       this.page = page;
       this.object = null;
     });
 
-    channel.bind(this, 'Controller:removePage', () => {
+    this.listen(this, 'Controller:removePage', () => {
       if (this.page == null) return;
       if (this.page == this.clipboard) { this.clipboard = null };
 
-      channel.send('PageList:removePage', this.page);
+      this.send('PageList:removePage', this.page);
 
       const nextpage = this.doc.removePage(this.page);
       this.page = nextpage;
 
       if (nextpage == null) {
         this.doc.selectedPageIndex = -1;
-        channel.send('Viewport:clear', nextpage);
+        this.send('Viewport:clear', nextpage);
       } else {
-        channel.send('PageList:selectPage', nextpage);
+        this.send('PageList:selectPage', nextpage);
       }
     });
 
-    channel.bind(this, 'Controller:addObject', (objType, states, file) => {
+    this.listen(this, 'Controller:addObject', (objType, states, file) => {
       if (this.page == null) return;
       let newObject = this.page.addObject(objType, states);
       switch(newObject.type) {
@@ -87,23 +90,23 @@ class DocumentController {
           });
           break;
       }
-      channel.send('Viewport:focus', newObject);
+      this.send('Viewport:focus', newObject);
     });
 
-    channel.bind(this, 'Controller:selectObject', (object) => {
+    this.listen(this, 'Controller:selectObject', (object) => {
       this.object = object;
     });
 
-    channel.bind(this, 'Controller:removeObject', () => {
+    this.listen(this, 'Controller:removeObject', () => {
       if (this.object == null) return;
       if (this.object == this.clipboard) { this.clipboard = null };
       this.page.removeObject(this.object);
       this.object = null;
 
-      channel.send('Viewport:blur');
+      this.send('Viewport:blur');
     });
 
-    channel.bind(this, 'Controller:align', (object, align) => {
+    this.listen(this, 'Controller:align', (object, align) => {
       if (object == null) return;
       if (object.page == null) return;
 
@@ -129,7 +132,7 @@ class DocumentController {
       }
     });
 
-    channel.bind(this, 'Controller:order', (object, order) => {
+    this.listen(this, 'Controller:order', (object, order) => {
       if (object == null) return;
       if (object.page == null) return;
 
@@ -150,7 +153,7 @@ class DocumentController {
       object.page.reorder();
     });
 
-    channel.bind(this, 'Controller:copy', () => {
+    this.listen(this, 'Controller:copy', () => {
       if (this.object != null) {
         this.clipboard = this.object;
         this.pasted = 0;
@@ -159,7 +162,7 @@ class DocumentController {
       }
     });
 
-    channel.bind(this, 'Controller:paste', () => {
+    this.listen(this, 'Controller:paste', () => {
       if (this.clipboard == null) return;
 
       console.log('pasting', this.clipboard);
@@ -190,7 +193,7 @@ class DocumentController {
         newObject.deserialize(JSON.parse(data));
 
         if (newObject.type == 'Page') {
-          const pagethumb = channel.send('PageList:addPage', newObject, this.doc.pages.find(newObject))[0];
+          const pagethumb = this.send('PageList:addPage', newObject, this.doc.pages.find(newObject))[0];
           if (pagethumb != null) {
             pagethumb.select();
           }
@@ -203,7 +206,7 @@ class DocumentController {
               newObject.y += this.pasted * 10;
             }
             this.object = newObject;
-            channel.send('Viewport:focus', newObject);
+            this.send('Viewport:focus', newObject);
           }
         }
       }
@@ -233,16 +236,16 @@ class DocumentController {
         });
     }
 
-    channel.bind(this, 'Controller:savePage', (format) => {
+    this.listen(this, 'Controller:savePage', (format) => {
       if (this.page == null) return;
       this.savePage(this.page);
     });
 
     // TBD: NOT LIKE THIS AT ALL
-    channel.bind(this, 'Controller:saveAllPage', (format) => {
+    this.listen(this, 'Controller:saveAllPage', (format) => {
       this.doc.pages.iter((page, i) => {
         setTimeout(() => {
-          channel.send('PageList:selectPage', page);
+          this.send('PageList:selectPage', page);
           setTimeout(() => {
             this.savePage(page);
           }, 500);
@@ -250,7 +253,7 @@ class DocumentController {
       });
     });
 
-    channel.bind(this, 'Controller:addAsset', (type, name, meta) => {
+    this.listen(this, 'Controller:addAsset', (type, name, meta) => {
       console.log('addAsset', type, name, meta);
       if (type === 'FILE') {
         let path = this.getFirebaseFilename(meta);
@@ -264,7 +267,7 @@ class DocumentController {
           asset.assetType = this.getExtension(meta);
           asset.url = url;
 
-          channel.send('AssetList:addAsset', asset);
+          this.send('AssetList:addAsset', asset);
         }).catch((err) => {
           // TBD: Error handling
           console.log(err);
@@ -274,20 +277,20 @@ class DocumentController {
         asset.name = name;
         asset.assetType = 'URL';
         asset.url = meta;
-        channel.send('AssetList:addAsset', asset);
+        this.send('AssetList:addAsset', asset);
       }
       //return this.fileUpload(file);
     });
 
-    channel.bind(this, 'Controller:removeAsset', (asset) => {
+    this.listen(this, 'Controller:removeAsset', (asset) => {
       this.doc.removeAsset(asset);
     });
 
-    channel.bind(this, 'Controller:getAssetList', () => {
+    this.listen(this, 'Controller:getAssetList', () => {
       return this.doc.assets;
     });
 
-    channel.bind(this, 'Controller:getAsset', (assetName) => {
+    this.listen(this, 'Controller:getAsset', (assetName) => {
       let asset = this.doc.assets.findby((item) => {
         return item.name == assetName;
       });

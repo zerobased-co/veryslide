@@ -35,7 +35,7 @@ class PanelForPage extends Panel {
       new ui.TitleBar({'title': 'Page style'}),
       ui.H(
         ui.createText('Background'),
-        new ui.ColorButton().bind(this.object, 'color'),
+        new ui.ColorButton().pair(this.object, 'color'),
       ),
     ].forEach(item => this.appendChild(item));
     return this.node;
@@ -66,54 +66,54 @@ class PanelForBox extends Panel {
         ui.createText('Order'),
         new ui.Vertical({children: [
           ui.HGroup(
-            ui.createButton('Back', () => { channel.send('Controller:order', this.object, 'back'); }),
-            ui.createButton('Front', () => { channel.send('Controller:order', this.object, 'front'); }),
+            ui.createButton('Back', () => { this.send('Controller:order', this.object, 'back'); }),
+            ui.createButton('Front', () => { this.send('Controller:order', this.object, 'front'); }),
           ),
           ui.HGroup(
-            ui.createButton('Backward', () => { channel.send('Controller:order', this.object, 'backward'); }),
-            ui.createButton('Forward', () => { channel.send('Controller:order', this.object, 'forward'); }),
+            ui.createButton('Backward', () => { this.send('Controller:order', this.object, 'backward'); }),
+            ui.createButton('Forward', () => { this.send('Controller:order', this.object, 'forward'); }),
           ),
         ]}),
       ),
       ui.H(
         ui.createText('Vertical'),
         ui.HGroup(
-          ui.createButton('Top', () => { channel.send('Controller:align', this.object, 'top'); }),
-          ui.createButton('Middle', () => { channel.send('Controller:align', this.object, 'middle'); }),
-          ui.createButton('Bottom', () => { channel.send('Controller:align', this.object, 'bottom'); }),
+          ui.createButton('Top', () => { this.send('Controller:align', this.object, 'top'); }),
+          ui.createButton('Middle', () => { this.send('Controller:align', this.object, 'middle'); }),
+          ui.createButton('Bottom', () => { this.send('Controller:align', this.object, 'bottom'); }),
         ),
       ),
       ui.H(
         ui.createText('Horizon'),
         ui.HGroup(
-          ui.createButton('Left', () => { channel.send('Controller:align', this.object, 'left'); }),
-          ui.createButton('Center', () => { channel.send('Controller:align', this.object, 'center'); }),
-          ui.createButton('Right', () => { channel.send('Controller:align', this.object, 'right'); }),
+          ui.createButton('Left', () => { this.send('Controller:align', this.object, 'left'); }),
+          ui.createButton('Center', () => { this.send('Controller:align', this.object, 'center'); }),
+          ui.createButton('Right', () => { this.send('Controller:align', this.object, 'right'); }),
         ),
       ),
 
       ui.H(
         ui.createText('Background'),
-        new ui.ColorButton().bind(this.object, 'color'),
+        new ui.ColorButton().pair(this.object, 'color'),
       ),
 
       ui.H(
         ui.createText('Border'),
         new ui.Select({
           options: [['none', '----'], ['solid', 'Solid'], ['dashed', 'Dashed']],
-        }).bind(this.object, 'borderStyle'),
-        new ui.InputText().bind(this.object, 'borderWidth'),
-        new ui.ColorButton().bind(this.object, 'borderColor'),
+        }).pair(this.object, 'borderStyle'),
+        new ui.InputText().pair(this.object, 'borderWidth'),
+        new ui.ColorButton().pair(this.object, 'borderColor'),
       ),
 
       ui.H(
         ui.createText('Opacity'),
-        new ui.InputText().bind(this.object, 'opacity'),
+        new ui.InputText().pair(this.object, 'opacity'),
       ),
 
       ui.H(
         ui.createText('Padding'),
-        new ui.InputText().bind(this.object, 'padding'),
+        new ui.InputText().pair(this.object, 'padding'),
       ),
     ].forEach(item => this.appendChild(item));
     return this.node;
@@ -128,45 +128,45 @@ class PanelForTextBox extends PanelForBox {
       new ui.TitleBar({'title': 'Text style'}),
       ui.H(
         ui.createText('Color'),
-        new ui.ColorButton().bind(this.object, 'textColor'),
+        new ui.ColorButton().pair(this.object, 'textColor'),
       ),
 
       ui.H(
         ui.createText('Font'),
-        new ui.InputText().bind(this.object, 'size'),
+        new ui.InputText().pair(this.object, 'size'),
         new ui.Select({
           options: FONTLIST,
-        }).bind(this.object, 'fontFamily'),
+        }).pair(this.object, 'fontFamily'),
       ),
 
       ui.H(
         ui.createText('Style'),
         new ui.CheckBox({
           title: 'Bold',
-        }).bind(this.object, 'bold'),
+        }).pair(this.object, 'bold'),
         new ui.CheckBox({
           title: 'Italic',
-        }).bind(this.object, 'italic'),
+        }).pair(this.object, 'italic'),
         new ui.CheckBox({
           title: 'Underline',
-        }).bind(this.object, 'underline'),
+        }).pair(this.object, 'underline'),
       ),
 
       ui.H(
         ui.createText('Word Break'),
         new ui.Select({
           options: [['normal', 'Normal'], ['break-all', 'Break All'], ['keep-all', 'Keep All'], ['break-word', 'Break Word']],
-        }).bind(this.object, 'wordBreak'),
+        }).pair(this.object, 'wordBreak'),
       ),
 
       ui.H(
         ui.createText('Alignment'),
         new ui.Select({
           options: [['left', 'Left'], ['center', 'Center'], ['right', 'Right']],
-        }).bind(this.object, 'align'),
+        }).pair(this.object, 'align'),
         new ui.Select({
           options: [['top', 'Top'], ['middle', 'Middle'], ['bottom', 'Bottom']],
-        }).bind(this.object, 'verticalAlign'),
+        }).pair(this.object, 'verticalAlign'),
       ),
     ].forEach(item => this.appendChild(item));
 
@@ -201,7 +201,7 @@ class PanelForImageList extends PanelForBox {
       this.object.update();
     }
 
-    this.assets = channel.send('Controller:getAssetList')[0];
+    this.assets = this.send('Controller:getAssetList')[0];
     this.dataOptions = [['', '----']].concat(this.assets.array.map(x => [x.name, x.name]));
 
     [
@@ -212,9 +212,9 @@ class PanelForImageList extends PanelForBox {
           options: this.dataOptions,
           onChange: (value) => { 
             super.onChange(value);
-            channel.send('Property:setPanelFor', this.object);
+            this.send('Property:setPanelFor', this.object);
           },
-        }).bind(this.object, 'asset'),
+        }).pair(this.object, 'asset'),
         ui.createText(
           '&nbsp;' + this.object.selectedItems.length + ' of ' + this.object.items.length + ' Item(s)',
           'vs-text-140',
@@ -225,7 +225,7 @@ class PanelForImageList extends PanelForBox {
         ui.createText('Image Base'),
         new ui.Select({
           options: this.dataOptions,
-        }).bind(this.object, 'imageBase'),
+        }).pair(this.object, 'imageBase'),
       ),
 
       ui.H(
@@ -233,7 +233,7 @@ class PanelForImageList extends PanelForBox {
         ui.HGroup(
           ui.createButton('Clear', () => { this.object.clear(); }),
           ui.createButton('Shuffle', () => { this.object.shuffle(); }),
-          ui.createButton('Apply', () => { this.object.apply(); channel.send('Property:setPanelFor', this.object); }),
+          ui.createButton('Apply', () => { this.object.apply(); this.send('Property:setPanelFor', this.object); }),
         ),
       ),
 
@@ -242,18 +242,18 @@ class PanelForImageList extends PanelForBox {
         ui.V(
           ui.H(
             ui.createText('Size'),
-            new ui.InputText().bind(this.object, 'itemMaxWidth'),
-            new ui.InputText().bind(this.object, 'itemMaxHeight'),
+            new ui.InputText().pair(this.object, 'itemMaxWidth'),
+            new ui.InputText().pair(this.object, 'itemMaxHeight'),
           ),
           ui.H(
             ui.createText('Margin'),
-            new ui.InputText().bind(this.object, 'itemMargin'),
+            new ui.InputText().pair(this.object, 'itemMargin'),
           ),
           ui.H(
             ui.createText('Arrange'),
             new ui.Select({
               options: [['row', 'Row'], ['column', 'Column']],
-            }).bind(this.object, 'itemDirection'),
+            }).pair(this.object, 'itemDirection'),
 
             new ui.Select({
               options: [
@@ -264,7 +264,7 @@ class PanelForImageList extends PanelForBox {
                 ['space-around', 'Around'],
                 ['space-evenly', 'Evenly']
               ],
-            }).bind(this.object, 'itemAlign'),
+            }).pair(this.object, 'itemAlign'),
           ),
         ),
       ),
@@ -290,7 +290,7 @@ class Property extends View {
       ...state,
     });
 
-    channel.bind(this, 'Property:setPanelFor', this.setPanelFor);
+    this.listen(this, 'Property:setPanelFor', this.setPanelFor);
   }
 
   setPanelFor(object) {
@@ -316,7 +316,7 @@ class Property extends View {
     }
     this.appendChild(this.panel);
 
-    channel.send('ToolBox:activeTab', 'Property');
+    this.send('ToolBox:activeTab', 'Property');
     return this.panel;
   }
 

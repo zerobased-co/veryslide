@@ -10,8 +10,8 @@ class AssetList extends View {
       ...state,
     });
 
-    channel.bind(this, 'AssetList:addAsset', this.addAsset);
-    channel.bind(this, 'AssetList:removeAsset', this.removeAsset);
+    this.listen(this, 'AssetList:addAsset', this.addAsset);
+    this.listen(this, 'AssetList:removeAsset', this.removeAsset);
   }
 
   render() {
@@ -29,7 +29,7 @@ class AssetList extends View {
         asset.update();
       }),
       ui.createButton('Remove', () => { 
-        channel.send('Controller:removeAsset', asset);
+        this.send('Controller:removeAsset', asset);
         assetItem.node.remove();
       })
     );
@@ -51,7 +51,7 @@ class AssetList extends View {
 
   onAddAsset() {
     this.loading(true);
-    channel.send('Controller:addAsset', 'URL', this.inputName.value, this.inputUrl.value);
+    this.send('Controller:addAsset', 'URL', this.inputName.value, this.inputUrl.value);
     this.inputName.value = '';
     this.inputUrl.value = '';
   }
@@ -84,7 +84,7 @@ class AssetList extends View {
 
     this.inputFile.onChange = (file) => {
       this.loading(true);
-      channel.send('Controller:addAsset', 'FILE', this.inputName.value, file);
+      this.send('Controller:addAsset', 'FILE', this.inputName.value, file);
       this.inputName.value = '';
       this.inputFile.reset();
     }

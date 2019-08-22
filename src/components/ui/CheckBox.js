@@ -24,10 +24,8 @@ class CheckBox extends View {
   }
 
   onChange(/*event*/) {
+    super.onChange(this.checked);
     this.checked = this.input.checked;
-    if (this.bindingTarget) {
-      this.bindingTarget[this.bindingKey] = this.checked;
-    }
   }
 
   render() {

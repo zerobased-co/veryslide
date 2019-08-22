@@ -31,16 +31,16 @@ class Handler extends View {
     this.snap = false;
     this.snapSize = 16;
 
-    channel.bind(this, 'Handler:connect', this.connect);
+    this.listen(this, 'Handler:connect', this.connect);
     this.addEventListener('mousedown', this.mousedown);
   }
 
   connect(object) {
     if (this.object != null) {
-      this.object.removeBinding(this);
+      this.object.removePairing(this);
     }
     this.object = object;
-    this.object.addBinding(this);
+    this.object.addPairing(this);
     this.show(true);
 
     this.alignToObject(this.object);
@@ -171,14 +171,6 @@ class Handler extends View {
 
       w = Math.max(w, minSize);
       h = Math.max(h, minSize);
-
-/*
-      // This will be done by 'binding'
-      this.node.style.left = x + 'px';
-      this.node.style.top = y + 'px';
-      this.node.style.width = w + 'px';
-      this.node.style.height = h + 'px';
-*/
 
       this.object.x = parseInt(x);
       this.object.y = parseInt(y);

@@ -16,11 +16,11 @@ class Channel {
   }
 
   cleanup() {
-    this.messages = new List();
+    //this.messages = new List();
     this.listeners = new Object();
   }
 
-  bind(listener, type, handler) {
+  listen(listener, type, handler) {
     if (!(type in this.listeners)) {
       this.listeners[type] = new Array();
     }
@@ -30,7 +30,7 @@ class Channel {
     });
   }
 
-  unbind(listener, type) {
+  dismiss(listener, type) {
     if (type && type in this.listeners) {
       this.listeners[type] = this.listeners[type].filter(function(elem) {
         return elem['listener'] !== listener;

@@ -17,7 +17,7 @@ class PageThumb extends View {
       this.select();
     });
 
-    channel.bind(this, 'PageThumb:deselect', () => {
+    this.listen(this, 'PageThumb:deselect', () => {
       this.deselect();
     });
   }
@@ -43,11 +43,11 @@ class PageThumb extends View {
   }
 
   select(smooth) {
-    channel.send('PageThumb:deselect');
+    this.send('PageThumb:deselect');
     let behavior = smooth !== false ? 'smooth' : 'auto';
     this.node.scrollIntoView({behavior: behavior, block: 'nearest', inline: 'nearest'});
     this.node.classList.toggle('focus');
-    channel.send('Viewport:selectPage', this.page);
+    this.send('Viewport:selectPage', this.page);
   }
 
   deselect() {
@@ -70,10 +70,10 @@ class PageList extends View {
     });
 
     this.pagethumbs = new List();
-    channel.bind(this, 'PageList:addPage', this.addPage);
-    channel.bind(this, 'PageList:selectPage', this.selectPage);
-    channel.bind(this, 'PageList:selectPageAt', this.selectPageAt);
-    channel.bind(this, 'PageList:removePage', this.removePage);
+    this.listen(this, 'PageList:addPage', this.addPage);
+    this.listen(this, 'PageList:selectPage', this.selectPage);
+    this.listen(this, 'PageList:selectPageAt', this.selectPageAt);
+    this.listen(this, 'PageList:removePage', this.removePage);
   }
 
   addPage(page, at) {

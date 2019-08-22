@@ -44,7 +44,7 @@ class UI {
   }
 
   createInputText(target, property) {
-    return new ui.InputText().bind(target, property);
+    return new ui.InputText().pair(target, property);
   }
 
   HGroup(...buttons) {

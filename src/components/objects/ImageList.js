@@ -94,7 +94,7 @@ class ImageList extends Box {
   }
 
   __waitAssetAndApply() {
-    let asset = channel.send('Controller:getAsset', this.asset)[0];
+    let asset = this.send('Controller:getAsset', this.asset)[0];
     if (asset == null || asset.data == '') {
       setTimeout(this.__waitAssetAndApply.bind(this), 500);
     } else {
@@ -130,7 +130,7 @@ class ImageList extends Box {
     this.loadedCount = 0;
     this.page.invalidate = true;
 
-    let imageBaseAsset = channel.send('Controller:getAsset', this.imageBase)[0];
+    let imageBaseAsset = this.send('Controller:getAsset', this.imageBase)[0];
     if (imageBaseAsset == null) return;
 
     for(let i = 0; i < this.items.length; i++) {
@@ -176,7 +176,7 @@ class ImageList extends Box {
   }
 
   update() {
-    let asset = channel.send('Controller:getAsset', this.asset)[0];
+    let asset = this.send('Controller:getAsset', this.asset)[0];
     // TBD: ???
     if (asset == null) return;
 

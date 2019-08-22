@@ -13,7 +13,7 @@ class Veryslide extends State {
       info: null,
       data: null,
 
-      document: null,
+      doc: null,
       editor: null,
       controller: null,
 
@@ -25,10 +25,10 @@ class Veryslide extends State {
     // TBD: every veryslide uses their own channel, not a singleton.
     channel.cleanup();
 
-    this.document = new Document({}, this.info);
-    this.editor = new Editor({ document: this.document });
+    const doc = this.doc = new Document({ info: this.info });
+    const editor = this.editor = new Editor({ doc });
 
-    this.documentController = new DocumentController(this.document, this.editor);
+    this.documentController = new DocumentController({ doc, editor });
     this.documentController.firebase = this.firebase;
     this.documentController.slideId = this.slideId;
 
@@ -37,7 +37,7 @@ class Veryslide extends State {
       this.deserialize(this.data);
       this.editor.init();
     }
-    channel.bind(this, 'Veryslide:save', this.save);
+    this.listen(this, 'Veryslide:save', this.save);
   }
 
   rename(title) {
@@ -51,7 +51,7 @@ class Veryslide extends State {
   save() {
     this.editor.loading(true);
     // TBD: On Firestore, we don't have to bake into string and make it back to json object again.
-    let json = this.document.serialize();
+    let json = this.doc.serialize();
     console.log(json.length);
 
     let data = JSON.parse(json);
@@ -73,7 +73,7 @@ class Veryslide extends State {
   }
 
   deserialize(data) {
-    this.document.deserialize(data);
+    this.doc.deserialize(data);
   }
 }
 

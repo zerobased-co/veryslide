@@ -18,9 +18,9 @@ class Menu extends View {
 
     [
       new ui.Text({'title': 'Page'}),
-      ui.createButton('Add',    () => { channel.send('Controller:addPage'); }),
+      ui.createButton('Add',    () => { this.send('Controller:addPage'); }),
       //ui.HGroup(
-        //ui.createButton('Remove',   () => { channel.send('Controller:removePage'); }),
+        //ui.createButton('Remove',   () => { this.send('Controller:removePage'); }),
       //),
 
       new ui.Text({'title': 'Viewport'}),
@@ -31,18 +31,18 @@ class Menu extends View {
 
       new ui.Text({'title': 'Object'}),
       ui.HGroup(
-        ui.createButton('TextBox',   () => { channel.send('Controller:addObject', 'TextBox'); }),
+        ui.createButton('TextBox',   () => { this.send('Controller:addObject', 'TextBox'); }),
         ui.createButton('Image',     () => { this.openFileDialog(); }),
-        ui.createButton('ImageList', () => { channel.send('Controller:addObject', 'ImageList'); }),
-        //ui.createButton('Remove', () => { channel.send('Controller:removeObject'); }),
+        ui.createButton('ImageList', () => { this.send('Controller:addObject', 'ImageList'); }),
+        //ui.createButton('Remove', () => { this.send('Controller:removeObject'); }),
       ),
 
       new ui.Text({'title': 'Misc'}),
       ui.HGroup(
-        ui.createButton('Image', () => { channel.send('Controller:savePage', 'image'); }),
-        ui.createButton('All',   () => { channel.send('Controller:saveAllPage', 'image'); }),
-        ui.createButton('Save',   () => { channel.send('Veryslide:save'); }),
-        ui.createButton('Play',   () => { channel.send('Viewport:setPresentationMode', true); }),
+        ui.createButton('Image', () => { this.send('Controller:savePage', 'image'); }),
+        ui.createButton('All',   () => { this.send('Controller:saveAllPage', 'image'); }),
+        ui.createButton('Save',   () => { this.send('Veryslide:save'); }),
+        ui.createButton('Play',   () => { this.send('Viewport:setPresentationMode', true); }),
       ),
 
       ui.createButton('Close',   () => { 
@@ -51,8 +51,8 @@ class Menu extends View {
     ].forEach(item => this.appendChild(item));
 
 
-    channel.bind(this, 'Menu:resetZoom', this.resetZoom);
-    channel.bind(this, 'Menu:toggleSnap', this.toggleSnap);
+    this.listen(this, 'Menu:resetZoom', this.resetZoom);
+    this.listen(this, 'Menu:toggleSnap', this.toggleSnap);
   }
 
   openFileDialog() {
@@ -68,7 +68,7 @@ class Menu extends View {
         var image = new Image();
         image.src = reader.result;
         image.onload = () => {
-          channel.send('Controller:addObject', 'ImageBox', {
+          this.send('Controller:addObject', 'ImageBox', {
             width: image.width,
             height: image.height,
             src: image.src,
@@ -81,12 +81,12 @@ class Menu extends View {
   }
 
   resetZoom() {
-    channel.send('Viewport:zoom', 1.0);
-    channel.send('Viewport:move', [0, 0]);
+    this.send('Viewport:zoom', 1.0);
+    this.send('Viewport:move', [0, 0]);
   }
 
   toggleSnap() {
-    let snap = channel.send('Viewport:toggleSnap')[0];
+    let snap = this.send('Viewport:toggleSnap')[0];
     if (snap) {
       this.btnSnap.title = 'Snap On';
     } else {
@@ -126,14 +126,14 @@ class Viewport extends View {
     //this.zoomLevel = [10, 25, 50, 75, 100, 200, 400];
     this.isPresentationMode = false;
 
-    channel.bind(this, 'Viewport:selectPage', this.selectPage);
-    channel.bind(this, 'Viewport:clear', this.clear);
-    channel.bind(this, 'Viewport:move', this.move);
-    channel.bind(this, 'Viewport:zoom', this.zoom);
-    channel.bind(this, 'Viewport:focus', this.focus);
-    channel.bind(this, 'Viewport:blur', this.blur);
-    channel.bind(this, 'Viewport:toggleSnap', this.toggleSnap);
-    channel.bind(this, 'Viewport:setPresentationMode', this.setPresentationMode);
+    this.listen(this, 'Viewport:selectPage', this.selectPage);
+    this.listen(this, 'Viewport:clear', this.clear);
+    this.listen(this, 'Viewport:move', this.move);
+    this.listen(this, 'Viewport:zoom', this.zoom);
+    this.listen(this, 'Viewport:focus', this.focus);
+    this.listen(this, 'Viewport:blur', this.blur);
+    this.listen(this, 'Viewport:toggleSnap', this.toggleSnap);
+    this.listen(this, 'Viewport:setPresentationMode', this.setPresentationMode);
 
     this.interval = setInterval(this.updateThumbnail.bind(this), 2000);
     this.keydownEvents = [
@@ -141,15 +141,15 @@ class Viewport extends View {
       [false, false, false, false, [32], () => this.beginGrab()],
       [false, false, false, false, [173, 189], () => this.zoomOut()],
       [false, false, false, false, [61, 187], () => this.zoomIn()],
-      [false, false, false, false, [83], () => channel.send('Menu:toggleSnap', null)],
-      [false, false, false, false, [48], () => channel.send('Menu:resetZoom', null)],
-      [false, false, false, false, [46, 8], () => channel.send('Controller:removeObject', this.object)],
-      [false, false, false, false, [219], () => channel.send('Controller:order', this.object, 'backward')],
-      [false, false, false, false, [221], () => channel.send('Controller:order', this.object, 'forward')],
+      [false, false, false, false, [83], () => this.send('Menu:toggleSnap', null)],
+      [false, false, false, false, [48], () => this.send('Menu:resetZoom', null)],
+      [false, false, false, false, [46, 8], () => this.send('Controller:removeObject', this.object)],
+      [false, false, false, false, [219], () => this.send('Controller:order', this.object, 'backward')],
+      [false, false, false, false, [221], () => this.send('Controller:order', this.object, 'forward')],
       [false, false, false, true,  [66], () => this.applyStyle('Bold')],
       [false, false, false, true,  [73], () => this.applyStyle('Italic')],
       [false, false, false, true,  [85], () => this.applyStyle('Underline')],
-      [false, false, false, true,  [83], () => channel.send('Veryslide:save')],
+      [false, false, false, true,  [83], () => this.send('Veryslide:save')],
       [false, false, false, true,  [173, 189], () => this.applyStyle('Smaller')],
       [false, false, false, true,  [61, 187], () => this.applyStyle('Bigger')],
       [false, false, false, false, [27], () => this.setPresentationMode(false)],
@@ -161,7 +161,7 @@ class Viewport extends View {
       [true,  false, false, false, [38], () => this.applyMove('BigUp')],
       [true,  false, false, false, [39], () => this.applyMove('BigRight')],
       [true,  false, false, false, [40], () => this.applyMove('BigDown')],
-      [false, false, true, false,  [78], () => channel.send('Controller:addPage')],
+      [false, false, true, false,  [78], () => this.send('Controller:addPage')],
     ];
     this.keyupEvents = [
     // shift, ctrl,  alt,   meta,  keycodes, func
@@ -277,21 +277,21 @@ class Viewport extends View {
       switch(direction) {
         case 'Left':
         case 'Up':
-          channel.send('Controller:prevPage');
+          this.send('Controller:prevPage');
           break;
         case 'Right':
         case 'Down':
-          channel.send('Controller:nextPage');
+          this.send('Controller:nextPage');
           break;
       }
     } else {
       if (this.object == null) {
         switch(direction) {
           case 'Up':
-            channel.send('Controller:prevPage');
+            this.send('Controller:prevPage');
             break;
           case 'Down':
-            channel.send('Controller:nextPage');
+            this.send('Controller:nextPage');
             break;
         }
       } else {
@@ -334,8 +334,8 @@ class Viewport extends View {
     this.updateTransform();
     this.setPageSnap();
 
-    channel.send('Controller:selectPage', page);
-    channel.send('Property:setPanelFor', page);
+    this.send('Controller:selectPage', page);
+    this.send('Property:setPanelFor', page);
   }
   
   setPageSnap() {
@@ -386,8 +386,8 @@ class Viewport extends View {
   focus(object) {
     this.object = object;
     this.handler.connect(object);
-    channel.send('Controller:selectObject', this.object);
-    channel.send('Property:setPanelFor', this.object);
+    this.send('Controller:selectObject', this.object);
+    this.send('Property:setPanelFor', this.object);
   }
 
   editable(object) {
@@ -408,9 +408,9 @@ class Viewport extends View {
 
     this.object = null;
     this.handler.show(false);
-    channel.send('Controller:selectObject', null);
+    this.send('Controller:selectObject', null);
     if (this.page) {
-      channel.send('Property:setPanelFor', this.page);
+      this.send('Property:setPanelFor', this.page);
     }
   }
 
@@ -468,14 +468,14 @@ class Viewport extends View {
   }
 
   copy(event) {
-    channel.send('Controller:copy');
+    this.send('Controller:copy');
   }
 
   paste(event) {
     if (event.target !== document.body && event.target !== this.node) {
       return;
     }
-    channel.send('Controller:paste');
+    this.send('Controller:paste');
   }
 
   setPresentationMode(mode) {
@@ -493,7 +493,7 @@ class Viewport extends View {
       this.editor.node.classList.remove('Presentation');
       // TBD: this makes `Document not active` error occasionally, but I'm not sure how to prevent it.
       document.exitFullscreen().catch(() => {});;
-      channel.send('PageList:selectPage', this.page, false);
+      this.send('PageList:selectPage', this.page, false);
     }
     this.updateTransform();
   }
@@ -525,7 +525,7 @@ class ToolBox extends View {
       ...state,
     });
 
-    channel.bind(this, 'ToolBox:activeTab', this.activeTab);
+    this.listen(this, 'ToolBox:activeTab', this.activeTab);
   }
 
   activeTab(name) {
@@ -548,18 +548,18 @@ class Editor extends View {
   constructor(state) {
     super({
       className: 'vs-editor',
-      document: null,
+      doc: null,
       ...state,
     });
   }
 
   init() {
-    if (this.document == null) {
+    if (this.doc == null) {
       return;
     }
 
-    if (this.document.selectedPageIndex >= 0) {
-      channel.send('PageList:selectPageAt', this.document.selectedPageIndex, false);
+    if (this.doc.selectedPageIndex >= 0) {
+      this.send('PageList:selectPageAt', this.doc.selectedPageIndex, false);
     }
   }
 

@@ -20,10 +20,10 @@ class View extends State {
     this.updateState();
   }
 
-  bind(target, key) {
-    this.bindingTarget = target;
-    this.bindingKey = key;
-    target.addBinding(this);
+  pair(target, key) {
+    this.pairTarget = target;
+    this.pairKey = key;
+    target.addPairing(this);
 
     // for initialize
     this.onNotify(target[key]);
@@ -31,7 +31,7 @@ class View extends State {
   }
 
   notify(from, key, value) {
-    if (from === this.bindingTarget && key === this.bindingKey) {
+    if (from === this.pairTarget && key === this.pairKey) {
       this.onNotify(value);
     }
   }
@@ -52,8 +52,8 @@ class View extends State {
   }
 
   onChange(value) {
-    if (this.bindingTarget) {
-      this.bindingTarget[this.bindingKey] = value;
+    if (this.pairTarget) {
+      this.pairTarget[this.pairKey] = value;
     }
   }
 
@@ -94,7 +94,7 @@ class View extends State {
     super.destroy();
 
     if (this.target != null ) {
-      this.target.removeBinding(this);
+      this.target.removePairing(this);
     }
 
     this.eventListeners.forEach(el => {

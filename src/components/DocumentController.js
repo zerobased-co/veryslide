@@ -19,7 +19,7 @@ class DocumentController extends State {
       clipboard: null,
       firebase: null,
       slideId: null,
-      pasted: 0,
+      pasted: -1,
       history: new History(),
       ...state,
     });
@@ -56,6 +56,7 @@ class DocumentController extends State {
       this.doc.selectedPageIndex = this.doc.pages.find(page);
       this.page = page;
       this.object = null;
+      this.pasted = -1;
     });
 
     this.listen(this, 'Controller:removePage', () => {
@@ -183,11 +184,6 @@ class DocumentController extends State {
         case 'Page':
           newObject = this.doc.addPage(this.page);
           break;
-          /*
-        case 'Document':
-          this.panel = new PanelForDocument({object});
-          break;
-          */
       }
 
       if (newObject != null) {
@@ -201,7 +197,7 @@ class DocumentController extends State {
         } else {
           if (this.page != null) {
             this.page.appendObject(newObject);
-            if (this.page == data.page) {
+            if (this.pasted >= 0) {
               this.pasted += 1;
               newObject.x += this.pasted * 10;
               newObject.y += this.pasted * 10;

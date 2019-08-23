@@ -1,5 +1,4 @@
 import State from 'core/State';
-import channel from 'core/Channel';
 import { uuid, showLoadingIndicator } from 'core/Util';
 import './BaseObject.scss';
 

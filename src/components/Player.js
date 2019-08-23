@@ -1,7 +1,6 @@
 import './Editor.scss';
 import ui from './ui/UI';
 import View from './ui/View';
-import channel from 'core/Channel';
 
 class Player extends View {
   constructor(state) {

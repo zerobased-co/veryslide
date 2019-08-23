@@ -1,5 +1,4 @@
 import './ImageBox.scss';
-import channel from 'core/Channel';
 import Box from './Box';
 
 class ImageBox extends Box {

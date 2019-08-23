@@ -1,5 +1,4 @@
 import View from './ui/View'
-import channel from 'core/Channel';
     
 const minSize = 0;
 const dotPreset = {

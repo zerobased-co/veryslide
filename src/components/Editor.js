@@ -6,7 +6,6 @@ import PageList from './PageList';
 import AssetList from './AssetList';
 import Property from './Property';
 import Handler from './Handler';
-import channel from 'core/Channel';
 
 
 class Menu extends View {

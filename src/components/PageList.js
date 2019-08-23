@@ -1,6 +1,5 @@
 import View from './ui/View';
 import List from 'core/List';
-import channel from 'core/Channel';
 
 class PageThumb extends View {
   constructor(state) {

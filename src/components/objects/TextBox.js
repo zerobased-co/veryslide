@@ -1,4 +1,3 @@
-import channel from 'core/Channel';
 import './TextBox.scss';
 import Box from './Box';
 

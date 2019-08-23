@@ -4,6 +4,7 @@ import { uuid, defaultDomToImageOption } from 'core/Util';
 import State from 'core/State';
 
 import { Page } from './Document';
+import History from './History';
 import TextBox from './objects/TextBox';
 import ImageBox from './objects/ImageBox';
 import ImageList from './objects/ImageList';
@@ -19,6 +20,7 @@ class DocumentController extends State {
       firebase: null,
       slideId: null,
       pasted: 0,
+      history: new History(),
       ...state,
     });
 
@@ -155,21 +157,20 @@ class DocumentController extends State {
 
     this.listen(this, 'Controller:copy', () => {
       if (this.object != null) {
-        this.clipboard = this.object;
+        this.clipboard = this.object.serialize();
         this.pasted = 0;
       } else if (this.page != null) {
-        this.clipboard = this.page;
+        this.clipboard = this.page.serialize();
       }
     });
 
     this.listen(this, 'Controller:paste', () => {
       if (this.clipboard == null) return;
 
-      console.log('pasting', this.clipboard);
       let newObject = null;
-      let data = this.clipboard.serialize();
+      let data = JSON.parse(this.clipboard);
 
-      switch(this.clipboard.type) {
+      switch(data.type) {
         case 'ImageList':
           newObject = new ImageList();
           break;
@@ -190,7 +191,7 @@ class DocumentController extends State {
       }
 
       if (newObject != null) {
-        newObject.deserialize(JSON.parse(data));
+        newObject.deserialize(data);
 
         if (newObject.type == 'Page') {
           const pagethumb = this.send('PageList:addPage', newObject, this.doc.pages.find(newObject))[0];
@@ -200,7 +201,7 @@ class DocumentController extends State {
         } else {
           if (this.page != null) {
             this.page.appendObject(newObject);
-            if (this.page == this.clipboard.page) {
+            if (this.page == data.page) {
               this.pasted += 1;
               newObject.x += this.pasted * 10;
               newObject.y += this.pasted * 10;

@@ -1,7 +1,6 @@
 import ui from './ui/UI';
 import View from './ui/View';
 import Panel from './ui/Panel';
-import channel from 'core/Channel';
 
 const FONTLIST = [
   ['serif', 'Serif'],

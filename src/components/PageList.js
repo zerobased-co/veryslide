@@ -4,20 +4,17 @@ import List from 'core/List';
 class PageThumb extends View {
   constructor(state) {
     super({
+      type: 'PageThumb',
       className: 'vs-pagethumb',
       width: 120,
       height: 80,
       page: null,
-      img: null,
+      selected: false,
       ...state,
     });
 
-    this.node.addEventListener('click', () => {
-      this.select();
-    });
-
-    this.listen(this, 'PageThumb:deselect', () => {
-      this.deselect();
+    this.node.addEventListener('click', (event) => {
+      this.send('Controller:select', this.page, event.shiftKey);
     });
   }
 
@@ -25,39 +22,44 @@ class PageThumb extends View {
     if (page != null) {
       page.pagethumb = this;
       this.height = this.width / (page.width / page.height);
-      this.updateThumbnail();
+      if (page.thumbnail != '') {
+        this.updateThumbnail();
+      }
     }
   }
 
   on_width(width) {
-    this.node.style.width = width + 'px';
+    this.holder.style.width = width + 'px';
   }
 
   on_height(height) {
-    this.node.style.height = height + 'px';
+    this.holder.style.height = height + 'px';
   }
 
   updateThumbnail() {
     this.img.src = this.page.thumbnail;
+    this.img.style.visibility = 'visible';
   }
 
-  select(smooth) {
-    this.send('PageThumb:deselect');
-    let behavior = smooth !== false ? 'smooth' : 'auto';
-    this.node.scrollIntoView({behavior: behavior, block: 'nearest', inline: 'nearest'});
-    this.node.classList.toggle('focus');
-    this.send('Viewport:selectPage', this.page);
-  }
+  focus(focused, smooth) {
+    super.focus(focused);
 
-  deselect() {
-    this.node.classList.remove('focus');
+    if (focused) {
+      let behavior = smooth !== false ? 'smooth' : 'auto';
+      this.node.scrollIntoView({behavior: behavior, block: 'nearest', inline: 'nearest'});
+      this.send('Viewport:focusPage', this.page);
+    }
   }
 
   render() {
     super.render();
 
+    this.holder = document.createElement('div');
+    this.holder.className = 'holder';
+    this.appendChild(this.holder);
+
     this.img = document.createElement('img');
-    this.appendChild(this.img);
+    this.holder.appendChild(this.img);
   }
 }
 
@@ -70,8 +72,6 @@ class PageList extends View {
 
     this.pagethumbs = new List();
     this.listen(this, 'PageList:addPage', this.addPage);
-    this.listen(this, 'PageList:selectPage', this.selectPage);
-    this.listen(this, 'PageList:selectPageAt', this.selectPageAt);
     this.listen(this, 'PageList:removePage', this.removePage);
   }
 
@@ -86,24 +86,7 @@ class PageList extends View {
       this.pagethumbs.insert(pagethumb, at);
       this.node.insertBefore(pagethumb.node, this.node.children[at]);
     }
-
-
-    pagethumb.node.scrollIntoView();
     return pagethumb;
-  }
-
-  selectPageAt(at, smooth) {
-    let pagethumb = this.pagethumbs.at(at);
-
-    if (pagethumb !== null) {
-      pagethumb.select(smooth);
-    }
-  }
-
-  selectPage(page, smooth) {
-    if (page.pagethumb !== null) {
-      page.pagethumb.select(smooth);
-    }
   }
 
   removePage(page) {

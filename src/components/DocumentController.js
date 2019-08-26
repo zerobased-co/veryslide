@@ -1,6 +1,7 @@
 import domtoimage from 'dom-to-image';
 
 import { uuid, defaultDomToImageOption } from 'core/Util';
+import List from 'core/List';
 import State from 'core/State';
 
 import { Page } from './Document';
@@ -14,71 +15,74 @@ class DocumentController extends State {
     super({
       doc: null,
       editor: null,
-      page: null,
-      object: null,
-      clipboard: null,
       firebase: null,
       slideId: null,
+      focusedPage: null,
+
+      selected: new List(),
+      clipboard: [],
       pasted: -1,
+
       history: new History(),
       ...state,
     });
 
     this.listen(this, 'Controller:addPage', () => {
-      const newPage = this.doc.addPage(this.page);
-      const pagethumb = this.send('PageList:addPage', newPage, this.doc.pages.find(newPage))[0];
-      if (pagethumb != null) {
-        pagethumb.select();
-      }
+      const newPage = this.doc.addPage(this.focusedPage);
+      this.send('PageList:addPage', newPage, this.doc.pages.find(newPage))[0];
+      this.send('Controller:select', newPage);
     });
 
     this.listen(this, 'Controller:prevPage', () => {
-      let prevPage = this.doc.pages.prev(this.page);
+      let prevPage = this.doc.pages.prev(this.focusedPage);
       if (prevPage) {
-        this.page = prevPage;
-        this.send('PageList:selectPage', this.page);
+        this.send('Controller:select', prevPage);
       } else {
         this.send('Viewport:setPresentationMode', false);
       }
     });
 
     this.listen(this, 'Controller:nextPage', () => {
-      let nextPage = this.doc.pages.next(this.page);
+      let nextPage = this.doc.pages.next(this.focusedPage);
       if (nextPage) {
-        this.page = nextPage;
-        this.send('PageList:selectPage', this.page);
+        this.send('Controller:select', nextPage);
       } else {
         this.send('Viewport:setPresentationMode', false);
       }
     });
 
-    this.listen(this, 'Controller:selectPage', (page) => {
-      this.doc.selectedPageIndex = this.doc.pages.find(page);
-      this.page = page;
-      this.object = null;
-      this.pasted = -1;
-    });
+    this.listen(this, 'Controller:remove', () => {
+      if (this.selected.length == 0) return;
 
-    this.listen(this, 'Controller:removePage', () => {
-      if (this.page == null) return;
-      if (this.page == this.clipboard) { this.clipboard = null };
+      let nextPage = this.focusedPage;
 
-      this.send('PageList:removePage', this.page);
+      this.selected.iter((item) => {
+        if (item.type === 'Page') {
+          this.send('PageList:removePage', item);
+          nextPage = this.doc.removePage(item);
+        } else {
+          this.focusedPage.removeObject(item);
+        }
+      });
+      
+      this.selected.removeAll();
 
-      const nextpage = this.doc.removePage(this.page);
-      this.page = nextpage;
-
-      if (nextpage == null) {
-        this.doc.selectedPageIndex = -1;
-        this.send('Viewport:clear', nextpage);
+      if (nextPage == null) {
+        this.doc.focusedPageIndex = -1;
+        this.send('Viewport:clear');
       } else {
-        this.send('PageList:selectPage', nextpage);
+        if (nextPage !== this.focusedPage) {
+          this.focusedPage = null;
+          this.send('Controller:select', nextPage);
+        }
       }
     });
 
     this.listen(this, 'Controller:addObject', (objType, states, file) => {
-      if (this.page == null) return;
-      let newObject = this.page.addObject(objType, states);
+      if (this.focusedPage == null) return;
+      this.send('Controller:deselect');
+
+      let newObject = this.focusedPage.addObject(objType, states);
       switch(newObject.type) {
         case 'ImageBox':
           newObject.loading(true);
@@ -93,23 +97,49 @@ class DocumentController extends State {
           });
           break;
       }
-      this.send('Viewport:focus', newObject);
+      this.send('Controller:select', newObject);
     });
 
-    this.listen(this, 'Controller:selectObject', (object) => {
-      this.object = object;
+    this.listen(this, 'Controller:focusPage', (page) => {
+      this.doc.focusedPageIndex = this.doc.pages.find(page);
+      if (this.focusedPage) {
+        this.focusedPage.focus(false);
+      }
+      this.focusedPage = page;
+      page.focus(true);
     });
 
-    this.listen(this, 'Controller:removeObject', () => {
-      if (this.object == null) return;
-      if (this.object == this.clipboard) { this.clipboard = null };
-      this.page.removeObject(this.object);
-      this.object = null;
+    this.listen(this, 'Controller:select', (item, keepSelection) => {
+      if (item == null) return;
 
-      this.send('Viewport:blur');
+      if (keepSelection !== true) {
+        this.send('Controller:deselect');
+      }
+
+      // TBD-NOW: update property
+      item.select();
+      this.selected.append(item);
+
+      if (this.selected.length == 1 && item.type == 'Page') {
+        this.send('Controller:focusPage', item);
+      }
+    });
+
+    this.listen(this, 'Controller:deselect', (item) => {
+      if (item == null) {
+        this.selected.iter((item) => {
+          item.select(false);
+        });
+        this.selected.removeAll();
+      } else {
+        item.select(false);
+        this.selected.remove(item);
+      }
+      // TBD-NOW: update property
     });
 
     this.listen(this, 'Controller:align', (object, align) => {
+      // TBD: for multiple object
       if (object == null) return;
       if (object.page == null) return;
 
@@ -136,6 +166,7 @@ class DocumentController extends State {
     });
 
     this.listen(this, 'Controller:order', (object, order) => {
+      // TBD: for multiple objects
       if (object == null) return;
       if (object.page == null) return;
 
@@ -157,56 +188,56 @@ class DocumentController extends State {
     });
 
     this.listen(this, 'Controller:copy', () => {
-      if (this.object != null) {
-        this.clipboard = this.object.serialize();
-        this.pasted = 0;
-      } else if (this.page != null) {
-        this.clipboard = this.page.serialize();
-      }
+      this.clipboard = [];
+      this.selected.iter((item) => {
+        this.clipboard.push(item.serialize());
+      });
+      this.pasted = 0;
     });
 
     this.listen(this, 'Controller:paste', () => {
       if (this.clipboard == null) return;
 
-      let newObject = null;
-      let data = JSON.parse(this.clipboard);
+      this.send('Controller:deselect');
 
-      switch(data.type) {
-        case 'ImageList':
-          newObject = new ImageList();
-          break;
-        case 'ImageBox':
-          newObject = new ImageBox();
-          break;
-        case 'TextBox':
-          newObject = new TextBox();
-          break;
-        case 'Page':
-          newObject = this.doc.addPage(this.page);
-          break;
-      }
+      this.clipboard.forEach((item) => {
+        item = JSON.parse(item);
 
-      if (newObject != null) {
-        newObject.deserialize(data);
+        let newObject = null;
+        switch(item.type) {
+          case 'ImageList':
+            newObject = new ImageList();
+            break;
+          case 'ImageBox':
+            newObject = new ImageBox();
+            break;
+          case 'TextBox':
+            newObject = new TextBox();
+            break;
+          case 'Page':
+            newObject = this.doc.addPage(this.focusedPage);
+            break;
+        }
 
-        if (newObject.type == 'Page') {
-          const pagethumb = this.send('PageList:addPage', newObject, this.doc.pages.find(newObject))[0];
-          if (pagethumb != null) {
-            pagethumb.select();
-          }
-        } else {
-          if (this.page != null) {
-            this.page.appendObject(newObject);
-            if (this.pasted >= 0) {
-              this.pasted += 1;
-              newObject.x += this.pasted * 10;
-              newObject.y += this.pasted * 10;
+        if (newObject != null) {
+          newObject.deserialize(item);
+          this.send('Controller:select', newObject);
+
+          if (newObject.type == 'Page') {
+            const pagethumb = this.send('PageList:addPage', newObject, this.doc.pages.find(newObject))[0];
+          } else {
+            if (this.focusedPage != null) {
+              this.focusedPage.appendObject(newObject);
+              if (this.pasted >= 0) {
+                this.pasted += 1;
+                newObject.x += this.pasted * 10;
+                newObject.y += this.pasted * 10;
+              }
+              this.send('Viewport:focus', newObject);
             }
-            this.object = newObject;
-            this.send('Viewport:focus', newObject);
           }
         }
-      }
+      });
     });
 
     this.savePage = (page) => {
@@ -238,8 +269,8 @@ class DocumentController extends State {
     }
 
     this.listen(this, 'Controller:savePage', (format) => {
-      if (this.page == null) return;
-      this.savePage(this.page);
+      if (this.focusedPage == null) return;
+      this.savePage(this.focusedPage);
     });
 
     // TBD: NOT LIKE THIS AT ALL

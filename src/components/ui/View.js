@@ -1,8 +1,6 @@
-import State from 'core/State.js';
-import List from 'core/List.js';
-import { showLoadingIndicator } from 'core/Util';
+import Node from '/core/Node';
 
-class View extends State {
+class View extends Node {
   constructor(state) {
     super({
       className: 'vs-view',
@@ -15,9 +13,6 @@ class View extends State {
     if (this.parent != null) {
       this.parent.children.push(this);
     }
-
-    this.render();
-    this.updateState();
   }
 
   pair(target, key) {
@@ -118,13 +113,10 @@ class View extends State {
   }
 
   render() {
-    this.node = document.createElement('div');
-    this.node.className = this.className;
-
+    super.render();
     this.children.forEach((child) => {
       this.appendChild(child);
     });
-
     return this.node;
   }
 
@@ -138,10 +130,6 @@ class View extends State {
     } else {
       this.node.appendChild(child);
     }
-  }
-
-  loading(isLoading) {
-    showLoadingIndicator(this, isLoading);
   }
 }
 

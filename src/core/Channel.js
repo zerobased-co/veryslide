@@ -1,22 +1,11 @@
 import List from './List.js';
 
-/*
-class Message {
-  constructor(type, value, callback) {
-    this.type = type;
-    this.value = value;
-    this.callback = callback;
-  }
-}
-*/
-
 class Channel {
   constructor() {
     this.cleanup();
   }
 
   cleanup() {
-    //this.messages = new List();
     this.listeners = new Object();
   }
 
@@ -45,22 +34,18 @@ class Channel {
     }
   }
 
-  /*
-  post(type, value, callback) {
-    msg = new Message(type, value, callback);
-    this.messages.append(msg);
-  }
-  */
-
   send(type, ...value) {
-    //console.log('Send', type, value);
+    console.debug('Send', type, value);
 
     let responses = new Array();
     if (type in this.listeners) {
       this.listeners[type].forEach(function(obj) {
-        //console.log('-- Recv', obj['listener']);
+        console.debug('-- Recv', obj['listener']);
         responses.push(obj['handler'].call(obj['listener'], ...value));
       });
+    }
+    if (responses.length == 0) {
+      console.info('No response', type, value);
     }
     return responses;
   }

@@ -108,6 +108,20 @@ class Page extends BaseObject {
     this.invalidate = true;
   }
 
+  select(selected) {
+    super.select(selected);
+    if (this.pagethumb) {
+      this.pagethumb.select(selected);
+    }
+  }
+
+  focus(focused, ...value) {
+    super.focus(focused, value);
+    if (this.pagethumb) {
+      this.pagethumb.focus(focused, value);
+    }
+  }
+
   render() {
     let node = super.render();
     this.objects.iter((object) => {
@@ -162,7 +176,7 @@ class Document extends State {
       pages: new List(),
       assets: new List(),
       type: 'Document',
-      selectedPageIndex: -1,
+      focusedPageIndex: -1,
       ...state,
     });
   }
@@ -209,8 +223,8 @@ class Document extends State {
     super.deserialize(data);
 
     // for legacy document
-    if (this.selectedPageIndex == -1 && this.pages.length > 0) {
-      this.selectedPageIndex = 0;
+    if (this.focusedPageIndex == -1 && this.pages.length > 0) {
+      this.focusedPageIndex = 0;
     }
   }
 }

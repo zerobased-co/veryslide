@@ -1,46 +1,7 @@
-import State from 'core/State';
-import { uuid, showLoadingIndicator } from 'core/Util';
+import Node from '/core/Node';
+import { uuid } from 'core/Util';
 import './BaseObject.scss';
-
-class Node extends State {
-  constructor(state) {
-    super({
-      type: 'Node',
-      className: 'vs-node',
-      ...state,
-    });
-
-    this.content = '';
-    this.node = this.render();
-    this.updateState();
-  }
-
-  on_className(className) {
-    this.node.className = className;
-  }
-
-  on_content(content) {
-    if (content != '') {
-      this.node.innerHTML = content;
-    }
-  }
-
-  record() {
-    this.content = this.node.innerHTML;
-    if (this.page != null) {
-      this.page.invalidate = true;
-    }
-  }
-
-  clear() {
-    this.content = '';
-  }
-  
-  render() {
-    let node = document.createElement('div');
-    return node;
-  }
-}
+import Handler from '../Handler';
 
 class BaseObject extends Node {
   constructor(state) {
@@ -59,15 +20,25 @@ class BaseObject extends Node {
     });
 
     this.page = null;
+    this.handler = null;
     this.addNumberState('x', 'y', 'width', 'height', 'order', 'opacity');
+  }
+
+  select(selected) {
+    super.select(selected);
+
+    // Page does not support handler
+    if (this.type == 'Page') return;
+
+    this.handler = new Handler({
+      object: this,
+    });
+
+    this.page.node.appendChild(this.handler.node);
   }
 
   contain(x, y) {
     return (x >= this.x) && (x < this.x + this.width) && (y >= this.y) && (y < this.y + this.height);
-  }
-
-  loading(isLoading) {
-    showLoadingIndicator(this, isLoading);
   }
 
   on(key, value) {

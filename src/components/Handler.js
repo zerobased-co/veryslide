@@ -16,10 +16,10 @@ class Handler extends View {
   constructor(state) {
     super({
       className: 'vs-handler',
+      object: null,
       ...state,
     });
 
-    this.object = null;
     this.viewport = null;
     this.transform = null;
     this.dragStart = undefined;
@@ -30,18 +30,12 @@ class Handler extends View {
     this.snap = false;
     this.snapSize = 16;
 
-    this.listen(this, 'Handler:connect', this.connect);
     this.addEventListener('mousedown', this.mousedown);
   }
 
   connect(object) {
-    if (this.object != null) {
-      this.object.removePairing(this);
-    }
     this.object = object;
     this.object.addPairing(this);
-    this.show(true);
-
     this.alignToObject(this.object);
   }
 
@@ -56,14 +50,6 @@ class Handler extends View {
     this.node.style.top = object.y + 'px';
     this.node.style.width = object.width + 'px';
     this.node.style.height = object.height + 'px';
-  }
-
-  show(isShow) {
-    if (isShow) {
-      this.node.style.visibility = 'visible';
-    } else {
-      this.node.style.visibility = 'hidden';
-    }
   }
 
   updateTransform() {

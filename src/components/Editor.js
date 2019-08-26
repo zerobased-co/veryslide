@@ -18,9 +18,6 @@ class Menu extends View {
     [
       new ui.Text({'title': 'Page'}),
       ui.createButton('Add',    () => { this.send('Controller:addPage'); }),
-      //ui.HGroup(
-        //ui.createButton('Remove',   () => { this.send('Controller:removePage'); }),
-      //),
 
       new ui.Text({'title': 'Viewport'}),
       ui.HGroup(
@@ -33,7 +30,6 @@ class Menu extends View {
         ui.createButton('TextBox',   () => { this.send('Controller:addObject', 'TextBox'); }),
         ui.createButton('Image',     () => { this.openFileDialog(); }),
         ui.createButton('ImageList', () => { this.send('Controller:addObject', 'ImageList'); }),
-        //ui.createButton('Remove', () => { this.send('Controller:removeObject'); }),
       ),
 
       new ui.Text({'title': 'Misc'}),
@@ -125,12 +121,10 @@ class Viewport extends View {
     //this.zoomLevel = [10, 25, 50, 75, 100, 200, 400];
     this.isPresentationMode = false;
 
-    this.listen(this, 'Viewport:selectPage', this.selectPage);
+    this.listen(this, 'Viewport:focusPage', this.focusPage);
     this.listen(this, 'Viewport:clear', this.clear);
     this.listen(this, 'Viewport:move', this.move);
     this.listen(this, 'Viewport:zoom', this.zoom);
-    this.listen(this, 'Viewport:focus', this.focus);
-    this.listen(this, 'Viewport:blur', this.blur);
     this.listen(this, 'Viewport:toggleSnap', this.toggleSnap);
     this.listen(this, 'Viewport:setPresentationMode', this.setPresentationMode);
 
@@ -142,7 +136,7 @@ class Viewport extends View {
       [false, false, false, false, [61, 187], () => this.zoomIn()],
       [false, false, false, false, [83], () => this.send('Menu:toggleSnap', null)],
       [false, false, false, false, [48], () => this.send('Menu:resetZoom', null)],
-      [false, false, false, false, [46, 8], () => this.send('Controller:removeObject', this.object)],
+      [false, false, false, false, [46, 8], () => this.send('Controller:remove')],
       [false, false, false, false, [219], () => this.send('Controller:order', this.object, 'backward')],
       [false, false, false, false, [221], () => this.send('Controller:order', this.object, 'forward')],
       [false, false, false, true,  [66], () => this.applyStyle('Bold')],
@@ -211,13 +205,11 @@ class Viewport extends View {
           } else {
             if (pickedObject != this.object) {
               event.preventDefault();
-              this.focus(pickedObject);
-              // pass event to handler for allowing drag instantly
-              this.handler.mousedown(event);
+              this.send('Controller:select', pickedObject, event.shiftKey);
             }
           }
         } else {
-          this.blur();
+          this.send('Controller:deselect');
         }
       }
     });
@@ -255,7 +247,6 @@ class Viewport extends View {
     if (this.grab === false) {
       this.node.style.cursor = 'grab';
       this.grab = true;
-      this.blur();
     }
   }
 
@@ -301,9 +292,10 @@ class Viewport extends View {
   }
 
   updateThumbnail() {
+    // TBD: prevent updating while editing objects
     if (this.page == null) return;
     if (this.isPresentationMode) return;
-    if (this.grab || this.drag || this.handler.handling) return;
+    if (this.grab || this.drag) return;
     this.page.updateThumbnail();
   }
 
@@ -318,13 +310,12 @@ class Viewport extends View {
   clear() {
     if (this.page == null) return;
 
-    this.blur();
     this.pageHolder.removeChild(this.page.node);
     delete this.page;
     this.page = null;
   }
 
-  selectPage(page) {
+  focusPage(page) {
     this.clear();
 
     this.page = page;
@@ -332,9 +323,6 @@ class Viewport extends View {
 
     this.updateTransform();
     this.setPageSnap();
-
-    this.send('Controller:selectPage', page);
-    this.send('Property:setPanelFor', page);
   }
   
   setPageSnap() {
@@ -353,7 +341,6 @@ class Viewport extends View {
     } else {
       this.snap = !this.snap;
     }
-    this.handler.snap = this.snap;
     this.setPageSnap();
     return this.snap;
   }
@@ -378,38 +365,13 @@ class Viewport extends View {
       }
     } else {
       this.pageHolder.style.transform = 'translate(' + this.translate.x + 'px, ' + this.translate.y + 'px) scale(' + this.scale + ')';
-      this.handler.updateTransform();
     }
-  }
-
-  focus(object) {
-    this.object = object;
-    this.handler.connect(object);
-    this.send('Controller:selectObject', this.object);
-    this.send('Property:setPanelFor', this.object);
   }
 
   editable(object) {
-    this.blur();
-    this.object = object;
     if (object.editable != null) {
+      this.send('Controller:deselect');
       object.editable();
-    }
-  }
-
-  blur() {
-    // get back the focus
-    this.node.focus();
-
-    if (this.object && this.object.blur != null) {
-      this.object.blur();
-    }
-
-    this.object = null;
-    this.handler.show(false);
-    this.send('Controller:selectObject', null);
-    if (this.page) {
-      this.send('Property:setPanelFor', this.page);
     }
   }
 
@@ -485,7 +447,6 @@ class Viewport extends View {
 
     if (this.isPresentationMode) {
       this.toggleSnap(false);
-      this.blur();
       this.editor.node.classList.add('Presentation');
       this.node.requestFullscreen();
     } else {
@@ -507,10 +468,6 @@ class Viewport extends View {
     this.pageSnap = document.createElement('div');
     this.pageSnap.className = 'vs-pagesnap';
     this.pageSnap.setAttribute('data-render-ignore', 'true');
-
-    this.handler = new Handler();
-    this.handler.viewport = this;
-    this.pageHolder.appendChild(this.handler.node);
 
     return this.node;
   }
@@ -556,8 +513,9 @@ class Editor extends View {
       return;
     }
 
-    if (this.doc.selectedPageIndex >= 0) {
-      this.send('PageList:selectPageAt', this.doc.selectedPageIndex, false);
+    if (this.doc.focusedPageIndex >= 0) {
+      let page = this.doc.pages.at(this.doc.focusedPageIndex);
+      this.send('Controller:select', page);
     }
   }
 

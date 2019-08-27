@@ -33,7 +33,9 @@ class State {
   }
 
   listen() {
-    return channel.listen.apply(channel, arguments);
+    var args = Array.prototype.slice.call(arguments);
+    args.unshift(this);
+    return channel.listen.apply(channel, args);
   }
 
   send() {

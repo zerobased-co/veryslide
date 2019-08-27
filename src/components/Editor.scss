@@ -143,6 +143,10 @@ $border-color: #afafb2;
   border: 1px solid $border-color;
   border-width: 1px 0;
   background: #C7CDD4;
+
+  .vs-pageholder {
+    transform-origin: top left;
+  }
 }
 
 .vs-toolbox {
@@ -166,7 +170,6 @@ $border-color: #afafb2;
   display: flex;
   position: absolute;
   z-index: 9999;
-  visibility: hidden;
   border: 1px solid #ff206f;
 }
 

@@ -26,15 +26,13 @@ class BaseObject extends Node {
 
   select(selected) {
     super.select(selected);
-
     // Page does not support handler
-    //if (this.type == 'Page') return;
+    if (this.type == 'Page') return;
 
-    //this.handler = new Handler({
-    //  object: this,
-    //});
-
-    //this.page.node.appendChild(this.handler.node);
+    if (this.handler) this.handler.destroy();
+    if (selected !== false) {
+      this.handler = new Handler({ object: this });
+    }
   }
 
   contain(x, y) {
@@ -48,6 +46,11 @@ class BaseObject extends Node {
       && (this.x + this.width > x)
       && (this.y + this.height > y)
     );
+  }
+
+  destroy() {
+    super.destroy();
+    if (this.handler) this.handler.destroy();
   }
 
   on(key, value) {

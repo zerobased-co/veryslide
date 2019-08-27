@@ -47,8 +47,8 @@ class Menu extends View {
     ].forEach(item => this.appendChild(item));
 
 
-    this.listen(this, 'Menu:resetZoom', this.resetZoom);
-    this.listen(this, 'Menu:toggleSnap', this.toggleSnap);
+    this.listen('Menu:resetZoom', this.resetZoom);
+    this.listen('Menu:toggleSnap', this.toggleSnap);
   }
 
   openFileDialog() {
@@ -107,7 +107,7 @@ class Selector extends View {
       className: 'vs-selector',
       x: 0,
       y: 0,
-      page: null,
+      viewport: null,
       preSelectedList: new List(),
       selectedList: new List(),
       ...state,
@@ -115,7 +115,6 @@ class Selector extends View {
   }
 
   reset() {
-    this.page = null;
     this.preSelectedList = new List();
     this.selectedList = new List();
     this.resize(0, 0);
@@ -135,8 +134,17 @@ class Selector extends View {
     this.node.style.width = w + 'px';
     this.node.style.height = h + 'px';
 
-    if (this.page != null) {
-      let boundObjects = this.page.findObjects(x, y, w, h);
+    if (this.viewport.page != null) {
+      let cx = (x - this.viewport.translate.x) / this.viewport.scale;
+      let cy = (y - this.viewport.translate.y) / this.viewport.scale;
+      let cw = w / this.viewport.scale;
+      let ch = h / this.viewport.scale;
+
+      if (this.box != null) {
+        this.box.remove();
+      }
+
+      let boundObjects = this.viewport.page.findObjects(cx, cy, cw, ch);
       let deselectList = this.selectedList.clone();
 
       boundObjects.forEach((object) => {
@@ -185,12 +193,13 @@ class Viewport extends View {
     //this.zoomLevel = [10, 25, 50, 75, 100, 200, 400];
     this.isPresentationMode = false;
 
-    this.listen(this, 'Viewport:focusPage', this.focusPage);
-    this.listen(this, 'Viewport:clear', this.clear);
-    this.listen(this, 'Viewport:move', this.move);
-    this.listen(this, 'Viewport:zoom', this.zoom);
-    this.listen(this, 'Viewport:toggleSnap', this.toggleSnap);
-    this.listen(this, 'Viewport:setPresentationMode', this.setPresentationMode);
+    this.listen('Viewport:get', () => { return this });
+    this.listen('Viewport:focusPage', this.focusPage);
+    this.listen('Viewport:clear', this.clear);
+    this.listen('Viewport:move', this.move);
+    this.listen('Viewport:zoom', this.zoom);
+    this.listen('Viewport:toggleSnap', this.toggleSnap);
+    this.listen('Viewport:setPresentationMode', this.setPresentationMode);
 
     this.interval = setInterval(this.updateThumbnail.bind(this), 2000);
     this.keydownEvents = [
@@ -231,9 +240,11 @@ class Viewport extends View {
 
     this.addEventListener('mousedown', this.onMouseDown);
     this.addEventListener('resize', this.onResize, window);
-    this.addEventListener('mousemove', this.onMouseMove, document);
-    this.addEventListener('mouseup', this.onMouseUp, document);
     this.addEventListener('fullscreenchange', this.onFullscreenChange, document);
+  }
+
+  convertPoint(x, y) {
+    return {x, y};
   }
 
   onMouseDown = (event) => {
@@ -256,13 +267,16 @@ class Viewport extends View {
       this.lastTranslate.y = this.translate.y;
     } else {
       // TBD: mutiply matrix to x and y before finding
-      let objects = this.page.findObjects(x, y);
+      let cx = x / this.scale - this.translate.x;
+      let cy = y / this.scale - this.translate.y;
+      let objects = this.page.findObjects(cx, cy);
       if (objects.length > 0) {
         const lastObject = objects.slice(-1)[0];
         if (event.detail >= 2) {
           this.editable(lastObject);
         } else {
           this.send('Controller:select', lastObject, event.shiftKey);
+          lastObject.handler.mousedown(event);
         }
       } else {
         if (event.shiftKey === false) {
@@ -272,9 +286,13 @@ class Viewport extends View {
         this.setSelector(x, y);
       }
     }
+    this.addEventListener('mousemove', this.onMouseMove, document);
+    this.addEventListener('mouseup', this.onMouseUp, document);
   }
 
   onMouseUp = (event) => {
+    this.removeEventListener('mousemove', document);
+    this.removeEventListener('mouseup', document);
     this.resetMode();
   }
 
@@ -287,6 +305,10 @@ class Viewport extends View {
     let rect = this.node.getBoundingClientRect();
     let dx = event.clientX - rect.x - this.dragStart.x;
     let dy = event.clientY - rect.y - this.dragStart.y;
+
+    if (Math.abs(dx) + Math.abs(dy) < 3) {
+      return;
+    }
 
     switch(this.mode) {
       case 'scroll':
@@ -308,11 +330,10 @@ class Viewport extends View {
   }
 
   setSelector(x, y) {
-    this.selector.reset();
-
     this.selector.x = x;
     this.selector.y = y;
-    this.selector.page = this.page;
+    this.selector.reset();
+
     this.selector.preSelectedList = this.send('Controller:getSelection')[0].clone();
 
     this.selector.show();
@@ -444,6 +465,7 @@ class Viewport extends View {
       }
     } else {
       this.pageHolder.style.transform = 'translate(' + this.translate.x + 'px, ' + this.translate.y + 'px) scale(' + this.scale + ')';
+      this.send('Object:updateTransform');
     }
   }
 
@@ -548,7 +570,9 @@ class Viewport extends View {
     this.pageSnap.className = 'vs-pagesnap';
     this.pageSnap.setAttribute('data-render-ignore', 'true');
 
-    this.selector = new Selector();
+    this.selector = new Selector({
+      viewport: this,
+    });
     this.selector.hide();
     this.appendChild(this.selector);
 
@@ -563,7 +587,7 @@ class ToolBox extends View {
       ...state,
     });
 
-    this.listen(this, 'ToolBox:activeTab', this.activeTab);
+    this.listen('ToolBox:activeTab', this.activeTab);
   }
 
   activeTab(name) {

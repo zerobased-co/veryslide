@@ -27,13 +27,13 @@ class DocumentController extends State {
       ...state,
     });
 
-    this.listen(this, 'Controller:addPage', () => {
+    this.listen('Controller:addPage', () => {
       const newPage = this.doc.addPage(this.focusedPage);
       this.send('PageList:addPage', newPage, this.doc.pages.find(newPage))[0];
       this.send('Controller:select', newPage);
     });
 
-    this.listen(this, 'Controller:prevPage', () => {
+    this.listen('Controller:prevPage', () => {
       let prevPage = this.doc.pages.prev(this.focusedPage);
       if (prevPage) {
         this.send('Controller:select', prevPage);
@@ -42,7 +42,7 @@ class DocumentController extends State {
       }
     });
 
-    this.listen(this, 'Controller:nextPage', () => {
+    this.listen('Controller:nextPage', () => {
       let nextPage = this.doc.pages.next(this.focusedPage);
       if (nextPage) {
         this.send('Controller:select', nextPage);
@@ -51,7 +51,7 @@ class DocumentController extends State {
       }
     });
 
-    this.listen(this, 'Controller:remove', () => {
+    this.listen('Controller:remove', () => {
       if (this.selected.length == 0) return;
 
       let nextPage = this.focusedPage;
@@ -78,7 +78,7 @@ class DocumentController extends State {
       }
     });
 
-    this.listen(this, 'Controller:addObject', (objType, states, file) => {
+    this.listen('Controller:addObject', (objType, states, file) => {
       if (this.focusedPage == null) return;
       this.send('Controller:deselect');
 
@@ -100,7 +100,7 @@ class DocumentController extends State {
       this.send('Controller:select', newObject);
     });
 
-    this.listen(this, 'Controller:focusPage', (page) => {
+    this.listen('Controller:focusPage', (page) => {
       this.doc.focusedPageIndex = this.doc.pages.find(page);
       if (this.focusedPage) {
         this.focusedPage.focus(false);
@@ -109,11 +109,11 @@ class DocumentController extends State {
       page.focus(true);
     });
 
-    this.listen(this, 'Controller:getSelection', () => {
+    this.listen('Controller:getSelection', () => {
       return this.selected;
     });
 
-    this.listen(this, 'Controller:select', (item, keepSelection) => {
+    this.listen('Controller:select', (item, keepSelection) => {
       if (item == null) return;
 
       if (keepSelection !== true) {
@@ -129,7 +129,7 @@ class DocumentController extends State {
       }
     });
 
-    this.listen(this, 'Controller:deselect', (item) => {
+    this.listen('Controller:deselect', (item) => {
       if (item == null) {
         this.selected.iter((item) => {
           item.select(false);
@@ -142,7 +142,7 @@ class DocumentController extends State {
       // TBD-NOW: update property
     });
 
-    this.listen(this, 'Controller:align', (object, align) => {
+    this.listen('Controller:align', (object, align) => {
       // TBD: for multiple object
       if (object == null) return;
       if (object.page == null) return;
@@ -169,7 +169,7 @@ class DocumentController extends State {
       }
     });
 
-    this.listen(this, 'Controller:order', (object, order) => {
+    this.listen('Controller:order', (object, order) => {
       // TBD: for multiple objects
       if (object == null) return;
       if (object.page == null) return;
@@ -191,7 +191,7 @@ class DocumentController extends State {
       object.page.reorder();
     });
 
-    this.listen(this, 'Controller:copy', () => {
+    this.listen('Controller:copy', () => {
       this.clipboard = [];
       this.selected.iter((item) => {
         this.clipboard.push(item.serialize());
@@ -199,11 +199,12 @@ class DocumentController extends State {
       this.pasted = 0;
     });
 
-    this.listen(this, 'Controller:paste', () => {
+    this.listen('Controller:paste', () => {
       if (this.clipboard == null) return;
 
       this.send('Controller:deselect');
 
+      this.pasted += 1;
       this.clipboard.forEach((item) => {
         item = JSON.parse(item);
 
@@ -225,7 +226,6 @@ class DocumentController extends State {
 
         if (newObject != null) {
           newObject.deserialize(item);
-          this.send('Controller:select', newObject);
 
           if (newObject.type == 'Page') {
             const pagethumb = this.send('PageList:addPage', newObject, this.doc.pages.find(newObject))[0];
@@ -233,13 +233,13 @@ class DocumentController extends State {
             if (this.focusedPage != null) {
               this.focusedPage.appendObject(newObject);
               if (this.pasted >= 0) {
-                this.pasted += 1;
                 newObject.x += this.pasted * 10;
                 newObject.y += this.pasted * 10;
               }
               this.send('Viewport:focus', newObject);
             }
           }
+          this.send('Controller:select', newObject, true);
         }
       });
     });
@@ -272,13 +272,13 @@ class DocumentController extends State {
         });
     }
 
-    this.listen(this, 'Controller:savePage', (format) => {
+    this.listen('Controller:savePage', (format) => {
       if (this.focusedPage == null) return;
       this.savePage(this.focusedPage);
     });
 
     // TBD: NOT LIKE THIS AT ALL
-    this.listen(this, 'Controller:saveAllPage', (format) => {
+    this.listen('Controller:saveAllPage', (format) => {
       this.doc.pages.iter((page, i) => {
         setTimeout(() => {
           this.send('PageList:selectPage', page);
@@ -289,7 +289,7 @@ class DocumentController extends State {
       });
     });
 
-    this.listen(this, 'Controller:addAsset', (type, name, meta) => {
+    this.listen('Controller:addAsset', (type, name, meta) => {
       console.log('addAsset', type, name, meta);
       if (type === 'FILE') {
         let path = this.getFirebaseFilename(meta);
@@ -318,15 +318,15 @@ class DocumentController extends State {
       //return this.fileUpload(file);
     });
 
-    this.listen(this, 'Controller:removeAsset', (asset) => {
+    this.listen('Controller:removeAsset', (asset) => {
       this.doc.removeAsset(asset);
     });
 
-    this.listen(this, 'Controller:getAssetList', () => {
+    this.listen('Controller:getAssetList', () => {
       return this.doc.assets;
     });
 
-    this.listen(this, 'Controller:getAsset', (assetName) => {
+    this.listen('Controller:getAsset', (assetName) => {
       let asset = this.doc.assets.findby((item) => {
         return item.name == assetName;
       });

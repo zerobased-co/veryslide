@@ -99,6 +99,7 @@ class Page extends BaseObject {
   removeObject(object) {
     object.node.parentNode.removeChild(object.node);
     this.objects.remove(object);
+    object.destroy();
     this.invalidate = true;
   }
 

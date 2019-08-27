@@ -17,39 +17,74 @@ class Handler extends View {
     super({
       className: 'vs-handler',
       object: null,
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
       ...state,
     });
 
-    this.viewport = null;
+    this.viewport = this.send('Viewport:get')[0];
     this.transform = null;
     this.dragStart = undefined;
     this.basePos = undefined;
     this.baseSize = undefined;
     this.currentDot = null;
-    this.handling = false;
     this.snap = false;
     this.snapSize = 16;
 
     this.addEventListener('mousedown', this.mousedown);
+    this.listen('Object:updateTransform', () => this.updateTransform());
+    this.listen('Object:moveTogether', this.moveTogether.bind(this));
+
+    if (this.object) {
+      this.object.page.node.appendChild(this.node);
+      this.object.addPairing(this);
+      this.alignToObject(this.object);
+      this.updateTransform();
+    }
   }
 
-  connect(object) {
-    this.object = object;
-    this.object.addPairing(this);
-    this.alignToObject(this.object);
+  destroy() {
+    super.destroy();
+    if (this.object) {
+      this.object.removePairing(this);
+    }
   }
 
   notify(from, key, value) {
     if (from === this.object) {
-      this.alignToObject(this.object);
+      this[key] = value;
     }
   }
 
-  alignToObject(object) {
-    this.node.style.left = object.x + 'px';
-    this.node.style.top = object.y + 'px';
-    this.node.style.width = object.width + 'px';
-    this.node.style.height = object.height + 'px';
+  moveTogether(from, dx, dy) {
+    if (this === from) return;
+    this.object.x += dx;
+    this.object.y += dy;
+  }
+
+  alignToObject() {
+    this.node.style.left = this.object.x + 'px';
+    this.node.style.top = this.object.y + 'px';
+    this.node.style.width = this.object.width + 'px';
+    this.node.style.height = this.object.height + 'px';
+  }
+
+  on_x(x) {
+    this.node.style.left = x + 'px';
+  }
+
+  on_y(y) {
+    this.node.style.top = y + 'px';
+  }
+
+  on_width(width) {
+    this.node.style.width = width + 'px';
+  }
+
+  on_height(height) {
+    this.node.style.height = height + 'px';
   }
 
   updateTransform() {
@@ -157,6 +192,10 @@ class Handler extends View {
       w = Math.max(w, minSize);
       h = Math.max(h, minSize);
 
+      if (this.transform === 'move') {
+        this.send('Object:moveTogether', this, parseInt(x) - this.object.x, parseInt(y) - this.object.y);
+      }
+
       this.object.x = parseInt(x);
       this.object.y = parseInt(y);
       this.object.width = parseInt(w);
@@ -167,6 +206,7 @@ class Handler extends View {
   mouseup(event) {
     if (this.object == null) return;
     event.stopPropagation();
+    event.preventDefault();
 
     if (this.transform != null) {
       this.node.classList.remove('vs-hidechildren');
@@ -179,14 +219,14 @@ class Handler extends View {
       this.currentDot = null;
     }
 
-    this.removeEventListener('mousemove', window);
-    this.removeEventListener('mouseup', window);
-
-    this.handling = false;
+    this.removeEventListener('mousemove', document);
+    this.removeEventListener('mouseup', document);
   }
 
   mousedown(event) {
     if (this.object == null) return;
+    event.stopPropagation();
+    event.preventDefault();
 
     this.dragStart = {
       x: event.clientX,
@@ -205,14 +245,11 @@ class Handler extends View {
       this.transform = event.target.innerText;
       this.currentDot = event.target;
       this.currentDot.classList.add('vs-showme');
-      event.stopPropagation();
     } else {
       this.transform = 'move';
     }
-    this.addEventListener('mousemove', this.mousemove, window);
-    this.addEventListener('mouseup', this.mouseup, window);
-
-    this.handling = true;
+    this.addEventListener('mousemove', this.mousemove, document);
+    this.addEventListener('mouseup', this.mouseup, document);
   }
 
   render() {

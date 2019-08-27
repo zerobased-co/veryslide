@@ -71,8 +71,8 @@ class PageList extends View {
     });
 
     this.pagethumbs = new List();
-    this.listen(this, 'PageList:addPage', this.addPage);
-    this.listen(this, 'PageList:removePage', this.removePage);
+    this.listen('PageList:addPage', this.addPage);
+    this.listen('PageList:removePage', this.removePage);
   }
 
   addPage(page, at) {

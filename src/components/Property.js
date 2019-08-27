@@ -288,7 +288,7 @@ class Property extends View {
       ...state,
     });
 
-    this.listen(this, 'Property:setPanelFor', this.setPanelFor);
+    this.listen('Property:setPanelFor', this.setPanelFor);
   }
 
   setPanelFor(object) {

@@ -9,8 +9,8 @@ class AssetList extends View {
       ...state,
     });
 
-    this.listen(this, 'AssetList:addAsset', this.addAsset);
-    this.listen(this, 'AssetList:removeAsset', this.removeAsset);
+    this.listen('AssetList:addAsset', this.addAsset);
+    this.listen('AssetList:removeAsset', this.removeAsset);
   }
 
   render() {

@@ -90,8 +90,8 @@ class View extends Node {
   destroy() {
     super.destroy();
 
-    if (this.target != null ) {
-      this.target.removePairing(this);
+    if (this.pairTarget != null) {
+      this.pairTarget.removePairing(this);
     }
 
     this.eventListeners.forEach(el => {

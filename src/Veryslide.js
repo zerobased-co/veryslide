@@ -37,7 +37,7 @@ class Veryslide extends State {
       this.deserialize(this.data);
       this.editor.init();
     }
-    this.listen(this, 'Veryslide:save', this.save);
+    this.listen('Veryslide:save', this.save);
   }
 
   rename(title) {

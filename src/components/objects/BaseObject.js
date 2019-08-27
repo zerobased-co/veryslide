@@ -28,13 +28,13 @@ class BaseObject extends Node {
     super.select(selected);
 
     // Page does not support handler
-    if (this.type == 'Page') return;
+    //if (this.type == 'Page') return;
 
-    this.handler = new Handler({
-      object: this,
-    });
+    //this.handler = new Handler({
+    //  object: this,
+    //});
 
-    this.page.node.appendChild(this.handler.node);
+    //this.page.node.appendChild(this.handler.node);
   }
 
   contain(x, y) {

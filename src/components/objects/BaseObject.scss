@@ -3,6 +3,10 @@
   position: absolute;
   align-items: center;
   justify-content: center;
+
+  &.select {
+    border: 1px solid red !important;
+  }
 }
 
 .vs-loading {

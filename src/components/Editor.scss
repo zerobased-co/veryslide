@@ -9,6 +9,14 @@ $border-color: #afafb2;
   user-select: none;
 }
 
+.vs-selector {
+  border: 1px solid white;
+  position: absolute;
+  background: #00000030;
+  z-index: 9999;
+  display: none;
+}
+
 .vs-editor {
   display: flex;
   width: 100%;

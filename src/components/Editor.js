@@ -110,11 +110,9 @@ class Viewport extends View {
     this.page = null;
     this.object = null;
 
-    this.scrollX = 0;
-    this.scrollY = 0;
     this.snap = false;
     this.grab = false;
-    this.drag = false;
+    this.mode = 'normal'; // normal, scroll, select
     this.dragStart = undefined;
     this.translate = {x: 0, y: 0};
     this.scale = 1.0;
@@ -158,77 +156,114 @@ class Viewport extends View {
     ];
     this.keyupEvents = [
     // shift, ctrl,  alt,   meta,  keycodes, func
-      [false, false, false, false, [32], () => this.endGrab()],
+      [false, false, false, false, [32], () => this.resetMode()],
     ];
 
     ['copy', 'paste', 'keydown', 'keyup'].forEach(e => {
       this.addEventListener(e, this[e], window);
     }, this);
 
-    this.addEventListener('mousemove', event => {
+    this.addEventListener('mousedown', this.onMouseDown);
+    this.addEventListener('resize', this.onResize, window);
+    this.addEventListener('mousemove', this.onMouseMove, document);
+    this.addEventListener('mouseup', this.onMouseUp, document);
+    this.addEventListener('fullscreenchange', this.onFullscreenChange, document);
+  }
+
+  onMouseDown = (event) => {
+    if (this.page == null) return;
+    // TBD: do something different in presentation mode
+    if (this.isPresentationMode) return;
+
+    let rect = this.node.getBoundingClientRect();
+    let x = event.clientX - rect.x;
+    let y = event.clientY - rect.y;
+    this.dragStart = {x, y};
+
+    if (this.grab === true) {
       event.preventDefault();
 
-      if (this.page == null) return;
-      if (this.drag === true) {
-        let dx = event.clientX - this.dragStart.x;
-        let dy = event.clientY - this.dragStart.y;
+      this.node.style.cursor = 'grabbing';
+      this.mode = 'scroll';
+    } else {
+      // TBD: mutiply matrix to x and y before finding
+      let pickedObject = this.page.findObject(x, y);
+      if (pickedObject != null) {
+        if (event.detail >= 2) {
+          // edit if available
+          event.preventDefault();
+          this.editable(pickedObject);
+        } else {
+          if (pickedObject != this.object) {
+            event.preventDefault();
+            this.send('Controller:select', pickedObject, event.shiftKey);
+          }
+        }
+      } else {
+        if (event.shiftKey === false) {
+          this.send('Controller:deselect');
+        }
+        this.mode = 'select';
+        this.showSelector();
+        this.selector.style.left = x + 'px';
+        this.selector.style.top = y + 'px';
+        this.selector.style.width = '0px';
+        this.selector.style.height = '0px';
+      }
+    }
+  }
 
+  onMouseUp = (event) => {
+    this.resetMode();
+  }
+
+  onMouseMove = (event) => {
+    event.preventDefault();
+
+    if (this.page == null) return;
+    if (this.mode == 'normal') return;
+
+    let rect = this.node.getBoundingClientRect();
+    let dx = event.clientX - this.dragStart.x - rect.x;
+    let dy = event.clientY - this.dragStart.y - rect.y;
+
+    switch(this.mode) {
+      case 'scroll':
         this.translate.x = dx;
         this.translate.y = dy;
         this.updateTransform();
-      }
-    });
+        break;
+      case 'select':
+        let x = this.dragStart.x;
+        let y = this.dragStart.y;
+        let w = dx;
+        let h = dy;
 
-    this.addEventListener('mousedown', event => {
-      if (this.isPresentationMode) return;
-      if (this.page == null) return;
-      if (this.grab === true) {
-        event.preventDefault();
-
-        this.node.style.cursor = 'grabbing';
-        this.drag = true;
-        this.dragStart = {
-          x: event.clientX - this.translate.x,
-          y: event.clientY - this.translate.y,
+        if (w < 0) {
+          x += w;
+          w *= -1;
         }
-      } else {
-        let rect = this.page.node.getBoundingClientRect();
-        let x = (event.clientX - rect.x) / this.scale;
-        let y = (event.clientY - rect.y) / this.scale;
-
-        let pickedObject = this.page.findObject(x, y);
-        if (pickedObject != null) {
-          if (event.detail >= 2) {
-            // edit if available
-            event.preventDefault();
-            this.editable(pickedObject);
-          } else {
-            if (pickedObject != this.object) {
-              event.preventDefault();
-              this.send('Controller:select', pickedObject, event.shiftKey);
-            }
-          }
-        } else {
-          this.send('Controller:deselect');
+        if (h < 0) {
+          y += h;
+          h *= -1;
         }
-      }
-    });
+        this.selector.style.left = x + 'px';
+        this.selector.style.top = y + 'px';
+        this.selector.style.width = w + 'px';
+        this.selector.style.height = h + 'px';
+        break;
+    }
+  }
 
-    this.addEventListener('mouseup', () => {
-      if (this.grab === true) {
-        this.node.style.cursor = 'grab';
-        this.drag = false;
-      }
-    });
+  resetMode() {
+    this.node.style.cursor = 'default';
+    this.grab = false;
+    this.mode = 'normal';
+    this.showSelector(false);
+  }
 
-    this.addEventListener('mouseleave', () => {
-      this.node.style.cursor = 'default';
-      this.grab = false;
-      this.drag = false;
-    });
-
-    window.addEventListener('resize', this.onResize);
-    document.addEventListener('fullscreenchange', this.onFullscreenChange);
+  showSelector(shown) {
+    this.selector.style.display = (shown !== false) ? 'inline-block' : 'none';
   }
 
   onResize = () => {
@@ -244,15 +279,10 @@ class Viewport extends View {
   }
 
   beginGrab() {
-    if (this.grab === false) {
+    if (this.grab === false && this.mode === 'normal') {
       this.node.style.cursor = 'grab';
       this.grab = true;
     }
-  }
-
-  endGrab() {
-    this.node.style.cursor = 'default';
-    this.grab = false;
   }
 
   applyStyle(style) {
@@ -301,9 +331,6 @@ class Viewport extends View {
 
   destroy() {
     super.destroy();
-
-    window.removeEventListener('resize', this.onResize);
-    document.removeEventListener('fullscreenchange', this.onFullscreenChange);
     clearInterval(this.interval);
   }
 
@@ -469,6 +496,9 @@ class Viewport extends View {
     this.pageSnap.className = 'vs-pagesnap';
     this.pageSnap.setAttribute('data-render-ignore', 'true');
 
+    this.selector = document.createElement('div');
+    this.selector.className = 'vs-selector';
+    this.node.appendChild(this.selector);
     return this.node;
   }
 }

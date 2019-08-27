@@ -13,6 +13,12 @@ class List {
   get length() {
     return this.array.length;
   }
+
+  clone() {
+    let newList = new List();
+    newList.array = this.array.slice(0);
+    return newList;
+  }
   
   at(index) {
     return this.array[index];

@@ -38,7 +38,16 @@ class BaseObject extends Node {
   }
 
   contain(x, y) {
-    return (x >= this.x) && (x < this.x + this.width) && (y >= this.y) && (y < this.y + this.height);
+    return this.overlap(x, y, 0, 0);
+  }
+
+  overlap(x, y, w, h) {
+    return (
+         (this.x <= x + w)
+      && (this.y <= y + h)
+      && (this.x + this.width > x)
+      && (this.y + this.height > y)
+    );
   }
 
   on(key, value) {

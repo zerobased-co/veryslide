@@ -27,6 +27,7 @@ class TextBox extends Box {
     this.node.contentEditable = 'true';
     this.node.focus();
     this.node.addEventListener('keydown', this.keydown.bind(this));
+    document.addEventListener('mousedown', this.mousedown.bind(this));
     document.execCommand('selectAll', false, null);
   }
 
@@ -37,10 +38,17 @@ class TextBox extends Box {
     }
   }
 
+  mousedown(event) {
+    if (event.target !== this.node) {
+      this.blur();
+    }
+  }
+
   blur() {
     this.node.contentEditable = 'false';
     this.node.blur();
     this.node.removeEventListener('keydown', this.keydown.bind(this));
+    document.removeEventListener('mousedown', this.mousedown.bind(this));
     window.getSelection().removeAllRanges();
 
     // copy text from node

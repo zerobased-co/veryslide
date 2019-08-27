@@ -56,11 +56,14 @@ class Page extends BaseObject {
     this.invalidate = true;
   }
 
-  findObject(x, y) {
-    let found = null;
+  findObjects(x, y, w, h) {
+    let found = [];
+    w = w || 0;
+    h = h || 0;
+
     this.objects.iter((object) => {
-      if (object.contain(x, y) === true) {
-        found = object;
+      if (object.overlap(x, y, w, h) === true) {
+        found.push(object);
       }
     });
     return found;

@@ -109,6 +109,10 @@ class DocumentController extends State {
       page.focus(true);
     });
 
+    this.listen(this, 'Controller:getSelection', () => {
+      return this.selected;
+    });
+
     this.listen(this, 'Controller:select', (item, keepSelection) => {
       if (item == null) return;
 

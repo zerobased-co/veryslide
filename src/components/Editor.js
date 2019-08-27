@@ -1,4 +1,5 @@
 import './Editor.scss';
+import List from '/core/List';
 import ui from './ui/UI';
 import View from './ui/View';
 import Panel from './ui/Panel';
@@ -100,6 +101,70 @@ class Navigator extends View {
   }
 }
 
+class Selector extends View {
+  constructor(state) {
+    super({
+      className: 'vs-selector',
+      x: 0,
+      y: 0,
+      page: null,
+      preSelectedList: new List(),
+      selectedList: new List(),
+      ...state,
+    });
+  }
+
+  reset() {
+    this.page = null;
+    this.preSelectedList = new List();
+    this.selectedList = new List();
+    this.resize(0, 0);
+  }
+  
+  resize = (dx, dy, event) => {
+    let x = this.x;
+    let y = this.y;
+    let w = dx;
+    let h = dy;
+
+    if (w < 0) { x += w; w *= -1; }
+    if (h < 0) { y += h; h *= -1; }
+
+    this.node.style.left = x + 'px';
+    this.node.style.top = y + 'px';
+    this.node.style.width = w + 'px';
+    this.node.style.height = h + 'px';
+
+    if (this.page != null) {
+      let boundObjects = this.page.findObjects(x, y, w, h);
+      let deselectList = this.selectedList.clone();
+
+      boundObjects.forEach((object) => {
+        if (this.selectedList.find(object) == -1) {
+          if (this.preSelectedList.find(object) !== -1 && event.shiftKey == true) {
+            this.send('Controller:deselect', object);
+            this.selectedList.append(object);
+          } else {
+            this.send('Controller:select', object, true);
+            this.selectedList.append(object);
+          }
+        }
+        deselectList.remove(object);
+      });
+
+      deselectList.iter((object) => {
+        if (this.preSelectedList.find(object) !== -1 && event.shiftKey == true) {
+          this.send('Controller:select', object, true);
+          this.selectedList.remove(object);
+        } else {
+          this.send('Controller:deselect', object);
+          this.selectedList.remove(object);
+        }
+      });
+    }
+  }
+}
+
 class Viewport extends View {
   constructor(state) {
     super({
@@ -115,6 +180,7 @@ class Viewport extends View {
     this.mode = 'normal'; // normal, scroll, select
     this.dragStart = undefined;
     this.translate = {x: 0, y: 0};
+    this.lastTranslate = {x: 0, y: 0};
     this.scale = 1.0;
     //this.zoomLevel = [10, 25, 50, 75, 100, 200, 400];
     this.isPresentationMode = false;
@@ -179,36 +245,31 @@ class Viewport extends View {
     let x = event.clientX - rect.x;
     let y = event.clientY - rect.y;
     this.dragStart = {x, y};
+    event.preventDefault();
 
     if (this.grab === true) {
       event.preventDefault();
 
       this.node.style.cursor = 'grabbing';
       this.mode = 'scroll';
+      this.lastTranslate.x = this.translate.x;
+      this.lastTranslate.y = this.translate.y;
     } else {
       // TBD: mutiply matrix to x and y before finding
-      let pickedObject = this.page.findObject(x, y);
-      if (pickedObject != null) {
+      let objects = this.page.findObjects(x, y);
+      if (objects.length > 0) {
+        const lastObject = objects.slice(-1)[0];
         if (event.detail >= 2) {
-          // edit if available
-          event.preventDefault();
-          this.editable(pickedObject);
+          this.editable(lastObject);
         } else {
-          if (pickedObject != this.object) {
-            event.preventDefault();
-            this.send('Controller:select', pickedObject, event.shiftKey);
-          }
+          this.send('Controller:select', lastObject, event.shiftKey);
         }
       } else {
         if (event.shiftKey === false) {
           this.send('Controller:deselect');
         }
         this.mode = 'select';
-        this.showSelector();
-        this.selector.style.left = x + 'px';
-        this.selector.style.top = y + 'px';
-        this.selector.style.width = '0px';
-        this.selector.style.height = '0px';
+        this.setSelector(x, y);
       }
     }
   }
@@ -224,33 +285,17 @@ class Viewport extends View {
     if (this.mode == 'normal') return;
 
     let rect = this.node.getBoundingClientRect();
-    let dx = event.clientX - this.dragStart.x - rect.x;
-    let dy = event.clientY - this.dragStart.y - rect.y;
+    let dx = event.clientX - rect.x - this.dragStart.x;
+    let dy = event.clientY - rect.y - this.dragStart.y;
 
     switch(this.mode) {
       case 'scroll':
-        this.translate.x = dx;
-        this.translate.y = dy;
+        this.translate.x = this.lastTranslate.x + dx;
+        this.translate.y = this.lastTranslate.y + dy;
         this.updateTransform();
         break;
       case 'select':
-        let x = this.dragStart.x;
-        let y = this.dragStart.y;
-        let w = dx;
-        let h = dy;
-
-        if (w < 0) {
-          x += w;
-          w *= -1;
-        }
-        if (h < 0) {
-          y += h;
-          h *= -1;
-        }
-        this.selector.style.left = x + 'px';
-        this.selector.style.top = y + 'px';
-        this.selector.style.width = w + 'px';
-        this.selector.style.height = h + 'px';
+        this.selector.resize(dx, dy, event);
         break;
     }
   }
@@ -259,11 +304,18 @@ class Viewport extends View {
     this.node.style.cursor = 'default';
     this.grab = false;
     this.mode = 'normal';
-    this.showSelector(false);
+    this.selector.hide();
   }
 
-  showSelector(shown) {
-    this.selector.style.display = (shown !== false) ? 'inline-block' : 'none';
+  setSelector(x, y) {
+    this.selector.reset();
+
+    this.selector.x = x;
+    this.selector.y = y;
+    this.selector.page = this.page;
+    this.selector.preSelectedList = this.send('Controller:getSelection')[0].clone();
+
+    this.selector.show();
   }
 
   onResize = () => {
@@ -490,15 +542,16 @@ class Viewport extends View {
     this.node.tabIndex = '0';
     this.pageHolder = document.createElement('div');
     this.pageHolder.className = 'vs-pageholder';
-    this.node.appendChild(this.pageHolder);
+    this.appendChild(this.pageHolder);
 
     this.pageSnap = document.createElement('div');
     this.pageSnap.className = 'vs-pagesnap';
     this.pageSnap.setAttribute('data-render-ignore', 'true');
 
-    this.selector = document.createElement('div');
-    this.selector.className = 'vs-selector';
-    this.node.appendChild(this.selector);
+    this.selector = new Selector();
+    this.selector.hide();
+    this.appendChild(this.selector);
+
     return this.node;
   }
 }

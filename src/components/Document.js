@@ -37,6 +37,8 @@ class Page extends BaseObject {
         break;
     }
     object.page = this;
+    object.order = this.objects.length;
+
     // set default states
     if (states != null) {
       for (const [k, v] of Object.entries(states)) {
@@ -106,7 +108,7 @@ class Page extends BaseObject {
   reorder() {
     let order = 0;
     this.objects.iter((object) => {
-      object.node.style.zIndex = order;
+      object.order = order;
       order += 1;
     });
     this.invalidate = true;

@@ -169,7 +169,6 @@ $border-color: #afafb2;
 .vs-handler {
   display: flex;
   position: absolute;
-  z-index: 9999;
   border: 1px solid #ff206f;
 }
 
@@ -181,6 +180,7 @@ $border-color: #afafb2;
   width: 9px;
   height: 9px;
   font-size: 0;
+  z-index: 9999;
 
   &.n {top: 0; left: 50%; cursor: row-resize;}
   &.e {top: 50%; right: 0; cursor: col-resize;}

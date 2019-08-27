@@ -38,6 +38,7 @@ class Handler extends View {
     this.listen('Object:moveTogether', this.moveTogether.bind(this));
 
     if (this.object) {
+      this.node.style.zIndex = this.object.node.zIndex;
       this.object.page.node.appendChild(this.node);
       this.object.addPairing(this);
       this.alignToObject(this.object);

@@ -36,9 +36,9 @@ class Handler extends View {
     this.addEventListener('mousedown', this.mousedown);
     this.listen('Object:updateTransform', () => this.updateTransform());
     this.listen('Object:moveTogether', this.moveTogether.bind(this));
+    this.listen('Object:hideHandler', this.hideHandler.bind(this));
 
     if (this.object) {
-      this.node.style.zIndex = this.object.node.zIndex;
       this.object.page.node.appendChild(this.node);
       this.object.addPairing(this);
       this.alignToObject(this.object);
@@ -59,6 +59,11 @@ class Handler extends View {
     }
   }
 
+  hideHandler(from, hiding) {
+    if (this === from) return;
+    this.hide(hiding);
+  }
+
   moveTogether(from, dx, dy) {
     if (this === from) return;
     this.object.x += dx;
@@ -70,6 +75,7 @@ class Handler extends View {
     this.node.style.top = this.object.y + 'px';
     this.node.style.width = this.object.width + 'px';
     this.node.style.height = this.object.height + 'px';
+    this.node.style.zIndex = this.object.node.style.zIndex;
   }
 
   on_x(x) {
@@ -109,7 +115,7 @@ class Handler extends View {
         this.object.node.classList.add('vs-transforming');
       }
       if (this.node.classList.contains('vs-hidechildren') === false) {
-        this.node.classList.add('vs-hidechildren');
+        this.hide(true);
       }
 
       let dx = (event.clientX - this.dragStart.x) / this.viewport.scale;
@@ -195,6 +201,8 @@ class Handler extends View {
 
       if (this.transform === 'move') {
         this.send('Object:moveTogether', this, parseInt(x) - this.object.x, parseInt(y) - this.object.y);
+      } else {
+        this.send('Object:hideHandler', this, true);
       }
 
       this.object.x = parseInt(x);
@@ -204,14 +212,23 @@ class Handler extends View {
     }
   }
 
+  hide(hiding) {
+    if (hiding !== false) {
+      this.node.classList.add('vs-hidechildren');
+    } else {
+      this.node.classList.remove('vs-hidechildren');
+    }
+  }
+
   mouseup(event) {
     if (this.object == null) return;
     event.stopPropagation();
     event.preventDefault();
 
     if (this.transform != null) {
-      this.node.classList.remove('vs-hidechildren');
+      this.hide(false);
       this.object.node.classList.remove('vs-transforming');
+      this.send('Object:hideHandler', this, false);
       this.transform = null;
     }
     

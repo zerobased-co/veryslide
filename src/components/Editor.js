@@ -255,16 +255,16 @@ class Viewport extends View {
     let rect = this.node.getBoundingClientRect();
     let x = event.clientX - rect.x;
     let y = event.clientY - rect.y;
+    let handled = false;
+
     this.dragStart = {x, y};
-    event.preventDefault();
 
     if (this.grab === true) {
-      event.preventDefault();
-
       this.node.style.cursor = 'grabbing';
       this.mode = 'scroll';
       this.lastTranslate.x = this.translate.x;
       this.lastTranslate.y = this.translate.y;
+      handled = true;
     } else {
       // TBD: mutiply matrix to x and y before finding
       let cx = x / this.scale - this.translate.x;
@@ -274,9 +274,13 @@ class Viewport extends View {
         const lastObject = objects.slice(-1)[0];
         if (event.detail >= 2) {
           this.editable(lastObject);
+          handled = true;
         } else {
-          this.send('Controller:select', lastObject, event.shiftKey);
-          lastObject.handler.mousedown(event);
+          if (lastObject.selected === false) {
+            this.send('Controller:select', lastObject, event.shiftKey);
+            lastObject.handler.mousedown(event);
+            handled = true;
+          }
         }
       } else {
         if (event.shiftKey === false) {
@@ -284,10 +288,15 @@ class Viewport extends View {
         }
         this.mode = 'select';
         this.setSelector(x, y);
+        handled = true;
       }
     }
-    this.addEventListener('mousemove', this.onMouseMove, document);
-    this.addEventListener('mouseup', this.onMouseUp, document);
+
+    if (handled) {
+      event.preventDefault();
+      this.addEventListener('mousemove', this.onMouseMove, document);
+      this.addEventListener('mouseup', this.onMouseUp, document);
+    }
   }
 
   onMouseUp = (event) => {

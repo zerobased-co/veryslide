@@ -77,6 +77,9 @@ class State {
         if (func != null) {
           func.bind(this)(value);
         }
+        this.pairings.forEach((pair) => {
+          pair.notify(this, key, value);
+        });
       }
     }
 

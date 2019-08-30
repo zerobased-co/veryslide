@@ -182,14 +182,15 @@ $border-color: #afafb2;
   font-size: 0;
   z-index: 9999;
 
-  &.n {top: 0; left: 50%; cursor: row-resize;}
-  &.e {top: 50%; right: 0; cursor: col-resize;}
-  &.w {top: 50%; left: 0; cursor: col-resize;}
-  &.s {bottom: 0; left: 50%; cursor: row-resize;}
-  &.nw {top: 0; left: 0; cursor: nwse-resize;}
-  &.ne {top: 0; right: 0; cursor: nesw-resize;}
-  &.se {bottom: 0; right: 0; cursor: nwse-resize;}
-  &.sw {bottom: 0; left: 0; cursor: nesw-resize;}
+  // Clockwise from northwest
+  &.d0 {top: 0; left: 0; cursor: nwse-resize;}
+  &.d1 {top: 0; left: 50%; cursor: row-resize;}
+  &.d2 {top: 0; right: 0; cursor: nesw-resize;}
+  &.d3 {top: 50%; right: 0; cursor: col-resize;}
+  &.d4 {bottom: 0; right: 0; cursor: nwse-resize;}
+  &.d5 {bottom: 0; left: 50%; cursor: row-resize;}
+  &.d6 {bottom: 0; left: 0; cursor: nesw-resize;}
+  &.d7 {top: 50%; left: 0; cursor: col-resize;}
 }
 
 .vs-transforming {

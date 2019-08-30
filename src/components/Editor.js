@@ -23,7 +23,7 @@ class Menu extends View {
       new ui.Text({'title': 'Viewport'}),
       ui.HGroup(
         ui.createButton('Reset zoom',    () => { this.resetZoom(); }),
-        ui.createButton('Snap Off',      () => { this.toggleSnap(); }),
+        this.btnSnap = ui.createButton('Snap Off',      () => { this.toggleSnap(); }),
       ),
 
       new ui.Text({'title': 'Object'}),

@@ -1,16 +1,17 @@
 import View from './ui/View'
     
-const minSize = 0;
-const dotPreset = {
-  'n': 'translate(-50%, -50%)',
-  'e': 'translate(50%, -50%)',
-  'w': 'translate(-50%, -50%)',
-  's': 'translate(-50%, 50%)',
-  'nw': 'translate(-50%, -50%)',
-  'ne': 'translate(50%, -50%)',
-  'se': 'translate(50%, 50%)',
-  'sw': 'translate(-50%, 50%)',
-};
+// Clockwise, from northwest
+const dotPreset = [
+//          x   y   w   h
+  {'value': [+1, +1, -1, -1], 'transform': 'translate(-50%, -50%)', }, // North-west
+  {'value': [ 0, +1,  0, -1], 'transform': 'translate(-50%, -50%)', }, // North
+  {'value': [ 0, +1, +1, -1], 'transform': 'translate(+50%, -50%)', }, // North-east
+  {'value': [ 0,  0, +1,  0], 'transform': 'translate(+50%, -50%)', }, // East
+  {'value': [ 0,  0, +1, +1], 'transform': 'translate(+50%, +50%)', }, // South-east
+  {'value': [ 0,  0,  0, +1], 'transform': 'translate(-50%, +50%)', }, // South
+  {'value': [+1,  0, -1, +1], 'transform': 'translate(-50%, +50%)', }, // South-west
+  {'value': [+1,  0, -1,  0], 'transform': 'translate(-50%, -50%)', }, // West
+];
 
 class Handler extends View {
   constructor(state) {
@@ -30,8 +31,6 @@ class Handler extends View {
     this.basePos = undefined;
     this.baseSize = undefined;
     this.currentDot = null;
-    this.snap = false;
-    this.snapSize = 16;
 
     this.addEventListener('mousedown', this.mousedown);
     this.listen('Object:updateTransform', () => this.updateTransform());
@@ -100,7 +99,7 @@ class Handler extends View {
     let dots = this.node.getElementsByClassName('vs-dot');
     for(var i = 0; i < dots.length; i++) {
       let type = dots[i].innerHTML;
-      dots[i].style.transform = dotPreset[type] + ' scale(' + (1 / this.viewport.scale) + ')';
+      dots[i].style.transform = dotPreset[type]['transform'] + ' scale(' + (1 / this.viewport.scale) + ')';
     }
   }
 
@@ -118,6 +117,7 @@ class Handler extends View {
         this.hide(true);
       }
 
+      let ratio = this.baseSize.width / this.baseSize.height;
       let dx = (event.clientX - this.dragStart.x) / this.viewport.scale;
       let dy = (event.clientY - this.dragStart.y) / this.viewport.scale;
 
@@ -127,48 +127,60 @@ class Handler extends View {
       let h = 0;
 
       switch(this.transform) {
-        case 'move': x = dx; y = dy; break;
-        case 'e': w = dx; break;
-        case 'se': w = dx; h = dy; break;
-        case 's': h = dy; break;
-        case 'sw': x = dx; w = -dx; h = dy; break;
-        case 'w': x = dx; w = -dx; break;
-        case 'nw': x = dx; w = -dx; y = dy; h = -dy; break;
-        case 'n': y = dy; h = -dy; break;
-        case 'ne': w = dx; y = dy; h = -dy; break;
+        case 'move':
+          break;
       }
 
-      if (event.shiftKey) {
-        if (this.transform === 'move') {
+      if (this.transform === 'move') {
+        if (event.shiftKey) {
           // Bound to 45 degree
-          if (Math.min(Math.abs(x), Math.abs(y)) / Math.max(Math.abs(x), Math.abs(y)) > 0.82) {
-            if (Math.abs(x) > Math.abs(y)) {
-              y = Math.sign(y) * Math.abs(x);
+          if (Math.min(Math.abs(dx), Math.abs(dy)) / Math.max(Math.abs(dx), Math.abs(dy)) > 0.82) {
+            if (Math.abs(dx) > Math.abs(dy)) {
+              dy = Math.sign(dy) * Math.abs(dx);
             } else {
-              x = Math.sign(x) * Math.abs(y);
+              dx = Math.sign(dx) * Math.abs(dy);
             }
           } else {
-            if (Math.abs(x) > Math.abs(y)) {
-              y = 0;
+            if (Math.abs(dx) > Math.abs(dy)) {
+              dy = 0;
             } else {
-              x = 0;
+              dx = 0;
             }
-          }
-        } else {
-          // Preserving ratio
-          if (Math.abs(w) / (this.baseSize.width / this.baseSize.height) > Math.abs(h)) {
-            h = w * (this.baseSize.height / this.baseSize.width);
-          } else {
-            w = h * (this.baseSize.width / this.baseSize.height);
           }
         }
-      }
+        x += dx;
+        y += dy;
+      } else {
+        let dot = parseInt(this.transform);
+        let v = dotPreset[dot]['value'].slice(0);
 
-      if (event.altKey) {
-        x -= w;
-        w *= 2;
-        y -= h;
-        h *= 2;
+        if (event.altKey) {
+          const vdot = (dot + 4) % 8;
+          for(let i = 0; i < 4; i++) {
+            v[i] -= dotPreset[vdot]['value'][i];
+          }
+        }
+
+        if (event.shiftKey) {
+          if (v[2] === 0) {
+            v[0] = -v[3] * 0.5;
+            v[2] = v[3];
+          } else if (v[3] === 0) {
+            v[1] = -v[2] * 0.5;
+            v[3] = v[2];
+          }
+
+          if (Math.abs(dx) > Math.abs(dy)) {
+            dy = dx / ratio * Math.sign(v[2]) * Math.sign(v[3]);
+          } else {
+            dx = dy * ratio * Math.sign(v[2]) * Math.sign(v[3]);
+          }
+        }
+
+        x += v[0] * dx;
+        y += v[1] * dy;
+        w += v[2] * dx;
+        h += v[3] * dy; 
       }
 
       let _x = x;
@@ -181,6 +193,8 @@ class Handler extends View {
       w += this.baseSize.width;
       h += this.baseSize.height;
 
+      /*
+      TBD
       if (this.snap) {
         if (_x != 0) {
           x = parseInt(x / this.snapSize) * this.snapSize;
@@ -195,20 +209,27 @@ class Handler extends View {
           h = parseInt(h / this.snapSize) * this.snapSize;
         }
       }
+      */
 
-      w = Math.max(w, minSize);
-      h = Math.max(h, minSize);
+      x = parseInt(x);
+      y = parseInt(y);
+      w = parseInt(w);
+      h = parseInt(h);
+
+      // Reversed
+      if (w < 0) { x += w; w = -w; }
+      if (h < 0) { y += h; h = -h; }
 
       if (this.transform === 'move') {
-        this.send('Object:moveTogether', this, parseInt(x) - this.object.x, parseInt(y) - this.object.y);
-      } else {
-        this.send('Object:hideHandler', this, true);
+        if ((x - this.object.x) !== 0 || (y - this.object.y) !== 0) {
+          this.send('Object:moveTogether', this, x - this.object.x, y - this.object.y);
+        }
       }
 
-      this.object.x = parseInt(x);
-      this.object.y = parseInt(y);
-      this.object.width = parseInt(w);
-      this.object.height = parseInt(h);
+      this.object.x = x;
+      this.object.y = y;
+      this.object.width = w;
+      this.object.height = h;
     }
   }
 
@@ -266,6 +287,7 @@ class Handler extends View {
     } else {
       this.transform = 'move';
     }
+    this.send('Object:hideHandler', this, true);
     this.addEventListener('mousemove', this.mousemove, document);
     this.addEventListener('mouseup', this.mouseup, document);
   }
@@ -274,12 +296,12 @@ class Handler extends View {
     super.render();
 
     // Add 8 handler dots
-    Object.getOwnPropertyNames(dotPreset).forEach(key => {
+    for(let i = 0; i < dotPreset.length; i++) {
       let dot = document.createElement('div');
-      dot.className = 'vs-dot ' + key;
-      dot.innerText = key;
+      dot.className = 'vs-dot d' + i;
+      dot.innerText = i;
       this.node.appendChild(dot);
-    });
+    }
 
     // To be ignored
     this.node.setAttribute('data-render-ignore', 'true');

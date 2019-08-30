@@ -35,17 +35,17 @@ class Channel {
   }
 
   send(type, ...value) {
-    console.debug('Send', type, value);
+    //console.debug('Send', type, value);
 
     let responses = new Array();
     if (type in this.listeners) {
       this.listeners[type].forEach(function(obj) {
-        console.debug('-- Recv', obj['listener']);
+        //console.debug('-- Recv', obj['listener']);
         responses.push(obj['handler'].call(obj['listener'], ...value));
       });
     }
     if (responses.length == 0) {
-      console.info('No response', type, value);
+      //console.info('No response', type, value);
     }
     return responses;
   }

@@ -112,3 +112,6 @@ webpack-stats.json
 
 .DS_Store
 .firebase
+
+# Coverage files
+coverage/

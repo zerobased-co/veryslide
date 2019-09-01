@@ -11,5 +11,5 @@ ReactDOM.render(
   <FirebaseContext.Provider value={new Firebase()}>
     <App />
   </FirebaseContext.Provider>
-  , document.getElementById("root")
+  , document.getElementById("root") || document.createElement('div') // for testing
 );

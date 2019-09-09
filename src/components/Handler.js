@@ -1,3 +1,4 @@
+import global from '/core/Global';
 import View from './ui/View'
     
 // Clockwise, from northwest
@@ -193,23 +194,20 @@ class Handler extends View {
       w += this.baseSize.width;
       h += this.baseSize.height;
 
-      /*
-      TBD
-      if (this.snap) {
+      if (global.snap) {
         if (_x != 0) {
-          x = parseInt(x / this.snapSize) * this.snapSize;
+          x = parseInt(x / global.snapSize) * global.snapSize;
         }
         if (_y != 0) {
-          y = parseInt(y / this.snapSize) * this.snapSize;
+          y = parseInt(y / global.snapSize) * global.snapSize;
         }
         if (_w != 0) {
-          w = parseInt(w / this.snapSize) * this.snapSize;
+          w = parseInt(w / global.snapSize) * global.snapSize;
         }
         if (_h != 0) {
-          h = parseInt(h / this.snapSize) * this.snapSize;
+          h = parseInt(h / global.snapSize) * global.snapSize;
         }
       }
-      */
 
       x = parseInt(x);
       y = parseInt(y);

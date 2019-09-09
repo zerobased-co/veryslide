@@ -1,4 +1,5 @@
 import './Editor.scss';
+import global from '/core/Global';
 import List from '/core/List';
 import ui from './ui/UI';
 import View from './ui/View';
@@ -183,7 +184,6 @@ class Viewport extends View {
     this.page = null;
     this.object = null;
 
-    this.snap = false;
     this.grab = false;
     this.mode = 'normal'; // normal, scroll, select
     this.dragStart = undefined;
@@ -436,7 +436,7 @@ class Viewport extends View {
   
   setPageSnap() {
     if (this.page) {
-      if (this.snap) {
+      if (global.snap) {
         this.page.node.appendChild(this.pageSnap);
       } else {
         this.pageSnap.remove();
@@ -446,12 +446,12 @@ class Viewport extends View {
 
   toggleSnap(show = null) {
     if (show != null) {
-      this.snap = show;
+      global.snap = show;
     } else {
-      this.snap = !this.snap;
+      global.snap = !global.snap;
     }
     this.setPageSnap();
-    return this.snap;
+    return global.snap;
   }
 
   updateTransform() {

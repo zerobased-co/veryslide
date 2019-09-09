@@ -182,7 +182,6 @@ class Viewport extends View {
     });
 
     this.page = null;
-    this.object = null;
 
     this.grab = false;
     this.mode = 'normal'; // normal, scroll, select
@@ -210,23 +209,23 @@ class Viewport extends View {
       [false, false, false, false, [83], () => this.send('Menu:toggleSnap', null)],
       [false, false, false, false, [48], () => this.send('Menu:resetZoom', null)],
       [false, false, false, false, [46, 8], () => this.send('Controller:remove')],
-      [false, false, false, false, [219], () => this.send('Controller:order', this.object, 'backward')],
-      [false, false, false, false, [221], () => this.send('Controller:order', this.object, 'forward')],
-      [false, false, false, true,  [66], () => this.applyStyle('Bold')],
-      [false, false, false, true,  [73], () => this.applyStyle('Italic')],
-      [false, false, false, true,  [85], () => this.applyStyle('Underline')],
+      [false, false, false, false, [219], () => this.send('Controller:order', 'backward')],
+      [false, false, false, false, [221], () => this.send('Controller:order', 'forward')],
+      [false, false, false, true,  [66], () => this.send('Controller:style', 'Bold')],
+      [false, false, false, true,  [73], () => this.send('Controller:style', 'Italic')],
+      [false, false, false, true,  [85], () => this.send('Controller:style', 'Underline')],
       [false, false, false, true,  [83], () => this.send('Veryslide:save')],
       [false, false, false, true,  [173, 189], () => this.applyStyle('Smaller')],
       [false, false, false, true,  [61, 187], () => this.applyStyle('Bigger')],
       [false, false, false, false, [27], () => this.setPresentationMode(false)],
-      [false, false, false, false, [37], () => this.applyMove('Left')],
-      [false, false, false, false, [38], () => this.applyMove('Up')],
-      [false, false, false, false, [39], () => this.applyMove('Right')],
-      [false, false, false, false, [40], () => this.applyMove('Down')],
-      [true,  false, false, false, [37], () => this.applyMove('BigLeft')],
-      [true,  false, false, false, [38], () => this.applyMove('BigUp')],
-      [true,  false, false, false, [39], () => this.applyMove('BigRight')],
-      [true,  false, false, false, [40], () => this.applyMove('BigDown')],
+      [false, false, false, false, [37], () => this.send('Controller:move', 'Left')],
+      [false, false, false, false, [38], () => this.send('Controller:move', 'Up')],
+      [false, false, false, false, [39], () => this.send('Controller:move', 'Right')],
+      [false, false, false, false, [40], () => this.send('Controller:move', 'Down')],
+      [true,  false, false, false, [37], () => this.send('Controller:move', 'BigLeft')],
+      [true,  false, false, false, [38], () => this.send('Controller:move', 'BigUp')],
+      [true,  false, false, false, [39], () => this.send('Controller:move', 'BigRight')],
+      [true,  false, false, false, [40], () => this.send('Controller:move', 'BigDown')],
       [false, false, true, false,  [78], () => this.send('Controller:addPage')],
     ];
     this.keyupEvents = [
@@ -364,42 +363,6 @@ class Viewport extends View {
     if (this.grab === false && this.mode === 'normal') {
       this.node.style.cursor = 'grab';
       this.grab = true;
-    }
-  }
-
-  applyStyle(style) {
-    if (this.object == null) return;
-    if (typeof this.object['apply'] !== 'function') return;
-
-    this.object.apply(style);
-  }
-
-  applyMove(direction) {
-    if (this.isPresentationMode) {
-      switch(direction) {
-        case 'Left':
-        case 'Up':
-          this.send('Controller:prevPage');
-          break;
-        case 'Right':
-        case 'Down':
-          this.send('Controller:nextPage');
-          break;
-      }
-    } else {
-      if (this.object == null) {
-        switch(direction) {
-          case 'Up':
-            this.send('Controller:prevPage');
-            break;
-          case 'Down':
-            this.send('Controller:nextPage');
-            break;
-        }
-      } else {
-        if (typeof this.object['apply'] !== 'function') return;
-        this.object.apply(direction);
-      }
     }
   }
 

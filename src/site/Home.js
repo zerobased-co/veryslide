@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { generatePath } from 'react-router';
 import { compose } from 'recompose';
-import IconTrash from '@iconscout/react-unicons/icons/uil-trash-alt'
 
 import { withFirebase } from './Firebase';
 import { AuthUserContext, withAuthorization } from './Session';
@@ -84,7 +83,9 @@ class HomeBase extends Component {
                       <span>{slide.id}</span>
                       }
                     </Link>
-                    <IconTrash size="20" onClick={() => this.deleteSlide(slide.id)} />
+                    <a onClick={() => this.deleteSlide(slide.id)}>
+                      <i className="fas fa-trash-alt"/>
+                    </a>
                   </li>
                 ) 
               }

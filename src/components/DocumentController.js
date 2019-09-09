@@ -120,9 +120,9 @@ class DocumentController extends State {
         this.send('Controller:deselect');
       }
 
-      // TBD-NOW: update property
       item.select();
       this.selected.append(item);
+      this.send('Property:setPanelFor', this.selected.array);
 
       if (this.selected.length == 1 && item.type == 'Page') {
         this.send('Controller:focusPage', item);
@@ -139,10 +139,10 @@ class DocumentController extends State {
         item.select(false);
         this.selected.remove(item);
       }
-      // TBD-NOW: update property
+      this.send('Property:setPanelFor', this.selected.array);
     });
 
-    this.listen('Controller:align', (object, align) => {
+    this.listen('Controller:align', (align) => {
       // TBD: for multiple object
       if (object == null) return;
       if (object.page == null) return;
@@ -169,7 +169,7 @@ class DocumentController extends State {
       }
     });
 
-    this.listen('Controller:order', (object, order) => {
+    this.listen('Controller:order', (order) => {
       // TBD: for multiple objects
       if (object == null) return;
       if (object.page == null) return;
@@ -189,6 +189,43 @@ class DocumentController extends State {
           break;
       }
       object.page.reorder();
+    });
+
+    this.listen('Controller:style', (style) => {
+      // TBD: for multiple objects
+      if (typeof this.object['apply'] !== 'function') return;
+
+      this.object.apply(style);
+    });
+
+    this.listen('Controller:move', (direction) => {
+      // TBD: for multiple objects
+      if (this.isPresentationMode) {
+        switch(direction) {
+          case 'Left':
+          case 'Up':
+            this.send('Controller:prevPage');
+            break;
+          case 'Right':
+          case 'Down':
+            this.send('Controller:nextPage');
+            break;
+        }
+      } else {
+        if (this.object == null) {
+          switch(direction) {
+            case 'Up':
+              this.send('Controller:prevPage');
+              break;
+            case 'Down':
+              this.send('Controller:nextPage');
+              break;
+          }
+        } else {
+          if (typeof this.object['apply'] !== 'function') return;
+          this.object.apply(direction);
+        }
+      }
     });
 
     this.listen('Controller:copy', () => {

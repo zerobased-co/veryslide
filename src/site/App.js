@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { hot } from "react-hot-loader";
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import "./App.scss";
@@ -61,4 +60,4 @@ class App extends Component {
 }
 
 
-export default hot(module)(withAuthentication(App));
+export default withAuthentication(App);

@@ -47,8 +47,6 @@ class SlideBase extends Component {
       else {
         // TBD: then create one on the fly?
       }
-    }).catch(function(error) {
-        console.log("Error retrieving document:", error);
     });
   }
 

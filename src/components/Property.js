@@ -210,7 +210,7 @@ class PanelForImageList extends PanelForBox {
         new ui.Select({
           options: this.dataOptions,
           afterChange: (value) => { 
-            this.send('Property:setPanelFor', this.object);
+            this.send('Property:setPanelFor', [this.object]);
           },
         }).pair(this.object, 'asset'),
         ui.createText(
@@ -231,7 +231,7 @@ class PanelForImageList extends PanelForBox {
         ui.HGroup(
           ui.createButton('Clear', () => { this.object.clear(); }),
           ui.createButton('Shuffle', () => { this.object.shuffle(); }),
-          ui.createButton('Apply', () => { this.object.apply(); this.send('Property:setPanelFor', this.object); }),
+          ui.createButton('Apply', () => { this.object.apply(); this.send('Property:setPanelFor', [this.object]); }),
         ),
       ),
 
@@ -280,51 +280,100 @@ class PanelForImageList extends PanelForBox {
   }
 }
 
+const objectsHandler = {
+  get(objects, prop) {
+    if (typeof objects[0][prop] === 'function') {
+      return (...args) => {
+        objects.forEach((obj) => {
+          obj[prop](...args);
+        });
+      }
+    }
+
+    let value = null;
+    for(let i = 0; i < objects.length; i++) {
+      if (value === null) {
+        value = objects[i][prop];
+      } else if (value !== objects[i][prop]) {
+        return '?';
+      }
+    }
+    return value;
+  },
+  set(objects, prop, value) {
+    objects.forEach((obj) => {
+      obj[prop] = value;
+    });
+    return true;
+  },
+}
+
 class Property extends View {
   constructor(state) {
     super({
       className: 'vs-property',
-      object: null,
       ...state,
     });
 
     this.listen('Property:setPanelFor', this.setPanelFor);
   }
 
-  setPanelFor(object) {
-    this.panel.destroy();
-    delete this.panel;
+  setPanelFor(objects) {
+    if (this.panel != null) {
+      this.panel.destroy();
+      delete this.panel;
+      this.panel = null;
+    }
 
-    switch(object.type) {
+    if (objects.length === 0) {
+      return null;
+    }
+
+    let proxy = new Proxy(objects, objectsHandler);
+    let resolvedType = '';
+
+    resolvedType = objects[0].type;
+
+    if (objects.length >= 2) {
+      for(let i = 1; i < objects.length; i++) {
+        if (objects[0].type !== objects[i].type) {
+          resolvedType = 'Multiple';
+          break;
+        }
+      }
+    }
+
+    switch(resolvedType) {
       case 'ImageList':
-        this.panel = new PanelForImageList({object});
+        this.panel = new PanelForImageList({object: proxy});
         break;
       case 'ImageBox':
-        this.panel = new PanelForImageBox({object});
+        this.panel = new PanelForImageBox({object: proxy});
         break;
       case 'TextBox':
-        this.panel = new PanelForTextBox({object});
+        this.panel = new PanelForTextBox({object: proxy});
         break;
-      case 'Page':
-        this.panel = new PanelForPage({object});
-        break;
-      case 'Document':
-        this.panel = new PanelForDocument({object});
-        break;
-    }
-    this.appendChild(this.panel);
 
+      case 'Multiple':
+        this.panel = new PanelForBox({object: proxy})
+        break;
+
+      case 'Page':
+        this.panel = new PanelForPage({object: proxy});
+        break;
+
+      case 'Document':
+        this.panel = new PanelForDocument({object: proxy});
+        break;
+
+      default:
+        /* really? */
+        return null;
+    }
+
+    this.appendChild(this.panel);
     this.send('ToolBox:activeTab', 'Property');
     return this.panel;
-  }
-
-  render() {
-    super.render();
-
-    this.panel = new ui.Panel();
-
-    this.appendChild(this.panel);
-    return this.node;
   }
 }
 

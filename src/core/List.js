@@ -19,7 +19,7 @@ class List {
     newList.array = this.array.slice(0);
     return newList;
   }
-  
+
   at(index) {
     return this.array[index];
   }

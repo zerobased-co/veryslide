@@ -39,7 +39,6 @@ class Node extends State {
   }
 
   select(selected) {
-    // TBD: Add handler
     this.selected = selected;
     if (selected === false) {
       this.node.classList.remove('select');

@@ -17,6 +17,7 @@ class CheckBox extends View {
 
   on_checked(checked) {
     this.input.checked = checked;
+    this.input.indeterminate = (checked === '?');
   }
 
   on_title(title) {

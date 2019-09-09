@@ -4,7 +4,7 @@ const Dotenv = require('dotenv-webpack');
 
 module.exports = {
   mode: 'development',
-  entry: './src/index.js',
+  entry: ['react-hot-loader/patch', './src/index.js', ],
   module: {
     rules: [
       {
@@ -40,7 +40,7 @@ module.exports = {
     new Dotenv(),
     new webpack.HotModuleReplacementPlugin(),
   ],
-  devtool: 'source-map',
+  devtool: 'inline-source-map',
   devServer: {
     contentBase: './dist',
     historyApiFallback: true,

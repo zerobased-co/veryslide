@@ -3,7 +3,6 @@
 const path = require('path');
 
 var webpackConfig = require('./webpack.config.js');
-delete webpackConfig.entry;
 
 module.exports = function(config) {
   config.set({
@@ -43,12 +42,13 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['dots', 'coverage-istanbul'],
+    reporters: ['dots', 'coverage'],
 
-    coverageIstanbulReporter: {
-        reports: ['html', 'text-summary'],
-        fixWebpackSourcePaths: true,
-        dir: path.join(__dirname, 'coverage'),
+    coverageReporter: {
+      reporters: [
+        {type: 'html'},
+        {type: 'text-summary'},
+      ],
     },
 
 

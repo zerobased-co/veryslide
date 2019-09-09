@@ -11,19 +11,6 @@ module.exports = {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
-        options: { presets: ["@babel/env"] },
-        enforce: 'pre',
-      },
-      {
-        test: /\.(js|jsx)$/,
-        exclude: [
-          /node_modules/,
-          /test\/index.js/,
-          /\.spec\.(js|jsx)$/,
-        ],
-        loader: 'istanbul-instrumenter-loader',
-        options: { esModules: true },
-        enforce: 'post',
       },
       {
         test: /\.(sa|sc|c)ss$/,
@@ -44,9 +31,6 @@ module.exports = {
         ],
       },
     ],
-  },
-  resolve: {
-    extensions: ['*', '.js', '.jsx']
   },
   output: {
     filename: 'bundle.js',

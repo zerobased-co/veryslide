@@ -1,11 +1,8 @@
 {
   "presets": [
     ['@babel/env', {
-      targets: {
-        node: 'current',
-      },
       useBuiltIns: 'entry',
-      corejs: '3.0.0',
+      corejs: 3,
     }],
     "@babel/preset-react",
   ],
@@ -15,5 +12,6 @@
     ["module-resolver", {
       "root": ["./src", "./"]
     }],
+    'istanbul',
   ]
 }

@@ -9,10 +9,6 @@ class View extends Node {
       eventListeners: [],
       ...state,
     });
-
-    if (this.parent != null) {
-      this.parent.children.push(this);
-    }
   }
 
   pair(target, key) {
@@ -112,15 +108,15 @@ class View extends Node {
 
   render() {
     super.render();
+
     this.children.forEach((child) => {
-      this.appendChild(child);
+      this.node.appendChild(child.node);
     });
     return this.node;
   }
 
   appendChild(child) {
     // TBD: only View can be added as child
-    // TBD: add children at once
     if (child.hasOwnProperty('children') && child.hasOwnProperty('state')) {
       child.parent = this;
       this.children.push(child);

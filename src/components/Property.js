@@ -1,6 +1,8 @@
 import ui from './ui/UI';
 import View from './ui/View';
 import Panel from './ui/Panel';
+import Node from '/core/Node';
+import global from '/core/Global';
 
 const FONTLIST = [
   ['serif', 'Serif'],
@@ -280,38 +282,102 @@ class PanelForImageList extends PanelForBox {
   }
 }
 
-const objectsHandler = {
-  get(objects, prop) {
-    if (typeof objects[0][prop] === 'function') {
-      return (...args) => {
-        objects.forEach((obj) => {
-          obj[prop](...args);
-        });
-      }
-    }
-
-    let value = null;
-    for(let i = 0; i < objects.length; i++) {
-      if (value === null) {
-        value = objects[i][prop];
-      } else if (value !== objects[i][prop]) {
-        return '?';
-      }
-    }
-    return value;
-  },
-  set(objects, prop, value) {
-    objects.forEach((obj) => {
-      obj[prop] = value;
+class ProxyObject extends Node {
+  constructor(state) {
+    super({
+      objects: [],
+      proxy: null,
+      ...state,
     });
-    return true;
-  },
+
+    this.objects.forEach((obj) => {
+      obj.addPairing(this);
+    });
+  }
+
+  notify(from, key, value) {
+    // check all values are same or not
+    for(let i = 0; i < this.objects.length; i++) {
+      if (this.objects[i][key] !== value) {
+        value = global.ambiguous;
+        break;
+      }
+    }
+    
+    this.pairings.forEach((pair) => {
+      pair.notify(this.proxy, key, value);
+    });
+  }
+
+  destroy() {
+    super.destroy();
+
+    this.objects.forEach((obj) => {
+      obj.removePairing(this);
+    });
+  }
+}
+
+function createProxy(objects) {
+  const proxyObj = new ProxyObject({objects: objects});
+
+  const handler = {
+    get(target, prop) {
+      if (typeof objects[0][prop] === 'function') {
+        switch(prop) {
+          case 'addPairing':
+          case 'removePairing':
+            return proxyObj[prop];
+          default:
+            return (...args) => {
+              objects.forEach((obj) => {
+                obj[prop](...args);
+              });
+            }
+        }
+      }
+      
+      switch(prop) {
+        case 'pairings':
+          return proxyObj[prop];
+        default:
+          let value = null;
+          for(let i = 0; i < objects.length; i++) {
+            if (value === null) {
+              value = objects[i][prop];
+            } else if (value !== objects[i][prop]) {
+              return global.ambiguous;
+            }
+          }
+          return value;
+      }
+    },
+    set(target, prop, value) {
+      switch(prop) {
+        case 'pairings':
+          proxyObj[prop] = value;
+          break;
+        default:
+          objects.forEach((obj) => {
+            obj[prop] = value;
+          });
+          break;
+      }
+      return true;
+    },
+  }
+
+  let proxy = new Proxy(proxyObj, handler);
+  proxyObj.proxy = proxy;
+  return {proxy, proxyObj};
 }
 
 class Property extends View {
   constructor(state) {
     super({
       className: 'vs-property',
+      proxyObj: null,
+      proxy: null,
       ...state,
     });
 
@@ -325,14 +391,19 @@ class Property extends View {
       this.panel = null;
     }
 
+    if (this.proxyObj != null) {
+      this.proxyObj.destroy();
+      this.proxyObj = null;
+    }
+
     if (objects.length === 0) {
       return null;
     }
 
-    let proxy = new Proxy(objects, objectsHandler);
-    let resolvedType = '';
-
-    resolvedType = objects[0].type;
+    let {proxy, proxyObj} = createProxy(objects);
+    this.proxy = proxy;
+    this.proxyObj = proxyObj;
+    let resolvedType = objects[0].type;
 
     if (objects.length >= 2) {
       for(let i = 1; i < objects.length; i++) {

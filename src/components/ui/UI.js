@@ -47,27 +47,27 @@ class UI {
     return new ui.InputText().pair(target, property);
   }
 
-  HGroup(...buttons) {
+  HGroup(...children) {
     return new HGroup({
-      children: buttons,
+      children,
     });
   }
 
   P(...children) {
     return new Panel({
-      children: children,
+      children,
     });
   }
 
   H(...children) {
     return new Horizon({
-      children: children,
+      children,
     });
   }
 
   V(...children) {
     return new Vertical({
-      children: children,
+      children,
     });
   }
 }

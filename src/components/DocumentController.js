@@ -118,13 +118,20 @@ class DocumentController extends State {
 
       if (keepSelection !== true) {
         this.send('Controller:deselect');
+      } else {
+        if (this.selected.length > 0) {
+          if ((item.type === 'Page' && this.selected.array[0].type !== 'Page') ||
+              (item.type !== 'Page' && this.selected.array[0].type === 'Page')) {
+            this.send('Controller:deselect');
+          }
+        }
       }
 
       item.select();
       this.selected.append(item);
       this.send('Property:setPanelFor', this.selected.array);
 
-      if (this.selected.length == 1 && item.type == 'Page') {
+      if (this.selected.length === 1 && item.type === 'Page') {
         this.send('Controller:focusPage', item);
       }
     });

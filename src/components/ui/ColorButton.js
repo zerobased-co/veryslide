@@ -2,6 +2,7 @@ import View from './View.js';
 import '@easylogic/colorpicker/dist/colorpicker.css';
 import ColorPickerUI from '@easylogic/colorpicker'
 import { properTextColor } from 'core/Util';
+import global from 'core/Global';
 
 class ColorButton extends View {
   constructor(state) {
@@ -27,7 +28,7 @@ class ColorButton extends View {
   }
 
   showPicker(event) {
-    const color = (this.color === '?') ? '#FFFFFF' : this.color;
+    const color = (this.color === global.ambiguous) ? '#FFFFFF' : this.color;
 
     this.colorPicker.show({
       left: event.clientX - 100,
@@ -42,7 +43,7 @@ class ColorButton extends View {
   on_color(color) {
     this.node.style.backgroundColor = color;
     this.node.innerText = color.toUpperCase();
-    this.node.style.color = (this.color === '?') ? '#000000' : properTextColor(color);
+    this.node.style.color = (this.color === global.ambiguous) ? '#000000' : properTextColor(color);
   }
 }
 

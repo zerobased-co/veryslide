@@ -1,4 +1,5 @@
 import View from './View.js';
+import global from '/core/Global.js';
 
 class CheckBox extends View {
   constructor(state) {
@@ -17,7 +18,7 @@ class CheckBox extends View {
 
   on_checked(checked) {
     this.input.checked = checked;
-    this.input.indeterminate = (checked === '?');
+    this.input.indeterminate = (checked === global.ambiguous);
   }
 
   on_title(title) {

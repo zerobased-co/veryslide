@@ -285,11 +285,23 @@ class Handler extends View {
       this.currentDot = event.target;
       this.currentDot.classList.add('vs-showme');
     } else {
-      this.transform = 'move';
+      if (event.detail >= 2) {
+        if (this.object.editable != null) {
+          this.send('Controller:deselect');
+          this.object.editable();
+          this.transform = null;
+        }
+      } else {
+        this.transform = 'move';
+      }
     }
+
     this.send('Object:hideHandler', this, true);
-    this.addEventListener('mousemove', this.mousemove, document);
-    this.addEventListener('mouseup', this.mouseup, document);
+    
+    if (this.transform != null) {
+      this.addEventListener('mousemove', this.mousemove, document);
+      this.addEventListener('mouseup', this.mouseup, document);
+    }
   }
 
   render() {

@@ -270,15 +270,10 @@ class Viewport extends View {
       let objects = this.page.findObjects(cx, cy);
       if (objects.length > 0) {
         const lastObject = objects.slice(-1)[0];
-        if (event.detail >= 2) {
-          this.editable(lastObject);
+        if (lastObject.selected === false) {
+          this.send('Controller:select', lastObject, event.shiftKey);
+          lastObject.handler.mousedown(event);
           handled = true;
-        } else {
-          if (lastObject.selected === false) {
-            this.send('Controller:select', lastObject, event.shiftKey);
-            lastObject.handler.mousedown(event);
-            handled = true;
-          }
         }
       } else {
         if (event.shiftKey === false) {
@@ -438,13 +433,6 @@ class Viewport extends View {
     } else {
       this.pageHolder.style.transform = 'translate(' + this.translate.x + 'px, ' + this.translate.y + 'px) scale(' + this.scale + ')';
       this.send('Object:updateTransform');
-    }
-  }
-
-  editable(object) {
-    if (object.editable != null) {
-      this.send('Controller:deselect');
-      object.editable();
     }
   }
 

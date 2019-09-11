@@ -35,6 +35,7 @@ class TextBox extends Box {
     if (event.keyCode === 13 && event.shiftKey === false) {
       event.preventDefault();
       this.blur();
+      this.send('Controller:select', this);
     }
   }
 

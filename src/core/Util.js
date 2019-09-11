@@ -3,7 +3,7 @@ export function randomInt(min, max) {
 }
 
 export function randomColor() {
-  var colors = [
+  const colors = [
     "#1ABC9C", "#2ECC71", "#3498DB", "#9B59B6",
     "#34495E", "#16A085", "#27AE60", "#2980B9",
     "#E74C3C", "#657F86", "#95A5A6", "#F39C12",
@@ -12,21 +12,28 @@ export function randomColor() {
   return colors[randomInt(0, colors.length - 1)];
 }
 
-export function properTextColor(color) {
-  var r, g, b, hsp;
+export function properTextColor(backColor, trueBackColor) {
+  function getRGBAfromHEX(color) {
+    color = color.slice(1).replace(color.length < 5 && /./g, '$&$&');
+    color = parseInt(color.length > 6 ? color : color + 'FF', 16);
 
-  color = +("0x" + color.slice(1).replace(color.length < 5 && /./g, '$&$&'));
-  r = color >> 16;
-  g = color >> 8 & 255;
-  b = color & 255;
-
-  hsp = Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
-
-  if (hsp > 127.5) {
-    return '#000000';
-  } else {
-    return '#FFFFFF';
+    return {
+      r: color >>> 24,
+      g: color >>> 16 & 255,
+      b: color >>>  8 & 255,
+      a: color & 255
+    };
   }
+
+  function getHSPfromRGB(r, g, b) {
+    return Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
+  }
+
+  const c = getRGBAfromHEX(backColor);
+  const b = getRGBAfromHEX(trueBackColor || '#FFFFFF');
+  Array.from('rgb').forEach(_ => {c[_] = (c[_] * c.a + b[_] * (255 - c.a)) / 255});
+
+  return (getHSPfromRGB(c.r, c.g, c.b) > 160) ? '#000000' : '#FFFFFF';
 }
 
 export function debounce(func, delay) {

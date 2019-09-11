@@ -127,6 +127,7 @@ $button-radius: 5px;
 .vs-colorbutton {
   @extend .vs-button;
   cursor: pointer;
+  transition: color 0.7s ease-out;
 }
 
 .vs-filter {
@@ -137,6 +138,7 @@ $button-radius: 5px;
   height: 30px;
   width: 64px;
   border-radius: $button-radius;
+  text-align: center;
 }
 
 .vs-inputfile input[type='file'] {

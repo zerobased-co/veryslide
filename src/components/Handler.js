@@ -262,6 +262,8 @@ class Handler extends View {
 
   mousedown(event) {
     if (this.object == null) return;
+    if (global.grabbing == true) return;
+
     event.stopPropagation();
     event.preventDefault();
 

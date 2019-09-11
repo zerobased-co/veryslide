@@ -183,7 +183,6 @@ class Viewport extends View {
 
     this.page = null;
 
-    this.grab = false;
     this.mode = 'normal'; // normal, scroll, select
     this.dragStart = undefined;
     this.translate = {x: 0, y: 0};
@@ -258,7 +257,7 @@ class Viewport extends View {
 
     this.dragStart = {x, y};
 
-    if (this.grab === true) {
+    if (global.grabbing === true) {
       this.node.style.cursor = 'grabbing';
       this.mode = 'scroll';
       this.lastTranslate.x = this.translate.x;
@@ -331,8 +330,9 @@ class Viewport extends View {
   }
 
   resetMode() {
+    global.grabbing = false;
+
     this.node.style.cursor = 'default';
-    this.grab = false;
     this.mode = 'normal';
     this.selector.hide();
   }
@@ -360,9 +360,9 @@ class Viewport extends View {
   }
 
   beginGrab() {
-    if (this.grab === false && this.mode === 'normal') {
+    if (global.grabbing === false && this.mode === 'normal') {
       this.node.style.cursor = 'grab';
-      this.grab = true;
+      global.grabbing = true;
     }
   }
 
@@ -370,7 +370,7 @@ class Viewport extends View {
     // TBD: prevent updating while editing objects
     if (this.page == null) return;
     if (this.isPresentationMode) return;
-    if (this.grab || this.drag) return;
+    if (global.grabbing) return;
     this.page.updateThumbnail();
   }
 

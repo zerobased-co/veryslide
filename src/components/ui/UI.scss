@@ -1,8 +1,10 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono&display=swap');
 $button-radius: 5px;
 
 .vs-view {
   position: relative;
   overflow: auto;
+  font-family: 'Roboto', sans-serif;
 }
 
 .vs-vertical {
@@ -50,6 +52,7 @@ $button-radius: 5px;
 }
 
 .vs-button {
+  @extend .vs-view;
   width: 80px;
   height: 30px;
   font-size: 0.8em;
@@ -84,6 +87,7 @@ $button-radius: 5px;
 }
 
 .vs-text {
+  @extend .vs-view;
   font-size: 0.8em;
   height: 30px;
   line-height: 30px;
@@ -128,6 +132,8 @@ $button-radius: 5px;
   @extend .vs-button;
   cursor: pointer;
   transition: color 0.7s ease-out;
+  font-family: 'Roboto Mono', monospace;
+  font-variant-numeric: tabular-nums;
 }
 
 .vs-filter {

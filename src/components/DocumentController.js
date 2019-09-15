@@ -150,52 +150,80 @@ class DocumentController extends State {
     });
 
     this.listen('Controller:align', (align) => {
-      // TBD: for multiple object
-      if (object == null) return;
-      if (object.page == null) return;
+      if (this.selected.length == 0) return;
 
-      switch(align) {
-        case 'left':
-          object.x = 0;
-          break;
-        case 'center':
-          object.x = parseInt((object.page.width - object.width) / 2);
-          break;
-        case 'right':
-          object.x = parseInt(object.page.width - object.width);
-          break;
-        case 'top':
-          object.y = 0;
-          break;
-        case 'middle':
-          object.y = parseInt((object.page.height - object.height) / 2);
-          break;
-        case 'bottom':
-          object.y = parseInt(object.page.height - object.height);
-          break;
+      // TBD: for multiple object
+      let getBB = (objects) => {
+        let sx = objects[0].x;
+        let sy = objects[0].y;
+        let ex = objects[0].x + objects[0].width;
+        let ey = objects[0].y + objects[0].height;
+
+        for(let i = 1; i < objects.length; i++) {
+          if (sx > objects[i].x) { sx = objects[i].x };
+          if (sy > objects[i].y) { sy = objects[i].y };
+          if (ex < objects[i].x + objects[i].width) { ex = objects[i].x + objects[i].width };
+          if (ey < objects[i].y + objects[i].height) { ey = objects[i].y + objects[i].height };
+        }
+        return {sx, sy, ex, ey};
+      }
+
+      let bb;
+      if (this.selected.length == 1 ) {
+        if (this.focusedPage == null) return;
+        bb = getBB([this.focusedPage]);
+      } else {
+        bb = getBB(this.selected.array);
+      }
+
+      for(let i = 0; i < this.selected.length; i++) {
+        const obj = this.selected.at(i);
+
+        switch(align) {
+          case 'left':
+            obj.x = bb.sx;
+            break;
+          case 'center':
+            obj.x = bb.sx + parseInt((bb.ex - bb.sx - obj.width) / 2);
+            break;
+          case 'right':
+            obj.x = bb.ex - obj.width;
+            break;
+          case 'top':
+            obj.y = bb.sy;
+            break;
+          case 'middle':
+            obj.y = bb.sy + parseInt((bb.ey - bb.sy - obj.height) / 2);
+            break;
+          case 'bottom':
+            obj.y = bb.ey - obj.height;
+            break;
+        }
       }
     });
 
     this.listen('Controller:order', (order) => {
-      // TBD: for multiple objects
-      if (object == null) return;
-      if (object.page == null) return;
+      if (this.focusedPage == null) return;
 
-      switch(order) {
-        case 'back':
-          object.page.objects.makeFirst(object);
-          break;
-        case 'front':
-          object.page.objects.makeLast(object);
-          break;
-        case 'backward':
-          object.page.objects.backward(object);
-          break;
-        case 'forward':
-          object.page.objects.forward(object);
-          break;
+      for(let i = 0; i < this.selected.length; i++) {
+        const obj = this.selected.at(i);
+
+        switch(order) {
+          case 'back':
+            this.focusedPage.objects.makeFirst(obj);
+            break;
+          case 'front':
+            this.focusedPage.objects.makeLast(obj);
+            break;
+          case 'backward':
+            this.focusedPage.objects.backward(obj);
+            break;
+          case 'forward':
+            this.focusedPage.objects.forward(obj);
+            break;
+        }
       }
-      object.page.reorder();
+      this.focusedPage.reorder();
     });
 
     this.listen('Controller:style', (style) => {

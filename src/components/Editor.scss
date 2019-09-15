@@ -170,6 +170,7 @@ $border-color: #afafb2;
   display: flex;
   position: absolute;
   border: 1px solid #ff206f;
+  z-index: 9999;
 }
 
 .vs-dot {

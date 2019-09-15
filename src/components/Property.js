@@ -67,29 +67,29 @@ class PanelForBox extends Panel {
         ui.createText('Order'),
         new ui.Vertical({children: [
           ui.HGroup(
-            ui.createButton('Back', () => { this.send('Controller:order', this.object, 'back'); }),
-            ui.createButton('Front', () => { this.send('Controller:order', this.object, 'front'); }),
+            ui.createButton('Back', () => { this.send('Controller:order', 'back'); }),
+            ui.createButton('Front', () => { this.send('Controller:order', 'front'); }),
           ),
           ui.HGroup(
-            ui.createButton('Backward', () => { this.send('Controller:order', this.object, 'backward'); }),
-            ui.createButton('Forward', () => { this.send('Controller:order', this.object, 'forward'); }),
+            ui.createButton('Backward', () => { this.send('Controller:order', 'backward'); }),
+            ui.createButton('Forward', () => { this.send('Controller:order', 'forward'); }),
           ),
         ]}),
       ),
       ui.H(
         ui.createText('Vertical'),
         ui.HGroup(
-          ui.createButton('Top', () => { this.send('Controller:align', this.object, 'top'); }),
-          ui.createButton('Middle', () => { this.send('Controller:align', this.object, 'middle'); }),
-          ui.createButton('Bottom', () => { this.send('Controller:align', this.object, 'bottom'); }),
+          ui.createButton('Top', () => { this.send('Controller:align', 'top'); }),
+          ui.createButton('Middle', () => { this.send('Controller:align', 'middle'); }),
+          ui.createButton('Bottom', () => { this.send('Controller:align', 'bottom'); }),
         ),
       ),
       ui.H(
         ui.createText('Horizon'),
         ui.HGroup(
-          ui.createButton('Left', () => { this.send('Controller:align', this.object, 'left'); }),
-          ui.createButton('Center', () => { this.send('Controller:align', this.object, 'center'); }),
-          ui.createButton('Right', () => { this.send('Controller:align', this.object, 'right'); }),
+          ui.createButton('Left', () => { this.send('Controller:align', 'left'); }),
+          ui.createButton('Center', () => { this.send('Controller:align', 'center'); }),
+          ui.createButton('Right', () => { this.send('Controller:align', 'right'); }),
         ),
       ),
 

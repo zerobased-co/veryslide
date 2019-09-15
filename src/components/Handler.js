@@ -23,6 +23,7 @@ class Handler extends View {
       y: 0,
       width: 0,
       height: 0,
+      order: 0,
       ...state,
     });
 
@@ -70,12 +71,11 @@ class Handler extends View {
     this.object.y += dy;
   }
 
-  alignToObject() {
-    this.node.style.left = this.object.x + 'px';
-    this.node.style.top = this.object.y + 'px';
-    this.node.style.width = this.object.width + 'px';
-    this.node.style.height = this.object.height + 'px';
-    this.node.style.zIndex = this.object.node.style.zIndex;
+  alignToObject(object) {
+    this.x = object.x;
+    this.y = object.y;
+    this.width = object.width;
+    this.height = object.height;
   }
 
   on_x(x) {

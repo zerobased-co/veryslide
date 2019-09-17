@@ -146,13 +146,13 @@ class DocumentController extends State {
         item.select(false);
         this.selected.remove(item);
       }
+
       this.send('Property:setPanelFor', this.selected.array);
     });
 
     this.listen('Controller:align', (align) => {
       if (this.selected.length == 0) return;
 
-      // TBD: for multiple object
       let getBB = (objects) => {
         let sx = objects[0].x;
         let sy = objects[0].y;
@@ -227,10 +227,12 @@ class DocumentController extends State {
     });
 
     this.listen('Controller:style', (style) => {
-      // TBD: for multiple objects
-      if (typeof this.object['apply'] !== 'function') return;
+      for(let i = 0; i < this.selected.length; i++) {
+        const obj = this.selected.at(i);
 
-      this.object.apply(style);
+        if (typeof obj['apply'] !== 'function') continue;
+        obj.apply(style);
+      }
     });
 
     this.listen('Controller:move', (direction) => {
@@ -247,7 +249,14 @@ class DocumentController extends State {
             break;
         }
       } else {
-        if (this.object == null) {
+        let isPage = true;
+        if (this.selected.length > 0) {
+          if (this.selected.at(0).type !== 'Page') {
+            isPage = false;
+          }
+        }
+
+        if (isPage) {
           switch(direction) {
             case 'Up':
               this.send('Controller:prevPage');
@@ -257,8 +266,12 @@ class DocumentController extends State {
               break;
           }
         } else {
-          if (typeof this.object['apply'] !== 'function') return;
-          this.object.apply(direction);
+          for(let i = 0; i < this.selected.length; i++) {
+            const obj = this.selected.at(i);
+
+            if (typeof obj['apply'] !== 'function') continue;
+            obj.apply(direction);
+          }
         }
       }
     });

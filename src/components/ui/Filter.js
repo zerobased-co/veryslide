@@ -1,6 +1,7 @@
 import View from './View';
 import ui from './UI';
 import Text from './Text';
+import global from '/core/Global';
 
 const options = [
   ['', '----'],
@@ -100,37 +101,45 @@ class Filter extends View {
 
   render() {
     super.render();
-    this.update_candidates();
 
-    let idx = 0;
-    this.fields.forEach((field) => {
-
-      let row = ui.H(
-        ui.createText(field, 'vs-text-140'),
-        this.operators[idx] = new ui.Select({
-          options: options,
-          value: this.get_currentFilter(idx, 'operator'),
-          onChange: () => { this.update_filter(); },
-        }),
-        this.values[idx] = new ui.InputText({
-          value: this.get_currentFilter(idx, 'value'),
-          onChange: () => { this.update_filter(); },
-        }),
-        new ui.Select({
-          filter: this,
-          idx: idx,
-          options: this.get_candidates(idx),
-          value: this.get_currentFilter(idx, 'value'),
-          onChange: function (value) { 
-            this.filter.values[this.idx].value = value;
-            this.filter.update_filter();
-          },
-        }),
+    // We cannot render ambiguous filters
+    if (this.fields === global.ambiguous) {
+      this.appendChild(
+        ui.createText('Cannot be displayed', 'vs-text-140')
       );
+    } else {
+      this.update_candidates();
 
-      this.appendChild(row);
-      idx += 1;
-    });
+      let idx = 0;
+      this.fields.forEach((field) => {
+
+        let row = ui.H(
+          ui.createText(field, 'vs-text-140'),
+          this.operators[idx] = new ui.Select({
+            options: options,
+            value: this.get_currentFilter(idx, 'operator'),
+            onChange: () => { this.update_filter(); },
+          }),
+          this.values[idx] = new ui.InputText({
+            value: this.get_currentFilter(idx, 'value'),
+            onChange: () => { this.update_filter(); },
+          }),
+          new ui.Select({
+            filter: this,
+            idx: idx,
+            options: this.get_candidates(idx),
+            value: this.get_currentFilter(idx, 'value'),
+            onChange: function (value) {
+              this.filter.values[this.idx].value = value;
+              this.filter.update_filter();
+            },
+          }),
+        );
+
+        this.appendChild(row);
+        idx += 1;
+      });
+    }
     return this.node;
   }
 }

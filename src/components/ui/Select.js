@@ -1,4 +1,5 @@
 import View from './View.js';
+import global from '/core/Global';
 
 class Select extends View {
   constructor(state) {
@@ -11,23 +12,36 @@ class Select extends View {
   }
 
   onNotify(value) {
+    if (value === global.ambiguous) return;
+
     this.state.value = value;
     this.select.value = value;
   }
 
   on_value(value) {
+    if (value === global.ambiguous) return;
+
     this.select.value = value;
   }
 
   on_options(options) {
     this.select.innerHTML = '';
 
+    // Add an empty tag for ambiguous selection
+    let emptyTag = document.createElement('option');
+    emptyTag.value = null;
+    emptyTag.hidden = true;
+    emptyTag.disabled = true;
+    emptyTag.selected = true;
+    emptyTag.innerText = global.ambiguous;
+    this.select.appendChild(emptyTag);
+
     options.forEach(option => {
       let tag = document.createElement('option');
       tag.value = option[0];
       tag.innerText = option[((option.length == 2) ? 1 : 0)];
 
-      if (this.value == tag.value) {
+      if (this.value === tag.value) {
         tag.selected = true;
       }
       this.select.appendChild(tag);

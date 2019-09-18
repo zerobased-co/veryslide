@@ -17,7 +17,7 @@ class TextBox extends Box {
       underline: false,
       align: 'center',
       verticalAlign: 'middle',
-      wordBreak: 'normal',
+      wordBreak: 'break-all',
       ...state,
     });
 

@@ -275,7 +275,7 @@ class Viewport extends View {
         if (lastObject !== global.editingObject) {
           if (lastObject.selected === false) {
             this.send('Controller:select', lastObject, event.shiftKey);
-            lastObject.handler.mousedown(event);
+            lastObject.handler.mousedown(event, true);
             handled = true;
           }
         }

@@ -260,12 +260,17 @@ class Handler extends View {
     this.removeEventListener('mouseup', document);
   }
 
-  mousedown(event) {
+  mousedown(event, fromEditor) {
     if (this.object == null) return;
     if (global.grabbing == true) return;
 
     event.stopPropagation();
     event.preventDefault();
+
+    if (event.shiftKey && !fromEditor) {
+      this.send('Controller:deselect', this.object);
+      return;
+    }
 
     this.dragStart = {
       x: event.clientX,

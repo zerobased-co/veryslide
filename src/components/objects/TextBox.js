@@ -1,5 +1,6 @@
 import './TextBox.scss';
 import Box from './Box';
+import global from '/core/Global';
 
 class TextBox extends Box {
   constructor(state) {
@@ -22,54 +23,96 @@ class TextBox extends Box {
 
     this.addNumberState('size');
   }
+  
+  render() {
+    super.render();
+    this.textNode = document.createElement('div');
+    this.textNode.addEventListener('paste', function (e) {
+      e.preventDefault();
+
+      let text = '';
+      if (e.clipboardData || e.originalEvent.clipboardData) {
+        text = (e.originalEvent || e).clipboardData.getData('text/plain');
+      } else if (window.clipboardData) {
+        text = window.clipboardData.getData('Text');
+      }
+
+      if (document.queryCommandSupported('insertText')) {
+        document.execCommand('insertText', false, text);
+      } else {
+        document.execCommand('paste', false, text);
+      }
+    });
+    this.node.appendChild(this.textNode);
+
+    return this.node;
+  }
 
   editable() {
-    this.node.contentEditable = 'true';
-    this.node.focus();
-    this.node.addEventListener('keydown', this.keydown.bind(this));
+    this.textNode.contentEditable = 'true';
+    this.textNode.focus();
+    this.textNode.addEventListener('keydown', this.keydown.bind(this));
     document.addEventListener('mousedown', this.mousedown.bind(this));
     document.execCommand('selectAll', false, null);
+
+    // TBD: I don't want to use global state here
+    global.editingObject = this;
   }
 
   keydown(event) {
-    if (event.keyCode === 13 && event.shiftKey === false) {
-      event.preventDefault();
-      this.blur();
-      this.send('Controller:select', this);
+    if (event.metaKey || event.ctrlKey) {
+      switch(event.keyCode) {
+        case 66: // Bold
+        case 98:
+        case 73: // Italic
+        case 105:
+        case 85: // Underline
+        case 117:
+          event.preventDefault();
+          return false;
+        case 13: // Enter
+          event.preventDefault();
+          this.blur();
+          this.send('Controller:select', this);
+          return false;
+      }
     }
+    return true;
   }
 
   mousedown(event) {
-    if (event.target !== this.node) {
+    if (event.target !== this.node && event.target !== this.textNode) {
       this.blur();
     }
   }
 
   blur() {
-    this.node.contentEditable = 'false';
-    this.node.blur();
-    this.node.removeEventListener('keydown', this.keydown.bind(this));
+    this.textNode.contentEditable = 'false';
+    this.textNode.blur();
+    this.textNode.removeEventListener('keydown', this.keydown.bind(this));
     document.removeEventListener('mousedown', this.mousedown.bind(this));
     window.getSelection().removeAllRanges();
 
     // copy text from node
-    this.text = this.node.innerText;
+    this.text = this.textNode.innerText;
+    // TBD: I don't want to use global state here
+    global.editingObject = null;
   }
 
   on_fontFamily(font) {
-    this.node.style.fontFamily = font;
+    this.textNode.style.fontFamily = font;
   }
 
   on_size(size) {
-    this.node.style.fontSize = size + 'px';
+    this.textNode.style.fontSize = size + 'px';
   }
 
   on_text(text) {
-    this.node.innerText = text;
+    this.textNode.innerText = text;
   }
 
   on_textColor(color) {
-    this.node.style.color = color;
+    this.textNode.style.color = color;
   }
 
   apply(style) {
@@ -99,25 +142,25 @@ class TextBox extends Box {
 
   on_bold(bold) {
     if (bold) {
-      this.node.style.fontWeight = 700;
+      this.textNode.style.fontWeight = 700;
     } else {
-      this.node.style.fontWeight = 400;
+      this.textNode.style.fontWeight = 400;
     }
   }
 
   on_italic(italic) {
     if (italic) {
-      this.node.style.fontStyle = 'italic';
+      this.textNode.style.fontStyle = 'italic';
     } else {
-      this.node.style.fontStyle = 'normal';
+      this.textNode.style.fontStyle = 'normal';
     }
   }
 
   on_underline(underline) {
     if (underline) {
-      this.node.style.textDecoration = 'underline';
+      this.textNode.style.textDecoration = 'underline';
     } else {
-      this.node.style.textDecoration = 'none';
+      this.textNode.style.textDecoration = 'none';
     }
   }
 
@@ -145,7 +188,7 @@ class TextBox extends Box {
   }
 
   on_wordBreak(value) {
-    this.node.style.wordBreak = value;
+    this.textNode.style.wordBreak = value;
   }
 }
 

@@ -6,11 +6,15 @@
   @extend .vs-object;
 
   overflow: hidden;
-  word-wrap: break-word;
-  word-break: break-all;
-  white-space: pre-wrap;
 
-  &:read-write:focus {
-    outline: none;
+  div {
+    word-wrap: break-word;
+    word-break: break-all;
+    white-space: pre-wrap;
+    display: block;
+
+    &:read-write:focus {
+      outline: none;
+    }
   }
 }

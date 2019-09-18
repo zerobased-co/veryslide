@@ -270,10 +270,14 @@ class Viewport extends View {
       let objects = this.page.findObjects(cx, cy);
       if (objects.length > 0) {
         const lastObject = objects.slice(-1)[0];
-        if (lastObject.selected === false) {
-          this.send('Controller:select', lastObject, event.shiftKey);
-          lastObject.handler.mousedown(event);
-          handled = true;
+
+        // If selected object is in content-editing, let it as it is
+        if (lastObject !== global.editingObject) {
+          if (lastObject.selected === false) {
+            this.send('Controller:select', lastObject, event.shiftKey);
+            lastObject.handler.mousedown(event);
+            handled = true;
+          }
         }
       } else {
         if (event.shiftKey === false) {
@@ -289,6 +293,11 @@ class Viewport extends View {
       event.preventDefault();
       this.addEventListener('mousemove', this.onMouseMove, document);
       this.addEventListener('mouseup', this.onMouseUp, document);
+
+      if (global.editingObject) {
+        global.editingObject.blur();
+        global.editingObject = null;
+      }
     }
   }
 

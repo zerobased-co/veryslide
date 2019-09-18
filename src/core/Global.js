@@ -3,6 +3,7 @@ class Global {
     this.snap = false;
     this.snapSize = 16;
     this.grabbing = false;
+    this.editingObject = null;
     this.ambiguous = '?';
   }
 }

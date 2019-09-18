@@ -192,6 +192,11 @@ class TextBox extends Box {
   on_wordBreak(value) {
     this.textNode.style.wordBreak = value;
   }
+
+  is_overflow() {
+    return (this.node.clientWidth < this.textNode.clientWidth)
+        || (this.node.clientHeight < this.textNode.clientHeight);
+  }
 }
 
 export default TextBox

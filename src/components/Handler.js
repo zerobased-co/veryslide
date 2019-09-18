@@ -44,6 +44,10 @@ class Handler extends View {
       this.object.addPairing(this);
       this.alignToObject(this.object);
       this.updateTransform();
+
+      if (typeof this.object['is_overflow'] === 'function') {
+        // TBD: Show overflow dot
+      }
     }
   }
 

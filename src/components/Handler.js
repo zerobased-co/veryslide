@@ -99,7 +99,7 @@ class Handler extends View {
 
     let dots = this.node.getElementsByClassName('vs-dot');
     for(var i = 0; i < dots.length; i++) {
-      let type = dots[i].innerHTML;
+      let type = dots[i].dataset.type;
       dots[i].style.transform = dotPreset[type]['transform'] + ' scale(' + (1 / this.viewport.scale) + ')';
     }
   }
@@ -286,7 +286,7 @@ class Handler extends View {
     };
 
     if (event.target.classList.contains('vs-dot')) {
-      this.transform = event.target.innerText;
+      this.transform = event.target.dataset.type;
       this.currentDot = event.target;
       this.currentDot.classList.add('vs-showme');
     } else {
@@ -316,7 +316,7 @@ class Handler extends View {
     for(let i = 0; i < dotPreset.length; i++) {
       let dot = document.createElement('div');
       dot.className = 'vs-dot d' + i;
-      dot.innerText = i;
+      dot.dataset.type = i;
       this.node.appendChild(dot);
     }
 

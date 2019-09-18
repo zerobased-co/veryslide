@@ -120,7 +120,9 @@ class TextBox extends Box {
 
     switch(style) {
       case 'Smaller':
-        this.size = parseInt(this.size) - 1;
+        if (this.size > 1) {
+          this.size = parseInt(this.size) - 1;
+        }
         break;
       case 'Bigger':
         this.size = parseInt(this.size) + 1;

@@ -74,6 +74,8 @@ class DocumentController extends State {
         if (nextPage !== this.focusedPage) {
           this.focusedPage = null;
           this.send('Controller:select', nextPage);
+        } else {
+          this.send('Property:setPanelFor', this.selected.array);
         }
       }
     });

@@ -33,6 +33,7 @@ class Handler extends View {
     this.basePos = undefined;
     this.baseSize = undefined;
     this.currentDot = null;
+    this.firstMove = false;
 
     this.addEventListener('mousedown', this.mousedown);
     this.listen('Object:updateTransform', () => this.updateTransform());
@@ -110,6 +111,11 @@ class Handler extends View {
 
   mousemove(event) {
     if (this.object == null) return;
+
+    if (this.firstMove) {
+      this.send('Object:hideHandler', this, true);
+      this.firstMove = false;
+    }
 
     event.stopPropagation();
     event.preventDefault();
@@ -304,10 +310,9 @@ class Handler extends View {
         this.transform = 'move';
       }
     }
-
-    this.send('Object:hideHandler', this, true);
     
     if (this.transform != null) {
+      this.firstMove = true;
       this.addEventListener('mousemove', this.mousemove, document);
       this.addEventListener('mouseup', this.mouseup, document);
     }

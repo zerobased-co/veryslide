@@ -150,7 +150,7 @@ class Selector extends View {
 
       boundObjects.forEach((object) => {
         if (this.selectedList.find(object) == -1) {
-          if (this.preSelectedList.find(object) !== -1 && event.shiftKey == true) {
+          if (this.preSelectedList.find(object) !== -1 && (event.shiftKey || event.metaKey)) {
             this.send('Controller:deselect', object);
             this.selectedList.append(object);
           } else {
@@ -162,7 +162,7 @@ class Selector extends View {
       });
 
       deselectList.iter((object) => {
-        if (this.preSelectedList.find(object) !== -1 && event.shiftKey == true) {
+        if (this.preSelectedList.find(object) !== -1 && (event.shiftKey || event.metaKey)) {
           this.send('Controller:select', object, true);
           this.selectedList.remove(object);
         } else {
@@ -274,13 +274,13 @@ class Viewport extends View {
         // If selected object is in content-editing, let it as it is
         if (lastObject !== global.editingObject) {
           if (lastObject.selected === false) {
-            this.send('Controller:select', lastObject, event.shiftKey);
+            this.send('Controller:select', lastObject, (event.shiftKey || event.metaKey));
             lastObject.handler.mousedown(event, true);
             handled = true;
           }
         }
       } else {
-        if (event.shiftKey === false) {
+        if (!event.shiftKey && !event.metaKey) {
           this.send('Controller:deselect');
         }
         this.mode = 'select';

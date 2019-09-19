@@ -121,6 +121,7 @@ class DocumentController extends State {
       if (keepSelection !== true) {
         this.send('Controller:deselect');
       } else {
+        // When different type (page / object) was selected, clear the selection
         if (this.selected.length > 0) {
           if ((item.type === 'Page' && this.selected.array[0].type !== 'Page') ||
               (item.type !== 'Page' && this.selected.array[0].type === 'Page')) {

@@ -13,6 +13,6 @@
       'root': ['./src', './']
     }],
     'react-hot-loader/babel',
-//    'istanbul',
+    'istanbul',
   ],
 }

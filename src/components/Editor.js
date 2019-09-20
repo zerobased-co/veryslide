@@ -21,10 +21,14 @@ class Menu extends View {
       new ui.Text({'title': 'Page'}),
       ui.createButton('Add',    () => { this.send('Controller:addPage'); }),
 
-      new ui.Text({'title': 'Viewport'}),
       ui.HGroup(
-        ui.createButton('Reset zoom',    () => { this.resetZoom(); }),
-        this.btnSnap = ui.createButton('Snap Off',      () => { this.toggleSnap(); }),
+        this.btnUndo = ui.createButton('Undo', () => this.send('Controller:history', 'Undo')),
+        this.btnRedo = ui.createButton('Redo', () => this.send('Controller:history', 'Redo')),
+      ),
+
+      ui.HGroup(
+        ui.createButton('Reset zoom', () => { this.resetZoom(); }),
+        this.btnSnap = ui.createButton('Snap Off', () => { this.toggleSnap(); }),
       ),
 
       new ui.Text({'title': 'Object'}),
@@ -38,8 +42,8 @@ class Menu extends View {
       ui.HGroup(
         ui.createButton('Image', () => { this.send('Controller:savePage', 'image'); }),
         ui.createButton('All',   () => { this.send('Controller:saveAllPage', 'image'); }),
-        ui.createButton('Save',   () => { this.send('Veryslide:save'); }),
-        ui.createButton('Play',   () => { this.send('Viewport:setPresentationMode', true); }),
+        ui.createButton('Save',  () => { this.send('Veryslide:save'); }),
+        ui.createButton('Play',  () => { this.send('Viewport:setPresentationMode', true); }),
       ),
 
       ui.createButton('Close',   () => { 
@@ -50,6 +54,15 @@ class Menu extends View {
 
     this.listen('Menu:resetZoom', this.resetZoom);
     this.listen('Menu:toggleSnap', this.toggleSnap);
+    this.listen('Menu:historyChanged', this.historyChanged);
+
+    this.btnUndo.enable(false);
+    this.btnRedo.enable(false);
+  }
+
+  historyChanged(undoable, redoable) {
+    this.btnUndo.enable(undoable);
+    this.btnRedo.enable(redoable);
   }
 
   openFileDialog() {
@@ -213,9 +226,9 @@ class Viewport extends View {
       [false, false, false, true,  [66], () => this.send('Controller:style', 'Bold')],
       [false, false, false, true,  [73], () => this.send('Controller:style', 'Italic')],
       [false, false, false, true,  [85], () => this.send('Controller:style', 'Underline')],
-      [false, false, false, true,  [83], () => this.send('Veryslide:save')],
       [false, false, false, true,  [173, 189], () => this.send('Controller:style', 'Smaller')],
       [false, false, false, true,  [61, 187], () => this.send('Controller:style', 'Bigger')],
+      [false, false, false, true,  [83], () => this.send('Veryslide:save')],
       [false, false, false, false, [27], () => this.setPresentationMode(false)],
       [false, false, false, false, [37], () => this.send('Controller:move', 'Left')],
       [false, false, false, false, [38], () => this.send('Controller:move', 'Up')],
@@ -225,7 +238,10 @@ class Viewport extends View {
       [true,  false, false, false, [38], () => this.send('Controller:move', 'BigUp')],
       [true,  false, false, false, [39], () => this.send('Controller:move', 'BigRight')],
       [true,  false, false, false, [40], () => this.send('Controller:move', 'BigDown')],
-      [false, false, true, false,  [78], () => this.send('Controller:addPage')],
+      [false, false, true,  false, [78], () => this.send('Controller:addPage')],
+      [false, false, false, true,  [89], () => this.send('Controller:history', 'Redo')],
+      [true,  false, false, true,  [90], () => this.send('Controller:history', 'Redo')],
+      [false, false, false, true,  [90], () => this.send('Controller:history', 'Undo')],
     ];
     this.keyupEvents = [
     // shift, ctrl,  alt,   meta,  keycodes, func

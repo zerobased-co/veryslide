@@ -8,7 +8,13 @@ class Button extends View {
       ...state,
     });
 
-    this.node.addEventListener('click', this.onClick);
+    this.addEventListener('click', this.click);
+  }
+
+  click(event) {
+    if (this.enabled) {
+      return this.onClick(event);
+    }
   }
 
   onClick(/*event*/) {

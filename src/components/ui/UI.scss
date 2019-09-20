@@ -30,8 +30,10 @@ $button-radius: 5px;
   align-items: center;
 
   .vs-button {
-    &:active {
-      transform: scale(1.0, 0.95);
+    &:not(.vs-disabled) {
+      &:active {
+        transform: scale(1.0, 0.95);
+      }
     }
   }
   *:first-child {
@@ -67,22 +69,28 @@ $button-radius: 5px;
   font-weight: 400;
   user-select: none;
 
-  &:hover {
-    background: white;
-    cursor: pointer;
-    box-shadow: 0 0 5px 2px #ddd;
-    transition: all 0.1s ease-out;
-  }
+  &:not(.vs-disabled) {
+    &:hover {
+      background: white;
+      cursor: pointer;
+      box-shadow: 0 0 5px 2px #ddd;
+      transition: all 0.1s ease-out;
+    }
 
-  &:active {
-    transform: scale(0.95, 0.95);
-    box-shadow: 0 0 5px 0px #eee;
-    transition: all 0.1s ease-out;
+    &:active {
+      transform: scale(0.95, 0.95);
+      box-shadow: 0 0 5px 0px #eee;
+      transition: all 0.1s ease-out;
+    }
   }
 
   &.small {
     width: 64px;
     font-size: 0.7em;
+  }
+
+  &.vs-disabled {
+    color: #888;
   }
 }
 

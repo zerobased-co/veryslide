@@ -48,6 +48,8 @@ class Page extends BaseObject {
     this.objects.append(object);
     this.node.append(object.node);
     this.invalidate = true;
+
+    this.send('Document:keep', object);
     return object;
   }
 
@@ -99,6 +101,7 @@ class Page extends BaseObject {
   }
 
   removeObject(object) {
+    this.send('Document:wipe', object);
     object.node.parentNode.removeChild(object.node);
     this.objects.remove(object);
     object.destroy();
@@ -130,9 +133,11 @@ class Page extends BaseObject {
 
   render() {
     let node = super.render();
-    this.objects.iter((object) => {
-      node.append(object.render());
-    });
+    if (this.objects.length > 0) {
+      this.objects.iter((object) => {
+        node.append(object.render());
+      });
+    }
     return node;
   }
 }
@@ -181,16 +186,31 @@ class Document extends State {
       height: 768,
       pages: new List(),
       assets: new List(),
+      objects: {},
       type: 'Document',
       focusedPageIndex: -1,
       ...state,
     });
+
+    this.listen('Document:keep', (object) => {
+      this.objects[object.uuid] = object;
+    });
+
+    this.listen('Document:wipe', (object) => {
+      delete this.objects[object.uuid];
+    });
+
+    this.listen('Document:find', (uuid) => {
+      return this.objects[uuid];
+    });
   }
 
-  addPage(after) {
-    let page = new Page();
-    page.width = this.width;
-    page.height = this.height;
+  addPage(after, states) {
+    let page = new Page(states);
+    if (states == null) {
+      page.width = this.width;
+      page.height = this.height;
+    }
 
     if (after == null) {
       this.pages.append(page);
@@ -198,6 +218,7 @@ class Document extends State {
       this.pages.insert(page, this.pages.find(after) + 1);
     }
 
+    this.send('Document:keep', page);
     return page;
   }
 
@@ -206,6 +227,7 @@ class Document extends State {
   }
 
   removePage(page) {
+    this.send('Document:wipe', page);
     let nextpage = this.pages.remove(page);
     return nextpage;
   }

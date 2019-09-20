@@ -8,7 +8,7 @@ class TextBox extends Box {
       type: 'TextBox',
       className: 'vs-textbox',
       fontFamily: 'sans-serif',
-      text: 'Text',
+      text: 'Very',
       color: '#FFFFFF00',
       textColor: '#000000',
       size: 14,
@@ -51,8 +51,9 @@ class TextBox extends Box {
   editable() {
     this.textNode.contentEditable = 'true';
     this.textNode.focus();
-    this.textNode.addEventListener('keydown', this.keydown.bind(this));
-    document.addEventListener('mousedown', this.mousedown.bind(this));
+
+    this.addEventListener('keydown', this.keydown);
+    this.addEventListener('mousedown', this.mousedown, document);
     document.execCommand('selectAll', false, null);
 
     // TBD: I don't want to use global state here
@@ -89,12 +90,15 @@ class TextBox extends Box {
   blur() {
     this.textNode.contentEditable = 'false';
     this.textNode.blur();
-    this.textNode.removeEventListener('keydown', this.keydown.bind(this));
-    document.removeEventListener('mousedown', this.mousedown.bind(this));
+    this.removeEventListener('keydown');
+    this.removeEventListener('mousedown', document);
     window.getSelection().removeAllRanges();
 
     // copy text from node
+    this.send('Controller:history', 'Before', [this]);
     this.text = this.textNode.innerText;
+    this.send('Controller:history', 'After', [this]);
+    this.send('Controller:history', 'Modify');
     // TBD: I don't want to use global state here
     global.editingObject = null;
   }

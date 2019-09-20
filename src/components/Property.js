@@ -3,6 +3,7 @@ import View from './ui/View';
 import Panel from './ui/Panel';
 import Node from '/core/Node';
 import global from '/core/Global';
+import channel from '/core/Channel';
 
 const FONTLIST = [
   ['serif', 'Serif'],
@@ -179,7 +180,7 @@ class PanelForImageBox extends PanelForBox {
   render() {
     super.render();
 
-    // TBD: We cannot change image after creation
+    // TBD: We cannot change image After creation
     [
       new ui.TitleBar({'title': 'Image'}),
       ui.H(
@@ -211,7 +212,7 @@ class PanelForImageList extends PanelForBox {
         ui.createText('Data Asset'),
         new ui.Select({
           options: this.dataOptions,
-          afterChange: (value) => { 
+          AfterChange: (value) => { 
             this.send('Property:setPanelFor', [this.object]);
           },
         }).pair(this.object, 'asset'),
@@ -358,9 +359,12 @@ function createProxy(objects) {
           proxyObj[prop] = value;
           break;
         default:
+          channel.send('Controller:history', 'Before');
           objects.forEach((obj) => {
             obj[prop] = value;
           });
+          channel.send('Controller:history', 'After');
+          channel.send('Controller:history', 'Modify');
           break;
       }
       return true;

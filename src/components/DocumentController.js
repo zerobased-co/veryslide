@@ -31,6 +31,7 @@ class DocumentController extends State {
       const newPage = this.doc.addPage(this.focusedPage);
       this.send('PageList:addPage', newPage, this.doc.pages.find(newPage))[0];
       this.send('Controller:select', newPage);
+      this.send('Controller:history', 'Add', [newPage]);
     });
 
     this.listen('Controller:prevPage', () => {
@@ -54,8 +55,9 @@ class DocumentController extends State {
     this.listen('Controller:remove', () => {
       if (this.selected.length == 0) return;
 
-      let nextPage = this.focusedPage;
+      this.send('Controller:history', 'Remove');
 
+      let nextPage = this.focusedPage;
       this.selected.iter((item) => {
         if (item.type === 'Page') {
           this.send('PageList:removePage', item);
@@ -99,6 +101,7 @@ class DocumentController extends State {
           });
           break;
       }
+      this.send('Controller:history', 'Add', [newObject]);
       this.send('Controller:select', newObject);
     });
 
@@ -179,6 +182,7 @@ class DocumentController extends State {
         bb = getBB(this.selected.array);
       }
 
+      this.send('Controller:history', 'Before');
       for(let i = 0; i < this.selected.length; i++) {
         const obj = this.selected.at(i);
 
@@ -203,11 +207,14 @@ class DocumentController extends State {
             break;
         }
       }
+      this.send('Controller:history', 'After');
+      this.send('Controller:history', 'Modify');
     });
 
     this.listen('Controller:order', (order) => {
       if (this.focusedPage == null) return;
 
+      this.send('Controller:history', 'Before');
       for(let i = 0; i < this.selected.length; i++) {
         const obj = this.selected.at(i);
 
@@ -227,19 +234,23 @@ class DocumentController extends State {
         }
       }
       this.focusedPage.reorder();
+      this.send('Controller:history', 'After');
+      this.send('Controller:history', 'Modify');
     });
 
     this.listen('Controller:style', (style) => {
+      this.send('Controller:history', 'Before');
       for(let i = 0; i < this.selected.length; i++) {
         const obj = this.selected.at(i);
 
         if (typeof obj['apply'] !== 'function') continue;
         obj.apply(style);
       }
+      this.send('Controller:history', 'After');
+      this.send('Controller:history', 'Modify');
     });
 
     this.listen('Controller:move', (direction) => {
-      // TBD: for multiple objects
       if (this.isPresentationMode) {
         switch(direction) {
           case 'Left':
@@ -269,12 +280,15 @@ class DocumentController extends State {
               break;
           }
         } else {
+          this.send('Controller:history', 'Before');
           for(let i = 0; i < this.selected.length; i++) {
             const obj = this.selected.at(i);
 
             if (typeof obj['apply'] !== 'function') continue;
             obj.apply(direction);
           }
+          this.send('Controller:history', 'After');
+          this.send('Controller:history', 'Modify');
         }
       }
     });
@@ -298,23 +312,15 @@ class DocumentController extends State {
 
         let newObject = null;
         switch(item.type) {
-          case 'ImageList':
-            newObject = new ImageList();
-            break;
-          case 'ImageBox':
-            newObject = new ImageBox();
-            break;
-          case 'TextBox':
-            newObject = new TextBox();
-            break;
           case 'Page':
-            newObject = this.doc.addPage(this.focusedPage);
+            newObject = this.doc.addPage(this.focusedPage, item);
+            break;
+          default:
+            newObject = this.focusedPage.addObject(item.type, item);
             break;
         }
 
         if (newObject != null) {
-          newObject.deserialize(item);
-
           if (newObject.type == 'Page') {
             const pagethumb = this.send('PageList:addPage', newObject, this.doc.pages.find(newObject))[0];
           } else {
@@ -327,6 +333,7 @@ class DocumentController extends State {
               this.send('Viewport:focus', newObject);
             }
           }
+          console.log('HISTORY:ADD (PASTE)', newObject);
           this.send('Controller:select', newObject, true);
         }
       });
@@ -419,6 +426,52 @@ class DocumentController extends State {
         return item.name == assetName;
       });
       return asset;
+    });
+
+    this.listen('Controller:history', (type, objects) => {
+      if (objects == null) {
+        objects = this.selected.array;
+      }
+      console.log('History', type, objects);
+
+      switch(type) {
+        case 'Add':
+          objects.forEach((obj) => {
+            this.history.insertAfterList(obj);
+          });
+          this.history.record('ADD');
+          break;
+        case 'Remove':
+          objects.forEach((obj) => {
+            this.history.insertBeforeList(obj);
+          });
+          this.history.record('REMOVE');
+          break;
+        case 'Modify':
+          this.history.record('MODIFY');
+          break;
+        case 'Before':
+          objects.forEach((obj) => {
+            this.history.insertBeforeList(obj);
+          });
+          break;
+        case 'After':
+          objects.forEach((obj) => {
+            this.history.insertAfterList(obj);
+          });
+          break;
+        case 'Prepare':
+          this.history.prepare();
+          break;
+        case 'Undoable':
+          return this.history.undoable();
+        case 'Redoable':
+          return this.history.redoable();
+        case 'Undo':
+          return this.history.undo();
+        case 'Redo':
+          return this.history.redo();
+      }
     });
   }
 

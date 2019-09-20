@@ -6,7 +6,9 @@ class View extends Node {
       className: 'vs-view',
       parent: null,
       children: [],
-      eventListeners: [],
+      
+      enabled: true,
+      shown: true,
       ...state,
     });
   }
@@ -28,8 +30,8 @@ class View extends Node {
   }
 
   show(isShow) {
-    isShow = (isShow == null) ? true : isShow;
-    if (isShow) {
+    this.shown = (isShow == null) ? true : isShow;
+    if (this.shown) {
       this.node.classList.remove('vs-hidden');
     } else {
       this.node.classList.add('vs-hidden');
@@ -40,6 +42,19 @@ class View extends Node {
     return this.show(false);
   }
 
+  enable(isEnable) {
+    this.enabled = (isEnable == null) ? true : isEnable;
+    if (this.enabled) {
+      this.node.classList.remove('vs-disabled');
+    } else {
+      this.node.classList.add('vs-disabled');
+    }
+  }
+
+  disable() {
+    return this.enable(false);
+  }
+
   afterChange(value) {
   }
 
@@ -48,39 +63,6 @@ class View extends Node {
       this.pairTarget[this.pairKey] = value;
     }
     this.afterChange(value);
-  }
-
-  addEventListener(eventType, handler, target) {
-    if (target == null) {
-      target = this.node;
-    }
-
-    if (handler.hasOwnProperty('prototype') !== false) {
-      handler = handler.bind(this);
-    }
-
-    target.addEventListener(eventType, handler);
-
-    this.eventListeners.push({
-      eventType,
-      handler,
-      target,
-    });
-  }
-
-  removeEventListener(eventType, target) {
-    if (target == null) {
-      target = this.node;
-    }
-
-    this.eventListeners = this.eventListeners.filter(el => {
-      if (el['eventType'] == eventType && el['target'] == target) {
-        el['target'].removeEventListener(el['eventType'], el['handler']);
-        return false;
-      } else {
-        return true;
-      }
-    });
   }
 
   destroy() {

@@ -266,6 +266,12 @@ class Handler extends View {
       this.currentDot = null;
     }
 
+    if (this.dragStart.x !== event.clientX || this.dragStart.y !== event.clientY) {
+      // Finally, something has been moved
+      this.send('Controller:history', 'After');
+      this.send('Controller:history', 'Modify');
+    }
+
     this.removeEventListener('mousemove', document);
     this.removeEventListener('mouseup', document);
   }
@@ -313,6 +319,8 @@ class Handler extends View {
     
     if (this.transform != null) {
       this.firstMove = true;
+      this.send('Controller:history', 'Prepare');
+      this.send('Controller:history', 'Before');
       this.addEventListener('mousemove', this.mousemove, document);
       this.addEventListener('mouseup', this.mouseup, document);
     }

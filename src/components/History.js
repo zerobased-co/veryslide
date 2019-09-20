@@ -1,21 +1,107 @@
-import List from 'core/List';
 import State from 'core/State';
+
+const HISTORY_QUEUE_LIMIT = 240;
 
 class History extends State {
   constructor(state) {
     super({
-      queue: new List(),
+      queue: [],
+      current: null,
       marker: -1,
     });
+
+    this.prepare();
   }
 
-  record() {
+  prepare() {
+    this.current = {};
+    this.current['type'] = '';
+    this.current['before'] = {};
+    this.current['after'] = {};
+  }
+
+  insertBeforeList(object) {
+    this.current.before[object.uuid] = object.serialize();
+  }
+
+  insertAfterList(object) {
+    this.current.after[object.uuid] = object.serialize();
+  }
+
+  record(type) {
+    // slice queue before recording (wipe out previous redo nodes)
+    this.queue = this.queue.slice(0, this.marker + 1);
+
+    this.current.type = type;
+    this.queue.push(this.current);
+    this.prepare();
+    this.marker++;
+    console.log(this.marker);
+
+    this.send('Menu:historyChanged', this.undoable(), this.redoable());
+  }
+
+  redoable() {
+    return (this.queue.length > 0 && this.marker < (this.queue.length - 1));
   }
 
   redo() {
+    if (this.marker + 1 >= this.queue.length) return;
+    this.marker++;
+
+    let w = this.queue[this.marker];
+
+    switch(w.type) {
+      case 'ADD':
+        break;
+      case 'REMOVE':
+        break;
+      case 'MODIFY':
+        Object.entries(w.after).forEach(([key, value]) => {
+          value = JSON.parse(value);
+          const obj = this.send('Document:find', key);
+          if (obj.length > 0) {
+            obj[0].deserialize(value);
+          }
+        });
+        break;
+    }
+    this.send('Menu:historyChanged', this.undoable(), this.redoable());
+  }
+
+  undoable() {
+    return (this.marker >= 0);
   }
 
   undo() {
+    if (this.marker < 0) return;
+
+    let w = this.queue[this.marker];
+
+    switch(w.type) {
+      case 'ADD':
+        Object.entries(w.after).forEach(([key, value]) => {
+          const obj = this.send('Document:find', key);
+          if (obj.length > 0) {
+            obj[0].page.removeObject(obj[0]);
+          }
+        });
+        break;
+      case 'REMOVE':
+        break;
+      case 'MODIFY':
+        Object.entries(w.before).forEach(([key, value]) => {
+          value = JSON.parse(value);
+          const obj = this.send('Document:find', key);
+          if (obj.length > 0) {
+            obj[0].deserialize(value);
+          }
+        });
+        break;
+    }
+
+    this.marker--;
+    this.send('Menu:historyChanged', this.undoable(), this.redoable());
   }
 }
 

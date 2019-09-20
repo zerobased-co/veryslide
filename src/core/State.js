@@ -124,13 +124,11 @@ class State {
       if (v.constructor.name === 'Array') {
         v.forEach((item) => {
           if (k === 'pages') {
-            let page = this.addPage();
-            // TBD: without using channel
+            let page = this.addPage(null, {'uuid': item.uuid});
             page.deserialize(item);
             this.send('PageList:addPage', page);
           } else if (k === 'objects') {
-            let obj = this.addObject(item.type);
-            obj.deserialize(item);
+            let obj = this.addObject(item.type, item);
           } else if (k === 'assets') {
             let asset = this.addAsset();
             asset.deserialize(item);

@@ -12,6 +12,7 @@ class Node extends State {
     this.content = '';
     this.selected = false;
     this.focused = false;
+    this.eventListeners = [];
 
     this.render();
     this.updateState();
@@ -58,6 +59,39 @@ class Node extends State {
 
   loading(isLoading) {
     showLoadingIndicator(this, isLoading);
+  }
+
+  addEventListener(eventType, handler, target) {
+    if (target == null) {
+      target = this.node;
+    }
+
+    if (handler.hasOwnProperty('prototype') !== false) {
+      handler = handler.bind(this);
+    }
+
+    target.addEventListener(eventType, handler);
+
+    this.eventListeners.push({
+      eventType,
+      handler,
+      target,
+    });
+  }
+
+  removeEventListener(eventType, target) {
+    if (target == null) {
+      target = this.node;
+    }
+
+    this.eventListeners = this.eventListeners.filter(el => {
+      if (el['eventType'] == eventType && el['target'] == target) {
+        el['target'].removeEventListener(el['eventType'], el['handler']);
+        return false;
+      } else {
+        return true;
+      }
+    });
   }
   
   render() {

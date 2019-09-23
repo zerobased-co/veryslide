@@ -36,7 +36,6 @@ class History extends State {
     this.queue.push(this.current);
     this.prepare();
     this.marker++;
-    console.log(this.marker);
 
     this.send('Menu:historyChanged', this.undoable(), this.redoable());
   }
@@ -59,9 +58,9 @@ class History extends State {
       case 'MODIFY':
         Object.entries(w.after).forEach(([key, value]) => {
           value = JSON.parse(value);
-          const obj = this.send('Document:find', key);
-          if (obj.length > 0) {
-            obj[0].deserialize(value);
+          const obj = this.send('Document:find', key)[0];
+          if (obj != null) {
+            obj.deserialize(value);
           }
         });
         break;
@@ -81,9 +80,13 @@ class History extends State {
     switch(w.type) {
       case 'ADD':
         Object.entries(w.after).forEach(([key, value]) => {
-          const obj = this.send('Document:find', key);
-          if (obj.length > 0) {
-            obj[0].page.removeObject(obj[0]);
+          const obj = this.send('Document:find', key)[0];
+          if (obj != null) {
+            if (obj.type === 'Page') { 
+              obj.doc.removePage(obj);
+            } else {
+              obj.page.removeObject(obj);
+            }
           }
         });
         break;
@@ -92,9 +95,9 @@ class History extends State {
       case 'MODIFY':
         Object.entries(w.before).forEach(([key, value]) => {
           value = JSON.parse(value);
-          const obj = this.send('Document:find', key);
-          if (obj.length > 0) {
-            obj[0].deserialize(value);
+          const obj = this.send('Document:find', key)[0];
+          if (obj != null) {
+            obj.deserialize(value);
           }
         });
         break;

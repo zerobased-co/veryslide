@@ -53,9 +53,6 @@ describe('History', () => {
 
     history.undo();
     assert.equal(object.text, defaultText);
-
-    history.undo();
-    assert.equal(page.objects.length, 0);
   });
 
   it('should run redo', () => {
@@ -98,5 +95,35 @@ describe('History', () => {
     history.record('MODIFY');
 
     assert.equal(history.redoable(), false);
+  });
+
+  it('should create and remove an object', () => {
+    let object = page.addObject('TextBox');
+    history.insertAfterList(object);
+    history.record('ADD');
+
+    history.undo();
+    assert.equal(page.objects.length, 0);
+  });
+
+  it('should create and remove multiple objects', () => {
+    const count = 10;
+    for(let i = 0; i < count; i++) {
+      history.insertAfterList(page.addObject('TextBox'));
+    }
+    history.record('ADD');
+    assert.equal(page.objects.length, count);
+
+    history.undo();
+    assert.equal(page.objects.length, 0);
+  });
+
+  it('should remove a page', () => {
+    page = doc.addPage();
+    history.insertAfterList(page);
+    history.record('ADD');
+
+    history.undo();
+    assert.equal(doc.pages.length, 1);
   });
 });

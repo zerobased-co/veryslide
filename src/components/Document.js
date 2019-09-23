@@ -1,8 +1,8 @@
 import domtoimage from 'dom-to-image';
 
-import { defaultDomToImageOption } from 'core/Util.js';
-import State from 'core/State.js';
-import List from 'core/List';
+import { defaultDomToImageOption } from 'core/Util';
+import State from 'core/State';
+import A from 'core/Array';
 import BaseObject from './objects/BaseObject';
 import TextBox from './objects/TextBox';
 import ImageBox from './objects/ImageBox';
@@ -13,13 +13,14 @@ class Page extends BaseObject {
     super({
       type: 'Page',
       className: 'vs-page',
-      objects: new List(),
+      objects: [],
       thumbnail: '',
       ...state,
     });
 
     this.invalidate = false;
     this.thumbnailScale = 0.2;
+    this.doc = null;
     this.pagethumb = null;
   }
 
@@ -45,7 +46,7 @@ class Page extends BaseObject {
         object[k] = v;
       }
     }
-    this.objects.append(object);
+    this.objects.push(object);
     this.node.append(object.node);
     this.invalidate = true;
 
@@ -53,19 +54,12 @@ class Page extends BaseObject {
     return object;
   }
 
-  appendObject(object) {
-    object.page = this;
-    this.objects.append(object);
-    this.node.append(object.node);
-    this.invalidate = true;
-  }
-
   findObjects(x, y, w, h) {
     let found = [];
     w = w || 0;
     h = h || 0;
 
-    this.objects.iter((object) => {
+    this.objects.forEach((object) => {
       if (object.overlap(x, y, w, h) === true) {
         found.push(object);
       }
@@ -103,14 +97,14 @@ class Page extends BaseObject {
   removeObject(object) {
     this.send('Document:wipe', object);
     object.node.parentNode.removeChild(object.node);
-    this.objects.remove(object);
+    A.remove(this.objects, object);
     object.destroy();
     this.invalidate = true;
   }
 
   reorder() {
     let order = 0;
-    this.objects.iter((object) => {
+    this.objects.forEach((object) => {
       object.order = order;
       order += 1;
     });
@@ -134,7 +128,7 @@ class Page extends BaseObject {
   render() {
     let node = super.render();
     if (this.objects.length > 0) {
-      this.objects.iter((object) => {
+      this.objects.forEach((object) => {
         node.append(object.render());
       });
     }
@@ -184,8 +178,8 @@ class Document extends State {
       title: '',
       width: 1024,
       height: 768,
-      pages: new List(),
-      assets: new List(),
+      pages: [],
+      assets: [],
       objects: {},
       type: 'Document',
       focusedPageIndex: -1,
@@ -207,43 +201,37 @@ class Document extends State {
 
   addPage(after, states) {
     let page = new Page(states);
+    page.doc = this;
+
     if (states == null) {
       page.width = this.width;
       page.height = this.height;
     }
 
     if (after == null) {
-      this.pages.append(page);
+      A.append(this.pages, page);
     } else {
-      this.pages.insert(page, this.pages.find(after) + 1);
+      A.insert(this.pages, page, this.pages.indexOf(after) + 1);
     }
 
     this.send('Document:keep', page);
     return page;
   }
 
-  appendPage(page) {
-    this.pages.append(page);
-  }
-
   removePage(page) {
     this.send('Document:wipe', page);
-    let nextpage = this.pages.remove(page);
+    let nextpage = A.remove(this.pages, page);
     return nextpage;
   }
 
   addAsset() {
     let asset = new Asset();
-    this.assets.append(asset);
+    A.append(this.assets, asset);
     return asset;
   }
 
-  appendAsset(asset) {
-    this.assets.append(asset);
-  }
-
   removeAsset(asset) {
-    let nextasset = this.assets.remove(asset);
+    let nextasset = A.remove(this.assets, asset);
     return nextasset;
   }
 

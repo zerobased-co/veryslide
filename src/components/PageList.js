@@ -1,5 +1,5 @@
 import View from './ui/View';
-import List from 'core/List';
+import A from 'core/Array';
 
 class PageThumb extends View {
   constructor(state) {
@@ -70,7 +70,7 @@ class PageList extends View {
       ...state,
     });
 
-    this.pagethumbs = new List();
+    this.pagethumbs = [];
     this.listen('PageList:addPage', this.addPage);
     this.listen('PageList:removePage', this.removePage);
   }
@@ -80,10 +80,10 @@ class PageList extends View {
     pagethumb.page = page;
 
     if (at == null) {
-      this.pagethumbs.append(pagethumb);
+      this.pagethumbs.push(pagethumb);
       this.node.appendChild(pagethumb.node);
     } else {
-      this.pagethumbs.insert(pagethumb, at);
+      A.insert(this.pagethumbs, pagethumb, at);
       this.node.insertBefore(pagethumb.node, this.node.children[at]);
     }
     return pagethumb;

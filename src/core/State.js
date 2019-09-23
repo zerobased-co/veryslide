@@ -1,5 +1,5 @@
 import channel from './Channel';
-import List from './List';
+import A from './Array';
 
 class State {
   constructor(state) {
@@ -7,7 +7,7 @@ class State {
     this.__TYPE__ = 'State';
     this.__NUMBER_STATE__ = [];
     this.__IGNORE_STATE__ = [];
-    this.pairings = new Array();
+    this.pairings = [];
 
     if (this.state != null) {
       Object.getOwnPropertyNames(this.state).forEach(key => {
@@ -94,8 +94,6 @@ class State {
         switch(v['__TYPE__']) {
           case 'State':
             return v.state;
-          case 'List':
-            return v.array;
         }
       }
       return v;

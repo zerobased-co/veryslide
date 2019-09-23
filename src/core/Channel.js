@@ -1,5 +1,3 @@
-import List from './List.js';
-
 class Channel {
   constructor() {
     this.cleanup();

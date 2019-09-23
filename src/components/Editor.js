@@ -1,6 +1,6 @@
 import './Editor.scss';
 import global from '/core/Global';
-import List from '/core/List';
+import A from '/core/Array';
 import ui from './ui/UI';
 import View from './ui/View';
 import Panel from './ui/Panel';
@@ -122,15 +122,15 @@ class Selector extends View {
       x: 0,
       y: 0,
       viewport: null,
-      preSelectedList: new List(),
-      selectedList: new List(),
+      preSelectedList: [],
+      selectedList: [],
       ...state,
     });
   }
 
   reset() {
-    this.preSelectedList = new List();
-    this.selectedList = new List();
+    this.preSelectedList = [];
+    this.selectedList = [];
     this.resize(0, 0);
   }
   
@@ -159,28 +159,28 @@ class Selector extends View {
       }
 
       let boundObjects = this.viewport.page.findObjects(cx, cy, cw, ch);
-      let deselectList = this.selectedList.clone();
+      let deselectList = A.clone(this.selectedList);
 
       boundObjects.forEach((object) => {
-        if (this.selectedList.find(object) == -1) {
-          if (this.preSelectedList.find(object) !== -1 && (event.shiftKey || event.metaKey)) {
+        if (this.selectedList.indexOf(object) == -1) {
+          if (this.preSelectedList.indexOf(object) !== -1 && (event.shiftKey || event.metaKey)) {
             this.send('Controller:deselect', object);
-            this.selectedList.append(object);
+            this.selectedList.push(object);
           } else {
             this.send('Controller:select', object, true);
-            this.selectedList.append(object);
+            this.selectedList.push(object);
           }
         }
-        deselectList.remove(object);
+        A.remove(deselectList, object);
       });
 
-      deselectList.iter((object) => {
-        if (this.preSelectedList.find(object) !== -1 && (event.shiftKey || event.metaKey)) {
+      deselectList.forEach((object) => {
+        if (this.preSelectedList.indexOf(object) !== -1 && (event.shiftKey || event.metaKey)) {
           this.send('Controller:select', object, true);
-          this.selectedList.remove(object);
+          A.remove(this.selectedList, object);
         } else {
           this.send('Controller:deselect', object);
-          this.selectedList.remove(object);
+          A.remove(this.selectedList, object);
         }
       });
     }
@@ -362,7 +362,7 @@ class Viewport extends View {
     this.selector.y = y;
     this.selector.reset();
 
-    this.selector.preSelectedList = this.send('Controller:getSelection')[0].clone();
+    this.selector.preSelectedList = A.clone(this.send('Controller:getSelection')[0]);
 
     this.selector.show();
   }
@@ -606,7 +606,7 @@ class Editor extends View {
     }
 
     if (this.doc.focusedPageIndex >= 0) {
-      let page = this.doc.pages.at(this.doc.focusedPageIndex);
+      let page = this.doc.pages[this.doc.focusedPageIndex];
       this.send('Controller:select', page);
     }
   }

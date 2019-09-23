@@ -126,7 +126,7 @@ class State {
             page.deserialize(item);
             this.send('PageList:addPage', page);
           } else if (k === 'objects') {
-            let obj = this.addObject(item.type, item);
+            let obj = this.addObject(item.type, null, item);
           } else if (k === 'assets') {
             let asset = this.addAsset();
             asset.deserialize(item);

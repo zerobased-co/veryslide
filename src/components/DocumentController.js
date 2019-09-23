@@ -27,11 +27,16 @@ class DocumentController extends State {
       ...state,
     });
 
-    this.listen('Controller:addPage', () => {
-      const newPage = this.doc.addPage(this.focusedPage);
-      this.send('PageList:addPage', newPage, this.doc.pages.indexOf(newPage))[0];
+    this.listen('Controller:addPage', (at, states, bypassHistory) => {
+      if (at == null && this.focusedPage) {
+        at = this.focusedPage.order + 1;
+      }
+      const newPage = this.doc.addPage(at, states);
+      this.send('PageList:addPage', newPage, newPage.order);
       this.send('Controller:select', newPage);
-      this.send('Controller:history', 'Add', [newPage]);
+      if (bypassHistory !== true) {
+        this.send('Controller:history', 'Add', [newPage]);
+      }
     });
 
     this.listen('Controller:prevPage', () => {
@@ -82,11 +87,11 @@ class DocumentController extends State {
       }
     });
 
-    this.listen('Controller:addObject', (objType, states, file) => {
+    this.listen('Controller:addObject', (objType, at, states, file, bypassHistory) => {
       if (this.focusedPage == null) return;
       this.send('Controller:deselect');
 
-      let newObject = this.focusedPage.addObject(objType, states);
+      let newObject = this.focusedPage.addObject(objType, null, states);
       switch(newObject.type) {
         case 'ImageBox':
           newObject.loading(true);
@@ -101,7 +106,10 @@ class DocumentController extends State {
           });
           break;
       }
-      this.send('Controller:history', 'Add', [newObject]);
+
+      if (bypassHistory !== true) {
+        this.send('Controller:history', 'Add', [newObject]);
+      }
       this.send('Controller:select', newObject);
     });
 
@@ -220,16 +228,16 @@ class DocumentController extends State {
 
         switch(order) {
           case 'back':
-            this.focusedPage.objects.makeFirst(obj);
+            A.makeFirst(this.focusedPage.objects, obj);
             break;
           case 'front':
-            this.focusedPage.objects.makeLast(obj);
+            A.makeLast(this.focusedPage.objects, obj);
             break;
           case 'backward':
-            this.focusedPage.objects.backward(obj);
+            A.backward(this.focusedPage.objects, obj);
             break;
           case 'forward':
-            this.focusedPage.objects.forward(obj);
+            A.forward(this.focusedPage.objects, obj);
             break;
         }
       }
@@ -309,14 +317,15 @@ class DocumentController extends State {
       this.pasted += 1;
       this.clipboard.forEach((item) => {
         item = JSON.parse(item);
+        delete item['uuid']; // remove old uuid before creating new object
 
         let newObject = null;
         switch(item.type) {
           case 'Page':
-            newObject = this.doc.addPage(this.focusedPage, item);
+            newObject = this.doc.addPage(this.focusedPage, item.order + 1);
             break;
           default:
-            newObject = this.focusedPage.addObject(item.type, item);
+            newObject = this.focusedPage.addObject(item.type, item.order + 1, item);
             break;
         }
 
@@ -332,10 +341,11 @@ class DocumentController extends State {
               this.send('Viewport:focus', newObject);
             }
           }
-          console.log('HISTORY:ADD (PASTE)', newObject);
           this.send('Controller:select', newObject, true);
+          this.history.insertAfterList(newObject);
         }
       });
+      this.history.record('ADD');
     });
 
     this.savePage = (page) => {
@@ -431,7 +441,6 @@ class DocumentController extends State {
       if (objects == null) {
         objects = this.selected;
       }
-      console.log('History', type, objects);
 
       switch(type) {
         case 'Add':

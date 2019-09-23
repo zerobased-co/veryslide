@@ -91,7 +91,7 @@ class PageList extends View {
 
   removePage(page) {
     if (page.pagethumb !== null) {
-      this.pagethumbs.remove(page.pagethumb);
+      A.remove(this.pagethumbs, page.pagethumb);
       page.pagethumb.destroy();
     }
   }

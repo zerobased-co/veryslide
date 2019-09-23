@@ -24,7 +24,7 @@ class Page extends BaseObject {
     this.pagethumb = null;
   }
 
-  addObject(type, states) {
+  addObject(type, at, states) {
     let object = null;
     switch(type) {
       case 'TextBox':
@@ -38,7 +38,6 @@ class Page extends BaseObject {
         break;
     }
     object.page = this;
-    object.order = this.objects.length;
 
     // set default states
     if (states != null) {
@@ -46,7 +45,14 @@ class Page extends BaseObject {
         object[k] = v;
       }
     }
-    this.objects.push(object);
+
+    if (at == null) {
+      this.objects.push(object);
+      object.order = this.objects.length;
+    } else {
+      A.insert(this.objects, object, at);
+      this.reorder(at);
+    }
     this.node.append(object.node);
     this.invalidate = true;
 
@@ -99,10 +105,11 @@ class Page extends BaseObject {
     object.node.parentNode.removeChild(object.node);
     A.remove(this.objects, object);
     object.destroy();
-    this.invalidate = true;
+
+    this.reorder(object.order);
   }
 
-  reorder() {
+  reorder(from) {  // TBD: reorder only after `from` position
     let order = 0;
     this.objects.forEach((object) => {
       object.order = order;
@@ -199,7 +206,7 @@ class Document extends State {
     });
   }
 
-  addPage(after, states) {
+  addPage(at, states) {
     let page = new Page(states);
     page.doc = this;
 
@@ -208,10 +215,12 @@ class Document extends State {
       page.height = this.height;
     }
 
-    if (after == null) {
+    if (at == null) {
+      page.order = this.pages.length;
       A.append(this.pages, page);
     } else {
-      A.insert(this.pages, page, this.pages.indexOf(after) + 1);
+      A.insert(this.pages, page, at);
+      this.reorder(at);
     }
 
     this.send('Document:keep', page);
@@ -221,6 +230,7 @@ class Document extends State {
   removePage(page) {
     this.send('Document:wipe', page);
     let nextpage = A.remove(this.pages, page);
+    this.reorder();
     return nextpage;
   }
 
@@ -242,6 +252,14 @@ class Document extends State {
     if (this.focusedPageIndex == -1 && this.pages.length > 0) {
       this.focusedPageIndex = 0;
     }
+  }
+
+  reorder(from) {  // TBD: reorder only after `from` position
+    let order = 0;
+    this.pages.forEach((page) => {
+      page.order = order;
+      order += 1;
+    });
   }
 }
 

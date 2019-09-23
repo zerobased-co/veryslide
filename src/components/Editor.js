@@ -78,7 +78,7 @@ class Menu extends View {
         var image = new Image();
         image.src = reader.result;
         image.onload = () => {
-          this.send('Controller:addObject', 'ImageBox', {
+          this.send('Controller:addObject', 'ImageBox', null, {
             width: image.width,
             height: image.height,
             src: image.src,

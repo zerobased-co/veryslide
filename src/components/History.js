@@ -34,8 +34,10 @@ class History extends State {
 
     this.current.type = type;
     this.queue.push(this.current);
+    console.log('RECORD', this.queue.length, this.current);
     this.prepare();
     this.marker++;
+    console.log('NOW MARKET AT', this.marker);
 
     this.send('Menu:historyChanged', this.undoable(), this.redoable());
   }
@@ -52,8 +54,28 @@ class History extends State {
 
     switch(w.type) {
       case 'ADD':
+        Object.entries(w.after).forEach(([key, value]) => {
+          console.log('REDO:ADD', value);
+          value = JSON.parse(value);
+          if (value.type === 'Page') { 
+            this.send('Controller:addPage', value.order, value, true);
+          } else {
+            this.send('Controller:addObject', value.type, value.order, value, null, true);
+          }
+        });
         break;
       case 'REMOVE':
+        Object.entries(w.before).forEach(([key, value]) => {
+          console.log('REDO:REMOVE', value);
+          const obj = this.send('Document:find', key)[0];
+          if (obj != null) {
+            if (obj.type === 'Page') { 
+              obj.doc.removePage(obj);
+            } else {
+              obj.page.removeObject(obj);
+            }
+          }
+        });
         break;
       case 'MODIFY':
         Object.entries(w.after).forEach(([key, value]) => {
@@ -80,6 +102,7 @@ class History extends State {
     switch(w.type) {
       case 'ADD':
         Object.entries(w.after).forEach(([key, value]) => {
+          console.log('UNDO:ADD', value);
           const obj = this.send('Document:find', key)[0];
           if (obj != null) {
             if (obj.type === 'Page') { 
@@ -91,6 +114,15 @@ class History extends State {
         });
         break;
       case 'REMOVE':
+        Object.entries(w.before).forEach(([key, value]) => {
+          console.log('UNDO:REMOVE', value);
+          value = JSON.parse(value);
+          if (value.type === 'Page') { 
+            this.send('Controller:addPage', value.order, value, true);
+          } else {
+            this.send('Controller:addObject', value.type, value.order, value, null, true);
+          }
+        });
         break;
       case 'MODIFY':
         Object.entries(w.before).forEach(([key, value]) => {

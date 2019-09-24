@@ -2,6 +2,7 @@ import ui from './ui/UI';
 import View from './ui/View';
 import Panel from './ui/Panel';
 import Node from '/core/Node';
+import A from 'core/Array';
 import global from '/core/Global';
 import channel from '/core/Channel';
 
@@ -304,7 +305,7 @@ class ProxyObject extends Node {
         break;
       }
     }
-    
+
     this.pairings.forEach((pair) => {
       pair.notify(this.proxy, key, value);
     });
@@ -404,7 +405,7 @@ class Property extends View {
       return null;
     }
 
-    let {proxy, proxyObj} = createProxy(objects);
+    let {proxy, proxyObj} = createProxy(A.clone(objects));
     this.proxy = proxy;
     this.proxyObj = proxyObj;
     let resolvedType = objects[0].type;

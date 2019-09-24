@@ -34,10 +34,8 @@ class History extends State {
 
     this.current.type = type;
     this.queue.push(this.current);
-    console.log('RECORD', this.queue.length, this.current);
     this.prepare();
     this.marker++;
-    console.log('NOW MARKET AT', this.marker);
 
     this.send('Menu:historyChanged', this.undoable(), this.redoable());
   }
@@ -51,22 +49,23 @@ class History extends State {
     this.marker++;
 
     let w = this.queue[this.marker];
+    this.send('Controller:deselect');
 
     switch(w.type) {
       case 'ADD':
         Object.entries(w.after).forEach(([key, value]) => {
-          console.log('REDO:ADD', value);
           value = JSON.parse(value);
+          let obj = null;
           if (value.type === 'Page') { 
-            this.send('Controller:addPage', value.order, value, true);
+            obj = this.send('Controller:addPage', value.order, value, true)[0];
           } else {
-            this.send('Controller:addObject', value.type, value.order, value, null, true);
+            obj = this.send('Controller:addObject', value.type, value.order, value, null, true)[0];
           }
+          this.send('Controller:select', obj, true);
         });
         break;
       case 'REMOVE':
         Object.entries(w.before).forEach(([key, value]) => {
-          console.log('REDO:REMOVE', value);
           const obj = this.send('Document:find', key)[0];
           if (obj != null) {
             if (obj.type === 'Page') { 
@@ -83,6 +82,7 @@ class History extends State {
           const obj = this.send('Document:find', key)[0];
           if (obj != null) {
             obj.deserialize(value);
+            this.send('Controller:select', obj, true);
           }
         });
         break;
@@ -98,11 +98,11 @@ class History extends State {
     if (this.marker < 0) return;
 
     let w = this.queue[this.marker];
+    this.send('Controller:deselect');
 
     switch(w.type) {
       case 'ADD':
         Object.entries(w.after).forEach(([key, value]) => {
-          console.log('UNDO:ADD', value);
           const obj = this.send('Document:find', key)[0];
           if (obj != null) {
             if (obj.type === 'Page') { 
@@ -115,13 +115,14 @@ class History extends State {
         break;
       case 'REMOVE':
         Object.entries(w.before).forEach(([key, value]) => {
-          console.log('UNDO:REMOVE', value);
           value = JSON.parse(value);
+          let obj = null;
           if (value.type === 'Page') { 
-            this.send('Controller:addPage', value.order, value, true);
+            obj = this.send('Controller:addPage', value.order, value, true)[0];
           } else {
-            this.send('Controller:addObject', value.type, value.order, value, null, true);
+            obj = this.send('Controller:addObject', value.type, value.order, value, null, true)[0];
           }
+          this.send('Controller:select', obj, true);
         });
         break;
       case 'MODIFY':
@@ -130,6 +131,7 @@ class History extends State {
           const obj = this.send('Document:find', key)[0];
           if (obj != null) {
             obj.deserialize(value);
+            this.send('Controller:select', obj, true);
           }
         });
         break;

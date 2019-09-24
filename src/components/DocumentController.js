@@ -20,6 +20,7 @@ class DocumentController extends State {
       focusedPage: null,
 
       selected: [],
+      copiedStyle: null,
       clipboard: [],
       pasted: -1,
 
@@ -31,12 +32,14 @@ class DocumentController extends State {
       if (at == null && this.focusedPage) {
         at = this.focusedPage.order + 1;
       }
+
       const newPage = this.doc.addPage(at, states);
       this.send('PageList:addPage', newPage, newPage.order);
-      this.send('Controller:select', newPage);
       if (bypassHistory !== true) {
+        this.send('Controller:select', newPage);
         this.send('Controller:history', 'Add', [newPage]);
       }
+      return newPage;
     });
 
     this.listen('Controller:prevPage', () => {
@@ -89,7 +92,6 @@ class DocumentController extends State {
 
     this.listen('Controller:addObject', (objType, at, states, file, bypassHistory) => {
       if (this.focusedPage == null) return;
-      this.send('Controller:deselect');
 
       let newObject = this.focusedPage.addObject(objType, null, states);
       switch(newObject.type) {
@@ -108,9 +110,10 @@ class DocumentController extends State {
       }
 
       if (bypassHistory !== true) {
+        this.send('Controller:select', newObject);
         this.send('Controller:history', 'Add', [newObject]);
       }
-      this.send('Controller:select', newObject);
+      return newObject;
     });
 
     this.listen('Controller:focusPage', (page) => {
@@ -303,10 +306,11 @@ class DocumentController extends State {
 
     this.listen('Controller:copy', () => {
       this.clipboard = [];
+      this.selected.sort((a, b) => (a.order > b.order) ? 1 : -1)
       this.selected.forEach((item) => {
         this.clipboard.push(item.serialize());
       });
-      this.pasted = 0;
+      this.pasted = 0; //TBD: do not use pasted count, change this to calculate new position
     });
 
     this.listen('Controller:paste', () => {
@@ -325,7 +329,8 @@ class DocumentController extends State {
             newObject = this.doc.addPage(this.focusedPage, item.order + 1);
             break;
           default:
-            newObject = this.focusedPage.addObject(item.type, item.order + 1, item);
+            delete item['order']; // remove old order before creating new object
+            newObject = this.focusedPage.addObject(item.type, null, item);
             break;
         }
 
@@ -480,6 +485,12 @@ class DocumentController extends State {
         case 'Redo':
           return this.history.redo();
       }
+    });
+
+    this.listen('Controller:copyStyle', () => {
+    });
+
+    this.listen('Controller:pasteStyle', () => {
     });
   }
 

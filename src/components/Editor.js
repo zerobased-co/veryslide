@@ -242,6 +242,8 @@ class Viewport extends View {
       [false, false, false, true,  [89], () => this.send('Controller:history', 'Redo')],
       [true,  false, false, true,  [90], () => this.send('Controller:history', 'Redo')],
       [false, false, false, true,  [90], () => this.send('Controller:history', 'Undo')],
+      [false, false, true,  true,  [67], () => this.send('Controller:copyStyle')],
+      [false, false, true,  true,  [86], () => this.send('Controller:pasteStyle')],
     ];
     this.keyupEvents = [
     // shift, ctrl,  alt,   meta,  keycodes, func

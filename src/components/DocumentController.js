@@ -60,10 +60,12 @@ class DocumentController extends State {
       }
     });
 
-    this.listen('Controller:remove', () => {
+    this.listen('Controller:remove', (bypassHistory) => {
       if (this.selected.length == 0) return;
 
-      this.send('Controller:history', 'Remove');
+      if (bypassHistory !== true) {
+        this.send('Controller:history', 'Remove');
+      }
 
       let nextPage = this.focusedPage;
       this.selected.forEach((item) => {
@@ -78,6 +80,7 @@ class DocumentController extends State {
       this.selected = [];
 
       if (nextPage == null) {
+        this.focusedPage = null;
         this.doc.focusedPageIndex = -1;
         this.send('Viewport:clear');
       } else {
@@ -93,7 +96,7 @@ class DocumentController extends State {
     this.listen('Controller:addObject', (objType, at, states, file, bypassHistory) => {
       if (this.focusedPage == null) return;
 
-      let newObject = this.focusedPage.addObject(objType, null, states);
+      let newObject = this.focusedPage.addObject(objType, at, states);
       switch(newObject.type) {
         case 'ImageBox':
           newObject.loading(true);
@@ -322,22 +325,20 @@ class DocumentController extends State {
       this.clipboard.forEach((item) => {
         item = JSON.parse(item);
         delete item['uuid']; // remove old uuid before creating new object
+        delete item['order']; // remove old order before creating new object
 
         let newObject = null;
         switch(item.type) {
           case 'Page':
-            newObject = this.doc.addPage(this.focusedPage, item.order + 1);
+            newObject = this.send('Controller:addPage', item.order + 1, null)[0];
             break;
           default:
-            delete item['order']; // remove old order before creating new object
             newObject = this.focusedPage.addObject(item.type, null, item);
             break;
         }
 
         if (newObject != null) {
-          if (newObject.type == 'Page') {
-            const pagethumb = this.send('PageList:addPage', newObject, this.doc.pages.indexOf(newObject))[0];
-          } else {
+          if (newObject.type !== 'Page') {
             if (this.focusedPage != null) {
               if (this.pasted >= 0) {
                 newObject.x += this.pasted * 10;

@@ -41,16 +41,14 @@ class Page extends BaseObject {
 
     // set default states
     if (states != null) {
-      for (const [k, v] of Object.entries(states)) {
-        object[k] = v;
-      }
+      object.deserialize(states);
     }
 
     if (at == null) {
       this.objects.push(object);
       object.order = this.objects.length;
     } else {
-      A.insert(this.objects, object, at);
+      A.insert(this.objects, object, at - 1); // order is one-based index
       this.reorder(at);
     }
     this.node.append(object.node);
@@ -110,7 +108,7 @@ class Page extends BaseObject {
   }
 
   reorder(from) {  // TBD: reorder only after `from` position
-    let order = 0;
+    let order = 1;
     this.objects.forEach((object) => {
       object.order = order;
       order += 1;
@@ -229,6 +227,10 @@ class Document extends State {
 
   removePage(page) {
     this.send('Document:wipe', page);
+    page.objects.forEach((object) => {
+      this.send('Document:wipe', object);
+    });
+
     let nextpage = A.remove(this.pages, page);
     this.reorder();
     return nextpage;

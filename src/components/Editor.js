@@ -250,7 +250,7 @@ class Viewport extends View {
       [false, false, false, false, [32], () => this.resetMode()],
     ];
 
-    ['copy', 'paste', 'keydown', 'keyup'].forEach(e => {
+    ['copy', 'paste', 'cut', 'keydown', 'keyup'].forEach(e => {
       this.addEventListener(e, this[e], window);
     }, this);
 
@@ -518,6 +518,11 @@ class Viewport extends View {
 
   copy(event) {
     this.send('Controller:copy');
+  }
+
+  cut(event) {
+    this.send('Controller:copy');
+    this.send('Controller:remove');
   }
 
   paste(event) {

@@ -64,7 +64,7 @@ class History extends State {
         w.after.forEach(item => {
           const data = JSON.parse(item['data']);
           let obj = null;
-          if (data.type === 'Page') { 
+          if (data.type === 'Page') {
             obj = this.send('Controller:addPage', data.order, data, true)[0];
           } else {
             obj = this.send('Controller:addObject', data.type, data.order, data, null, true)[0];
@@ -76,13 +76,10 @@ class History extends State {
         w.before.forEach(item => {
           const obj = this.send('Document:find', item['uuid'])[0];
           if (obj != null) {
-            if (obj.type === 'Page') { 
-              obj.doc.removePage(obj);
-            } else {
-              obj.page.removeObject(obj);
-            }
+            this.send('Controller:select', obj, true);
           }
         });
+        this.send('Controller:remove', true);
         break;
       case 'MODIFY':
         w.after.forEach(item => {
@@ -113,22 +110,19 @@ class History extends State {
         w.after.forEach(item => {
           const obj = this.send('Document:find', item['uuid'])[0];
           if (obj != null) {
-            if (obj.type === 'Page') { 
-              obj.doc.removePage(obj);
-            } else {
-              obj.page.removeObject(obj);
-            }
+            this.send('Controller:select', obj, true);
           }
         });
+        this.send('Controller:remove', true);
         break;
       case 'REMOVE':
         w.before.forEach(item => {
           const data = JSON.parse(item['data']);
           let obj = null;
-          if (data.type === 'Page') { 
-            obj = this.send('Controller:addPage', data.order, data, true)[0];
+          if (data.type === 'Page') {
+            obj = this.send('Controller:addPage', data.order, null, true)[0];
+            obj.deserialize(data);
           } else {
-            console.log(data.order, data);
             obj = this.send('Controller:addObject', data.type, data.order, data, null, true)[0];
           }
           this.send('Controller:select', obj, true);

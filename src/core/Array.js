@@ -31,6 +31,15 @@ class A {
     array.unshift(node);
   }
 
+  static findby(array, func) {
+    for(let i = 0, l = array.length; i < l; i++) {
+      if (func(array[i]) === true) {
+        return array[i];
+      }
+    }
+    return null;
+  }
+
   static removeAt(array, at) {
     if (at < 0 || at >= array.length) {
       return null;

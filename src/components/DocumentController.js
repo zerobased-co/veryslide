@@ -43,7 +43,7 @@ class DocumentController extends State {
     });
 
     this.listen('Controller:prevPage', () => {
-      let prevPage = this.doc.pages.prev(this.focusedPage);
+      let prevPage = A.prev(this.doc.pages, this.focusedPage);
       if (prevPage) {
         this.send('Controller:select', prevPage);
       } else {
@@ -52,7 +52,7 @@ class DocumentController extends State {
     });
 
     this.listen('Controller:nextPage', () => {
-      let nextPage = this.doc.pages.next(this.focusedPage);
+      let nextPage = A.next(this.doc.pages, this.focusedPage);
       if (nextPage) {
         this.send('Controller:select', nextPage);
       } else {
@@ -76,7 +76,7 @@ class DocumentController extends State {
           this.focusedPage.removeObject(item);
         }
       });
-      
+
       this.selected = [];
 
       if (nextPage == null) {
@@ -437,10 +437,9 @@ class DocumentController extends State {
     });
 
     this.listen('Controller:getAsset', (assetName) => {
-      let asset = this.doc.assets.findby((item) => {
+      return A.findby(this.doc.assets, (item) => {
         return item.name == assetName;
       });
-      return asset;
     });
 
     this.listen('Controller:history', (type, objects) => {

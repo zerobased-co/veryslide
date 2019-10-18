@@ -161,4 +161,11 @@ describe('Array', () => {
     assert.equal(2, A.next(array, 1));
     assert.equal(null, A.next(array, 4));
   });
+
+  it('findby should return an item which return true by given function', () => {
+    let array = [{'name': 'John', 'group': 'O'}, {'name': 'Jane', 'group': 'A'}];
+
+    assert.equal('O', A.findby(array, (item) => { return item['name'] == 'John' })['group']);
+    assert.equal('Jane', A.findby(array, (item) => { return item['group'] == 'A' })['name']);
+  });
 });

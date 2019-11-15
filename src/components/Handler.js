@@ -1,6 +1,6 @@
 import global from '/core/Global';
 import View from './ui/View'
-    
+
 // Clockwise, from northwest
 const dotPreset = [
 //          x   y   w   h
@@ -191,7 +191,7 @@ class Handler extends View {
         x += v[0] * dx;
         y += v[1] * dy;
         w += v[2] * dx;
-        h += v[3] * dy; 
+        h += v[3] * dy;
       }
 
       let _x = x;
@@ -260,7 +260,7 @@ class Handler extends View {
       this.send('Object:hideHandler', this, false);
       this.transform = null;
     }
-    
+
     if (this.currentDot != null) {
       this.currentDot.classList.remove('vs-showme');
       this.currentDot = null;
@@ -283,7 +283,7 @@ class Handler extends View {
     event.stopPropagation();
     event.preventDefault();
 
-    if (event.shiftKey && !fromEditor) {
+    if (event.shiftKey && !fromEditor && !event.target.classList.contains('vs-dot')) {
       this.send('Controller:deselect', this.object);
       return;
     }
@@ -316,7 +316,7 @@ class Handler extends View {
         this.transform = 'move';
       }
     }
-    
+
     if (this.transform != null) {
       this.firstMove = true;
       this.send('Controller:history', 'Prepare');

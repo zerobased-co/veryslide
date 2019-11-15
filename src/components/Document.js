@@ -116,6 +116,14 @@ class Page extends BaseObject {
     this.invalidate = true;
   }
 
+  rebuild() {
+    let newObjects = new Array(this.objects.length);
+    this.objects.forEach((object) => {
+      newObjects[object.order - 1] = object;
+    });
+    this.objects = newObjects;
+  }
+
   select(selected) {
     super.select(selected);
     if (this.pagethumb) {
@@ -185,11 +193,11 @@ class Document extends State {
       height: 768,
       pages: [],
       assets: [],
-      objects: {},
       type: 'Document',
       focusedPageIndex: -1,
       ...state,
     });
+    this.objects = {};
 
     this.listen('Document:keep', (object) => {
       this.objects[object.uuid] = object;

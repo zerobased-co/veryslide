@@ -1,6 +1,6 @@
 import State from 'core/State';
 
-const HISTORY_QUEUE_LIMIT = 240;
+const HISTORY_QUEUE_LIMIT = 240; // TBD: not applied yet
 
 function sortObject(obj, key) {
   return Object.values(obj).sort((a, b) => (a[key] > b[key]) ? 1 : -1)
@@ -22,14 +22,29 @@ class History extends State {
     this.current['type'] = '';
     this.current['before'] = {};
     this.current['after'] = {};
+    this.current['reorder'] = false;
   }
 
-  insertBeforeList(object) {
-    this.current.before[object.uuid] = {uuid: object.uuid, order: object.order, data: object.serialize()};
+  setReorder(target) {
+    this.current['reorder'] = target;
   }
 
-  insertAfterList(object) {
-    this.current.after[object.uuid] = {uuid: object.uuid, order: object.order, data: object.serialize()};
+  insertBeforeList(object, selected) {
+    this.current.before[object.uuid] = {
+      uuid: object.uuid,
+      order: object.order,
+      data: object.serialize(),
+      selected: selected,
+    };
+  }
+
+  insertAfterList(object, selected) {
+    this.current.after[object.uuid] = {
+      uuid: object.uuid,
+      order: object.order,
+      data: object.serialize(),
+      selected: selected,
+    };
   }
 
   record(type) {
@@ -87,9 +102,14 @@ class History extends State {
           const obj = this.send('Document:find', item['uuid'])[0];
           if (obj != null) {
             obj.deserialize(data);
-            this.send('Controller:select', obj, true);
+            if (item['selected'] === true) {
+              this.send('Controller:select', obj, true);
+            }
           }
         });
+        if (w.reorder) {
+          w.reorder.rebuild();
+        }
         break;
     }
     this.send('Menu:historyChanged', this.undoable(), this.redoable());
@@ -134,9 +154,14 @@ class History extends State {
           const obj = this.send('Document:find', item['uuid'])[0];
           if (obj != null) {
             obj.deserialize(data);
-            this.send('Controller:select', obj, true);
+            if (item['selected'] === true) {
+              this.send('Controller:select', obj, true);
+            }
           }
         });
+        if (w.reorder) {
+          w.reorder.rebuild();
+        }
         break;
     }
 

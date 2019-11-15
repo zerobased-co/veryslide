@@ -12,6 +12,10 @@ class Text extends View {
   on_title(text) {
     this.node.innerHTML = text;
   }
+
+  onNotify(value) {
+    this.node.innerHTML = value;
+  }
 }
 
 export default Text

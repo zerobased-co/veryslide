@@ -68,6 +68,7 @@ class PanelForBox extends Panel {
       ui.H(
         ui.createText('Order'),
         new ui.Vertical({children: [
+          ui.createReadOnly(this.object, 'order'),
           ui.HGroup(
             ui.createButton('Back', () => { this.send('Controller:order', 'back'); }),
             ui.createButton('Front', () => { this.send('Controller:order', 'front'); }),
@@ -186,7 +187,7 @@ class PanelForImageBox extends PanelForBox {
       new ui.TitleBar({'title': 'Image'}),
       ui.H(
         ui.createText('Reset'),
-        ui.createButton('Original size', () => { 
+        ui.createButton('Original size', () => {
           this.object.resetSize();
         }),
       ),
@@ -213,7 +214,7 @@ class PanelForImageList extends PanelForBox {
         ui.createText('Data Asset'),
         new ui.Select({
           options: this.dataOptions,
-          AfterChange: (value) => { 
+          AfterChange: (value) => {
             this.send('Property:setPanelFor', [this.object]);
           },
         }).pair(this.object, 'asset'),
@@ -338,7 +339,7 @@ function createProxy(objects) {
             }
         }
       }
-      
+
       switch(prop) {
         case 'pairings':
           return proxyObj[prop];

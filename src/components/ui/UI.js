@@ -42,8 +42,12 @@ class UI {
     return new Button({title, onClick, className});
   }
 
+  createReadOnly(target, property) {
+    return new Text().pair(target, property);
+  }
+
   createInputText(target, property) {
-    return new ui.InputText().pair(target, property);
+    return new InputText().pair(target, property);
   }
 
   HGroup(...children) {

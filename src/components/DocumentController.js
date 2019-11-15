@@ -228,9 +228,14 @@ class DocumentController extends State {
     this.listen('Controller:order', (order) => {
       if (this.focusedPage == null) return;
 
-      this.send('Controller:history', 'Before');
+      // TBD: Add entire objects into history to preserve their orders
+      // TBD: There must be a better logic
+      this.send('Controller:history', 'Before', this.focusedPage.objects, false);
+      this.send('Controller:history', 'Before', this.selected, true);
+
       for(let i = 0; i < this.selected.length; i++) {
         const obj = this.selected[i];
+        // Mark this object should be selected while traversing histories
 
         switch(order) {
           case 'back':
@@ -248,7 +253,9 @@ class DocumentController extends State {
         }
       }
       this.focusedPage.reorder();
-      this.send('Controller:history', 'After');
+      this.send('Controller:history', 'After', this.focusedPage.objects, false);
+      this.send('Controller:history', 'After', this.selected, true);
+      this.send('Controller:history', 'Reorder');
       this.send('Controller:history', 'Modify');
     });
 
@@ -442,10 +449,11 @@ class DocumentController extends State {
       });
     });
 
-    this.listen('Controller:history', (type, objects) => {
+    this.listen('Controller:history', (type, objects, selected) => {
       if (objects == null) {
         objects = this.selected;
       }
+      selected = (selected === false) ? false : true;
 
       switch(type) {
         case 'Add':
@@ -463,14 +471,17 @@ class DocumentController extends State {
         case 'Modify':
           this.history.record('MODIFY');
           break;
+        case 'Reorder':
+          this.history.setReorder(this.focusedPage);
+          break;
         case 'Before':
           objects.forEach((obj) => {
-            this.history.insertBeforeList(obj);
+            this.history.insertBeforeList(obj, selected);
           });
           break;
         case 'After':
           objects.forEach((obj) => {
-            this.history.insertAfterList(obj);
+            this.history.insertAfterList(obj, selected);
           });
           break;
         case 'Prepare':

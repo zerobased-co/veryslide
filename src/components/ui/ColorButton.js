@@ -4,19 +4,19 @@ import ColorPickerUI from '@easylogic/colorpicker'
 import { properTextColor } from 'core/Util';
 import global from 'core/Global';
 
+let colorPicker = ColorPickerUI.create({
+  type: 'sketch',
+  color: '#000000',
+  outputFormat : 'hex',
+  hideDelay: 2000,
+});
+
 class ColorButton extends View {
   constructor(state) {
     super({
       className: 'vs-colorbutton',
       color: '#FFFFFF',
       ...state,
-    });
-
-    this.colorPicker = ColorPickerUI.create({
-      type: 'sketch',
-      color: this.color,
-      outputFormat : 'hex',
-      hideDelay: 2000,
     });
 
     this.node.addEventListener('click', this.showPicker.bind(this));
@@ -30,7 +30,8 @@ class ColorButton extends View {
   showPicker(event) {
     const color = (this.color === global.ambiguous) ? '#FFFFFF' : this.color;
 
-    this.colorPicker.show({
+    colorPicker.show({
+      color,
       left: event.clientX - 100,
       top: event.clientY + 14,
       hideDelay: 2000,

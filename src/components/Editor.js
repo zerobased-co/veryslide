@@ -40,13 +40,14 @@ class Menu extends View {
 
       new ui.Text({'title': 'Misc'}),
       ui.HGroup(
-        ui.createButton('Image', () => { this.send('Controller:savePage', 'image'); }),
-        ui.createButton('All',   () => { this.send('Controller:saveAllPage', 'image'); }),
+        ui.createButton('PNG', () => { this.send('Controller:savePage', 'png'); }),
+        ui.createButton('PDF', () => { this.send('Controller:savePage', 'pdf'); }),
+        //ui.createButton('All',   () => { this.send('Controller:saveAllPage', 'image'); }),
         ui.createButton('Save',  () => { this.send('Veryslide:save'); }),
         ui.createButton('Play',  () => { this.send('Viewport:setPresentationMode', true); }),
       ),
 
-      ui.createButton('Close',   () => { 
+      ui.createButton('Close',   () => {
         window.history.back();
       }),
     ].forEach(item => this.appendChild(item));
@@ -133,7 +134,7 @@ class Selector extends View {
     this.selectedList = [];
     this.resize(0, 0);
   }
-  
+
   resize = (dx, dy, event) => {
     let x = this.x;
     let y = this.y;
@@ -418,7 +419,7 @@ class Viewport extends View {
     this.updateTransform();
     this.setPageSnap();
   }
-  
+
   setPageSnap() {
     if (this.page) {
       if (global.snap) {
@@ -446,7 +447,7 @@ class Viewport extends View {
       let top = 0;
       let left = 0;
       let scale = 1;
-      
+
       if (this.page) {
         if ( width / this.page.width < height / this.page.height) {
           scale = width / this.page.width;

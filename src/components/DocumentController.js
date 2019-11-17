@@ -1,4 +1,5 @@
 import domtoimage from 'dom-to-image';
+import jsPDF from 'jspdf';
 
 import { uuid, defaultDomToImageOption } from 'core/Util';
 import A from 'core/Array';
@@ -373,37 +374,82 @@ class DocumentController extends State {
       this.history.record('ADD', this.focusedPage);
     });
 
-    this.savePage = (page) => {
+    this.savePage = (page, format) => {
+      // TBD: DO NOT DUPLICATE CODE MYSELF LIKE THIS
       // TBD: we have to hide things before capturing
-      domtoimage.toPng(page.node.parentElement, Object.assign(defaultDomToImageOption, {
-        width: page.width,
-        height: page.height,
-        style: {
-          'transform': 'scale(1)',
-        },
-      }))
-        .then((dataUrl) => {
-          // TBD: Why should we get page number here? Too slow.
-          let pageNo = this.doc.pages.indexOf(page) + 1;
-          let filename = 'veryslide-' + this.slideId + '-' + String(pageNo).padStart(3, '0');
+      switch(format) {
+        case 'pdf':
+          const scale = 2;
+          domtoimage.toPng(page.node.parentElement, Object.assign(defaultDomToImageOption, {
+            width: page.width * scale,
+            height: page.height * scale,
+            style: {
+              'transform': 'scale(' + scale + ')',
+            },
+          })).then((dataUrl) => {
+            // TBD: Why should we get page number here? Too slow.
+            let pageNo = this.doc.pages.indexOf(page) + 1;
+            let filename = 'veryslide-' + this.slideId + '-' + String(pageNo).padStart(3, '0');
 
-          let link = document.createElement("a");
-          link.download = filename + '.png';
-          link.href = dataUrl;
+            let pdf = new jsPDF({
+              orientation: 'landscape',
+              unit: 'pt',
+              format: [page.width, page.height],
+              compressPdf: true,
+            });
 
-          document.body.appendChild(link);
-          link.click();
+            var parentRect = page.node.parentElement.getBoundingClientRect();
+            let rescale = 1 / this.editor.viewport.scale;
+            // TBD: clean up
+            pdf.addImage(dataUrl, 'PNG', 0, 0, page.width, page.height);
+            page.node.querySelectorAll('a').forEach((link) => {
+              var rect = link.getBoundingClientRect();
+              pdf.link(
+                parseInt((rect.left - parentRect.left) * rescale),
+                parseInt((rect.top - parentRect.top) * rescale),
+                parseInt(rect.width * rescale),
+                parseInt(rect.height * rescale),
+                {
+                  url: link.href
+                }
+              );
+            });
+            pdf.save(filename + '.pdf');
+          }).catch((error) => {
+            console.log('Error on while saving:', error);
+          });
+          break;
+        case 'png':
+          domtoimage.toPng(page.node.parentElement, Object.assign(defaultDomToImageOption, {
+            width: page.width,
+            height: page.height,
+            style: {
+              'transform': 'scale(1)',
+            },
+          })).then((dataUrl) => {
+            // TBD: Why should we get page number here? Too slow.
+            let pageNo = this.doc.pages.indexOf(page) + 1;
+            let filename = 'veryslide-' + this.slideId + '-' + String(pageNo).padStart(3, '0');
 
-          // Cleanup the DOM
-          document.body.removeChild(link);
-        }).catch((error) => {
-          console.log('Error on while saving:', error);
-        });
+            let link = document.createElement("a");
+            link.download = filename + '.png';
+            link.href = dataUrl;
+
+            document.body.appendChild(link);
+            link.click();
+
+            // Cleanup the DOM
+            document.body.removeChild(link);
+          }).catch((error) => {
+            console.log('Error on while saving:', error);
+          });
+          break;
+      }
     }
 
     this.listen('Controller:savePage', (format) => {
       if (this.focusedPage == null) return;
-      this.savePage(this.focusedPage);
+      this.savePage(this.focusedPage, format);
     });
 
     // TBD: NOT LIKE THIS AT ALL
@@ -412,7 +458,7 @@ class DocumentController extends State {
         setTimeout(() => {
           this.send('PageList:selectPage', page);
           setTimeout(() => {
-            this.savePage(page);
+            this.savePage(page, format);
           }, 500);
         }, i * 2000);
       });

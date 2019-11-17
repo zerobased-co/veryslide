@@ -172,6 +172,12 @@ class PanelForTextBox extends PanelForBox {
           options: [['top', 'Top'], ['middle', 'Middle'], ['bottom', 'Bottom']],
         }).pair(this.object, 'verticalAlign'),
       ),
+
+      ui.H(
+        ui.createText('Link'),
+        new ui.InputText().pair(this.object, 'link'),
+      ),
+
     ].forEach(item => this.appendChild(item));
 
     return this.node;

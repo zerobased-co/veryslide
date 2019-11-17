@@ -18,12 +18,13 @@ class TextBox extends Box {
       align: 'center',
       verticalAlign: 'middle',
       wordBreak: 'break-all',
+      link: '',
       ...state,
     });
 
     this.addNumberState('size');
   }
-  
+
   render() {
     super.render();
     this.textNode = document.createElement('div');
@@ -112,7 +113,19 @@ class TextBox extends Box {
   }
 
   on_text(text) {
-    this.textNode.innerText = text;
+    this.updateText();
+  }
+
+  on_link(link) {
+    this.updateText();
+  }
+
+  updateText() {
+    if (this.link != '') {
+      this.textNode.innerHTML = '<a href="' + this.link + '">' + this.text + '</a>';
+    } else {
+      this.textNode.innerHTML = this.text;
+    }
   }
 
   on_textColor(color) {

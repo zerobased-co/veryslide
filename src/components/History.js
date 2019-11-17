@@ -22,11 +22,12 @@ class History extends State {
     this.current['type'] = '';
     this.current['before'] = {};
     this.current['after'] = {};
+    this.current['pageUuid'] = null;
     this.current['reorder'] = false;
   }
 
   setReorder(target) {
-    this.current['reorder'] = target;
+    this.current['reorder'] = true;
   }
 
   insertBeforeList(object, selected) {
@@ -47,11 +48,12 @@ class History extends State {
     };
   }
 
-  record(type) {
+  record(type, focusedPage) {
     // slice queue before recording (wipe out previous redo nodes)
     this.queue = this.queue.slice(0, this.marker + 1);
 
     // sort items by order
+    this.current.pageUuid = focusedPage.uuid;
     this.current.after = sortObject(this.current.after, 'order');
     this.current.before = sortObject(this.current.before, 'order');
     this.current.type = type;
@@ -72,7 +74,13 @@ class History extends State {
     this.marker++;
 
     let w = this.queue[this.marker];
+    // Deselect before doing something
     this.send('Controller:deselect');
+    // Select the right page
+    if (w.pageUuid != null) {
+      const page = this.send('Document:find', w.pageUuid)[0];
+      this.send('Controller:focusPage', page);
+    }
 
     switch(w.type) {
       case 'ADD':
@@ -123,7 +131,13 @@ class History extends State {
     if (this.marker < 0) return;
 
     let w = this.queue[this.marker];
+    // Deselect before doing something
     this.send('Controller:deselect');
+    // Select the right page
+    if (w.pageUuid != null) {
+      const page = this.send('Document:find', w.pageUuid)[0];
+      this.send('Controller:focusPage', page);
+    }
 
     switch(w.type) {
       case 'ADD':

@@ -228,7 +228,19 @@ class DocumentController extends State {
     this.listen('Controller:order', (order) => {
       if (this.focusedPage == null) return;
 
-      // TBD: Add entire objects into history to preserve their orders
+      // Sort objects before changing orders
+      switch(order) {
+        case 'front':
+        case 'backward':
+          this.selected.sort((a, b) => (a.order > b.order) ? 1 : -1)
+          break;
+        case 'back':
+        case 'forward':
+          this.selected.sort((a, b) => (a.order < b.order) ? 1 : -1)
+          break;
+      }
+
+      // TBD: Now we're adding entire objects into history to preserve their orders
       // TBD: There must be a better logic
       this.send('Controller:history', 'Before', this.focusedPage.objects, false);
       this.send('Controller:history', 'Before', this.selected, true);
@@ -358,7 +370,7 @@ class DocumentController extends State {
           this.history.insertAfterList(newObject);
         }
       });
-      this.history.record('ADD');
+      this.history.record('ADD', this.focusedPage);
     });
 
     this.savePage = (page) => {
@@ -460,16 +472,16 @@ class DocumentController extends State {
           objects.forEach((obj) => {
             this.history.insertAfterList(obj);
           });
-          this.history.record('ADD');
+          this.history.record('ADD', this.focusedPage);
           break;
         case 'Remove':
           objects.forEach((obj) => {
             this.history.insertBeforeList(obj);
           });
-          this.history.record('REMOVE');
+          this.history.record('REMOVE', this.focusedPage);
           break;
         case 'Modify':
-          this.history.record('MODIFY');
+          this.history.record('MODIFY', this.focusedPage);
           break;
         case 'Reorder':
           this.history.setReorder(this.focusedPage);

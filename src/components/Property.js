@@ -206,7 +206,7 @@ class PanelForImageList extends PanelForBox {
     }
 
     this.assets = this.send('Controller:getAssetList')[0];
-    this.dataOptions = [['', '----']].concat(this.assets.array.map(x => [x.name, x.name]));
+    this.dataOptions = [['', '----']].concat(this.assets.map(x => [x.name, x.name]));
 
     [
       new ui.TitleBar({title: 'List Property'}),

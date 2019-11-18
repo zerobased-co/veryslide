@@ -31,6 +31,8 @@ class History extends State {
   }
 
   insertBeforeList(object, selected) {
+    if (object.uuid in this.current.before) return;
+
     this.current.before[object.uuid] = {
       uuid: object.uuid,
       order: object.order,
@@ -40,6 +42,8 @@ class History extends State {
   }
 
   insertAfterList(object, selected) {
+    if (object.uuid in this.current.after) return;
+
     this.current.after[object.uuid] = {
       uuid: object.uuid,
       order: object.order,

@@ -6,7 +6,7 @@ class View extends Node {
       className: 'vs-view',
       parent: null,
       children: [],
-      
+
       enabled: true,
       shown: true,
       ...state,

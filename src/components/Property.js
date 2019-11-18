@@ -371,8 +371,12 @@ function createProxy(objects) {
           objects.forEach((obj) => {
             obj[prop] = value;
           });
-          channel.send('Controller:history', 'After');
-          channel.send('Controller:history', 'Modify');
+
+          // TBD: I don't want to do like this but no idea
+          if (!global.temporary) {
+            channel.send('Controller:history', 'After');
+            channel.send('Controller:history', 'Modify');
+          }
           break;
       }
       return true;

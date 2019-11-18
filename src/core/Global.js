@@ -5,6 +5,7 @@ class Global {
     this.grabbing = false;
     this.editingObject = null;
     this.ambiguous = '?';
+    this.temporary = false;
   }
 }
 

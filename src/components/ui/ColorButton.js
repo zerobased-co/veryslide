@@ -36,8 +36,16 @@ class ColorButton extends View {
       top: event.clientY + 14,
       hideDelay: 2000,
     }, color, (newColor) => {
+      // dragging
+      this.color = newColor;
+      global.temporary = true;
+      this.onChange(newColor);
+      global.temporary = false;
+    }, () => {}, (newColor) => {
+      // finished to choose
       this.color = newColor;
       this.onChange(newColor);
+      console.log('onLastUpdate', this.color, newColor);
     });
   }
 

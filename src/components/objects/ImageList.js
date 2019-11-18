@@ -1,7 +1,7 @@
 import './ImageList.scss';
 import { parse } from 'papaparse';
 import Box from './Box';
-import { randomInt } from 'core/Util';
+import { randomInt, getValidUrl } from 'core/Util';
 
 function isValidItem(item, filter) {
   let valid = true;
@@ -82,7 +82,7 @@ class ImageList extends Box {
 
   deserialize(data) {
     super.deserialize(data);
-    
+
     // wait until asset is ready
     if (this.asset != '') {
       this.loading(true);
@@ -149,7 +149,7 @@ class ImageList extends Box {
       let item = this.selectedItems[i];
       let node = document.createElement('a');
       node.className = 'aligner';
-      node.href = item['Homepage'];
+      node.href = getValidUrl(item['Homepage']);
       node.style.margin = this.itemMargin + 'px';
 
       let img = document.createElement('img');

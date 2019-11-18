@@ -90,3 +90,12 @@ export const defaultDomToImageOption = {
     return (!node.hasAttribute('data-render-ignore'));
   },
 }
+
+export function getValidUrl(url) {
+  const pattern = /^((http|https|ftp):\/\/)/;
+  if (!pattern.test(url)) {
+    return 'http://' + url;
+  } else {
+    return url;
+  }
+}

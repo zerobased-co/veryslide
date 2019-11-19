@@ -45,7 +45,6 @@ class ColorButton extends View {
       // finished to choose
       this.color = newColor;
       this.onChange(newColor);
-      console.log('onLastUpdate', this.color, newColor);
     });
   }
 

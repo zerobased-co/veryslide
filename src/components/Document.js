@@ -1,6 +1,6 @@
 import domtoimage from 'dom-to-image';
 
-import { defaultDomToImageOption } from 'core/Util';
+import { defaultDomToImageOption, uuid } from 'core/Util';
 import State from 'core/State';
 import A from 'core/Array';
 import BaseObject from './objects/BaseObject';
@@ -26,23 +26,29 @@ class Page extends BaseObject {
 
   addObject(type, at, states) {
     let object = null;
+
+    // set default states
+    states = states || {};
+    // for supporting legacy documents (has duplicated uuids)
+    if ('uuid' in states) {
+      if (states['uuid'] in this.doc.objects) {
+        states['uuid'] = uuid(); // give new uuid
+      }
+    }
+
     switch(type) {
       case 'TextBox':
-        object = new TextBox();
+        object = new TextBox(states);
         break;
       case 'ImageBox':
-        object = new ImageBox();
+        object = new ImageBox(states);
         break;
       case 'ImageList':
-        object = new ImageList();
+        object = new ImageList(states);
         break;
     }
     object.page = this;
-
-    // set default states
-    if (states != null) {
-      object.deserialize(states);
-    }
+    object.deserialize(states);
 
     if (at == null) {
       this.objects.push(object);
@@ -213,6 +219,12 @@ class Document extends State {
   }
 
   addPage(at, states) {
+    // for supporting legacy documents (has duplicated uuids)
+    if ('uuid' in states) {
+      if (states['uuid'] in this.objects) {
+        states['uuid'] = uuid(); // give new uuid
+      }
+    }
     let page = new Page(states);
     page.doc = this;
 

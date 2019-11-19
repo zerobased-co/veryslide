@@ -93,7 +93,7 @@ class Node extends State {
       }
     });
   }
-  
+
   render() {
     this.node = document.createElement('div');
     return this.node;

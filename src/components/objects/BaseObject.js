@@ -1,5 +1,6 @@
 import Node from '/core/Node';
 import { uuid } from 'core/Util';
+import global from 'core/Global';
 import './BaseObject.scss';
 import Handler from '../Handler';
 
@@ -22,6 +23,12 @@ class BaseObject extends Node {
     this.page = null;
     this.handler = null;
     this.addNumberState('x', 'y', 'width', 'height', 'order', 'opacity');
+
+    // for supporting legacy objects (before Oct 2019)
+    if (typeof this.uuid === 'undefined') {
+      console.log('No uuid found.');
+      this.uuid = uuid();
+    }
   }
 
   select(selected) {
@@ -121,6 +128,17 @@ class BaseObject extends Node {
         return false;
     }
     return true;
+  }
+
+  render() {
+    this.node = super.render();
+    if (global.debug) {
+      let debugNode = document.createElement('div');
+      debugNode.className = 'vs-debug';
+      debugNode.innerHTML = this.uuid;
+      this.node.appendChild(debugNode);
+    }
+    return this.node;
   }
 }
 

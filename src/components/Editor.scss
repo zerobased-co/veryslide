@@ -16,6 +16,18 @@ $border-color: #afafb2;
   z-index: 9999;
 }
 
+.vs-debug {
+  position: absolute;
+  z-index: 9998;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  top: 0;
+  left: 0;
+  text-align: left;
+  font-size: 10px;
+  font-family: monospace;
+}
+
 .vs-editor {
   display: flex;
   width: 100%;

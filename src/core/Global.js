@@ -1,5 +1,7 @@
 class Global {
   constructor() {
+    this.debug = true;
+
     this.snap = false;
     this.snapSize = 16;
     this.grabbing = false;

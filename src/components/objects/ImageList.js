@@ -195,21 +195,21 @@ class ImageList extends Box {
   }
 
   on_itemMaxWidth(width) {
-    var children = Array.from(this.node.childNodes);
+    var children = Array.from(this.node.getElementsByClassName('aligner'));
     children.forEach(function(item){
       item.firstChild.style.maxWidth = width + 'px';
     });
   }
 
   on_itemMaxHeight(height) {
-    var children = Array.from(this.node.childNodes);
+    var children = Array.from(this.node.getElementsByClassName('aligner'));
     children.forEach(function(item){
       item.firstChild.style.maxHeight = height + 'px';
     });
   }
 
   on_itemMargin(margin) {
-    var children = Array.from(this.node.childNodes);
+    var children = Array.from(this.node.getElementsByClassName('aligner'));
     children.forEach(function(item){
       item.style.margin = margin + 'px';
     });

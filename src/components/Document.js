@@ -77,6 +77,12 @@ class Page extends BaseObject {
     return found;
   }
 
+  on_thumbnail(thumbnail) {
+    if (this.pagethumb != null) {
+      this.pagethumb.updateThumbnail();
+    }
+  }
+
   updateThumbnail(force) {
     if (this.node == null) return;
 
@@ -220,11 +226,14 @@ class Document extends State {
 
   addPage(at, states) {
     // for supporting legacy documents (has duplicated uuids)
-    if ('uuid' in states) {
-      if (states['uuid'] in this.objects) {
-        states['uuid'] = uuid(); // give new uuid
+    if (states) {
+      if ('uuid' in states) {
+        if (states['uuid'] in this.objects) {
+          states['uuid'] = uuid(); // give new uuid
+        }
       }
     }
+
     let page = new Page(states);
     page.doc = this;
 

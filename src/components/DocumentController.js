@@ -34,7 +34,14 @@ class DocumentController extends State {
         at = this.focusedPage.order + 1;
       }
 
-      const newPage = this.doc.addPage(at, states);
+      let newPage;
+      if (states) {
+        newPage = this.doc.addPage(at, 'uuid' in states ? {uuid: states['uuid']} : {});
+        newPage.deserialize(states);
+      } else {
+        newPage = this.doc.addPage(at);
+      }
+
       this.send('PageList:addPage', newPage, newPage.order);
       if (bypassHistory !== true) {
         this.send('Controller:select', newPage);
@@ -341,19 +348,25 @@ class DocumentController extends State {
 
       this.send('Controller:deselect');
 
+      if (this.pasted < 0) { this.pasted = 0; }
       this.pasted += 1;
+      let order = this.focusedPage ? this.focusedPage.order + 1 : null;
+
       this.clipboard.forEach((item) => {
         item = JSON.parse(item);
-        delete item['uuid']; // remove old uuid before creating new object
-        delete item['order']; // remove old order before creating new object
+
+        // remove old uuid & order before creating new object
+        delete item['uuid'];
+        delete item['order'];
 
         let newObject = null;
         switch(item.type) {
           case 'Page':
-            newObject = this.send('Controller:addPage', item.order + 1, null)[0];
+            newObject = this.send('Controller:addPage', order, item, true)[0];
+            order += 1;
             break;
           default:
-            newObject = this.focusedPage.addObject(item.type, null, item);
+            newObject = this.send('Controller:addObject', item.type, null, item, null, true)[0];
             break;
         }
 
@@ -364,7 +377,7 @@ class DocumentController extends State {
                 newObject.x += this.pasted * 10;
                 newObject.y += this.pasted * 10;
               }
-              this.send('Viewport:focus', newObject);
+              //this.send('Viewport:focus', newObject);
             }
           }
           this.send('Controller:select', newObject, true);
@@ -550,6 +563,7 @@ class DocumentController extends State {
         case 'Redoable':
           return this.history.redoable();
         case 'Undo':
+          this.pasted -= 1;
           return this.history.undo();
         case 'Redo':
           return this.history.redo();

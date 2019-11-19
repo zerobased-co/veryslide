@@ -83,7 +83,9 @@ class History extends State {
     // Select the right page
     if (w.pageUuid != null) {
       const page = this.send('Document:find', w.pageUuid)[0];
-      this.send('Controller:focusPage', page);
+      if (page) {
+        this.send('Controller:focusPage', page);
+      }
     }
 
     switch(w.type) {
@@ -92,7 +94,8 @@ class History extends State {
           const data = JSON.parse(item['data']);
           let obj = null;
           if (data.type === 'Page') {
-            obj = this.send('Controller:addPage', data.order, data, true)[0];
+            obj = this.send('Controller:addPage', data.order, {uuid: data.uuid}, true)[0];
+            obj.deserialize(data);
           } else {
             obj = this.send('Controller:addObject', data.type, data.order, data, null, true)[0];
           }
@@ -140,7 +143,9 @@ class History extends State {
     // Select the right page
     if (w.pageUuid != null) {
       const page = this.send('Document:find', w.pageUuid)[0];
-      this.send('Controller:focusPage', page);
+      if (page) {
+        this.send('Controller:focusPage', page);
+      }
     }
 
     switch(w.type) {
@@ -158,7 +163,7 @@ class History extends State {
           const data = JSON.parse(item['data']);
           let obj = null;
           if (data.type === 'Page') {
-            obj = this.send('Controller:addPage', data.order, null, true)[0];
+            obj = this.send('Controller:addPage', data.order, {uuid: data.uuid}, true)[0];
             obj.deserialize(data);
           } else {
             obj = this.send('Controller:addObject', data.type, data.order, data, null, true)[0];

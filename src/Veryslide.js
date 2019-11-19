@@ -35,6 +35,8 @@ class Veryslide extends State {
     this.target.appendChild(this.editor.node);
     if (this.data != null) {
       this.deserialize(this.data);
+      // for supporting legacy documents (no order)
+      doc.reorder();
       this.editor.init();
     }
     this.listen('Veryslide:save', this.save);

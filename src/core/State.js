@@ -123,6 +123,7 @@ class State {
         v.forEach((item) => {
           if (k === 'pages') {
             let page = this.addPage(null, {'uuid': item.uuid});
+            item['uuid'] = page.uuid; // TBD: for legacy duplicated objects
             page.deserialize(item);
             this.send('PageList:addPage', page);
           } else if (k === 'objects') {

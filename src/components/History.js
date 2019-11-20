@@ -23,6 +23,7 @@ class History extends State {
     this.current['before'] = {};
     this.current['after'] = {};
     this.current['pageUuid'] = null;
+    this.current['selectedObjects'] = [];
     this.current['reorder'] = false;
   }
 
@@ -30,29 +31,29 @@ class History extends State {
     this.current['reorder'] = true;
   }
 
-  insertBeforeList(object, selected) {
+  insertBeforeList(object) {//, selected) {
     if (object.uuid in this.current.before) return;
 
     this.current.before[object.uuid] = {
       uuid: object.uuid,
       order: object.order,
       data: object.serialize(),
-      selected: selected,
+      //selected: selected,
     };
   }
 
-  insertAfterList(object, selected) {
+  insertAfterList(object) {//, selected) {
     if (object.uuid in this.current.after) return;
 
     this.current.after[object.uuid] = {
       uuid: object.uuid,
       order: object.order,
       data: object.serialize(),
-      selected: selected,
+      //selected: selected,
     };
   }
 
-  record(type, focusedPage) {
+  record(type, selectedObjects, focusedPage) {
     // slice queue before recording (wipe out previous redo nodes)
     this.queue = this.queue.slice(0, this.marker + 1);
 
@@ -60,6 +61,7 @@ class History extends State {
     this.current.pageUuid = focusedPage.uuid;
     this.current.after = sortObject(this.current.after, 'order');
     this.current.before = sortObject(this.current.before, 'order');
+    this.current.selectedObjects = selectedObjects.map((obj) => { return obj.uuid });
     this.current.type = type;
     this.queue.push(this.current);
 
@@ -110,6 +112,15 @@ class History extends State {
           }
         });
         this.send('Controller:remove', true);
+
+        // Select recorded previous selection
+        this.send('Controller:deselect');
+        w.selectedObjects.forEach(uuid => {
+          const obj = this.send('Document:find', uuid)[0];
+          if (obj != null) {
+            this.send('Controller:select', obj, true);
+          }
+        });
         break;
       case 'MODIFY':
         w.after.forEach(item => {
@@ -127,6 +138,7 @@ class History extends State {
         }
         break;
     }
+
     this.send('Menu:historyChanged', this.undoable(), this.redoable());
   }
 
@@ -157,6 +169,15 @@ class History extends State {
           }
         });
         this.send('Controller:remove', true);
+
+        // Select recorded previous selection
+        this.send('Controller:deselect');
+        w.selectedObjects.forEach(uuid => {
+          const obj = this.send('Document:find', uuid)[0];
+          if (obj != null) {
+            this.send('Controller:select', obj, true);
+          }
+        });
         break;
       case 'REMOVE':
         w.before.forEach(item => {

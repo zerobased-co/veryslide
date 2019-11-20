@@ -340,17 +340,28 @@ class DocumentController extends State {
       this.selected.forEach((item) => {
         this.clipboard.push(item.serialize());
       });
-      this.pasted = 0; //TBD: do not use pasted count, change this to calculate new position
+     // TBD: do not use pasted count, change this to calculate new position
+      this.pasted = 0;
     });
 
     this.listen('Controller:paste', () => {
       if (this.clipboard == null) return;
 
+      // Duplicated selected object to preserve previous selection
+      const wasSelected = this.selected;
+      let order = 0;
+      if (this.selected.length > 0 && this.selected[0].type === 'Page') {
+        order = this.selected.reduce((prev, curr) => {
+          return (prev.order > curr.order) ? prev : curr;
+        }).order + 1;
+      } else {
+        order = this.focusedPage.order + 1;
+      }
       this.send('Controller:deselect');
 
+     // TBD: do not use pasted count, change this to calculate new position
       if (this.pasted < 0) { this.pasted = 0; }
       this.pasted += 1;
-      let order = this.focusedPage ? this.focusedPage.order + 1 : null;
 
       this.clipboard.forEach((item) => {
         item = JSON.parse(item);
@@ -384,7 +395,7 @@ class DocumentController extends State {
           this.history.insertAfterList(newObject);
         }
       });
-      this.history.record('ADD', this.focusedPage);
+      this.history.record('ADD', wasSelected, this.focusedPage);
     });
 
     this.savePage = (page, format) => {
@@ -531,16 +542,16 @@ class DocumentController extends State {
           objects.forEach((obj) => {
             this.history.insertAfterList(obj);
           });
-          this.history.record('ADD', this.focusedPage);
+          this.history.record('ADD', this.selected, this.focusedPage);
           break;
         case 'Remove':
           objects.forEach((obj) => {
             this.history.insertBeforeList(obj);
           });
-          this.history.record('REMOVE', this.focusedPage);
+          this.history.record('REMOVE', this.selected, this.focusedPage);
           break;
         case 'Modify':
-          this.history.record('MODIFY', this.focusedPage);
+          this.history.record('MODIFY', this.selected, this.focusedPage);
           break;
         case 'Reorder':
           this.history.setReorder(this.focusedPage);

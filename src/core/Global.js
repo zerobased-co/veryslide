@@ -1,6 +1,6 @@
 class Global {
   constructor() {
-    this.debug = true;
+    this.debug = process.env.MODE === 'development';
 
     this.snap = false;
     this.snapSize = 16;

@@ -38,8 +38,13 @@ class Select extends View {
 
     options.forEach(option => {
       let tag = document.createElement('option');
-      tag.value = option[0];
-      tag.innerText = option[((option.length == 2) ? 1 : 0)];
+      if (typeof option === 'string') {
+        tag.value = option;
+        tag.innerText = option;
+      } else {
+        tag.value = option[0];
+        tag.innerText = option[((option.length == 2) ? 1 : 0)];
+      }
 
       if (this.value === tag.value) {
         tag.selected = true;

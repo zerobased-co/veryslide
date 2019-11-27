@@ -220,7 +220,7 @@ class PanelForImageList extends PanelForBox {
         ui.createText('Data Asset'),
         new ui.Select({
           options: this.dataOptions,
-          AfterChange: (value) => {
+          afterChange: (value) => {
             this.send('Property:setPanelFor', [this.object]);
           },
         }).pair(this.object, 'asset'),
@@ -235,6 +235,30 @@ class PanelForImageList extends PanelForBox {
         new ui.Select({
           options: this.dataOptions,
         }).pair(this.object, 'imageBase'),
+      ),
+
+      ui.H(
+        ui.createText('Column'),
+        ui.V(
+          ui.H(
+            ui.createText('UID'),
+            new ui.Select({
+              options: this.object.fields,
+              afterChange: (value) => {
+                this.object.apply();
+              },
+            }).pair(this.object, 'uidColumn'),
+          ),
+          ui.H(
+            ui.createText('Link'),
+            new ui.Select({
+              options: this.object.fields,
+              afterChange: (value) => {
+                this.object.apply();
+              },
+            }).pair(this.object, 'linkColumn'),
+          ),
+        )
       ),
 
       ui.H(

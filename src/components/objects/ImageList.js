@@ -60,6 +60,8 @@ class ImageList extends Box {
       borderStyle: 'solid',
       asset: '',
       imageBase: '',
+      uidColumn: 'UID',
+      linkColumn: 'Homepage',
 
       filter: [],
 
@@ -149,11 +151,11 @@ class ImageList extends Box {
       let item = this.selectedItems[i];
       let node = document.createElement('a');
       node.className = 'aligner';
-      node.href = getValidUrl(item['Homepage']);
+      node.href = getValidUrl(item[this.linkColumn]);
       node.style.margin = this.itemMargin + 'px';
 
       let img = document.createElement('img');
-      img.src = imageBaseAsset.url + item['UID'] + '.png';
+      img.src = imageBaseAsset.url + item[this.uidColumn] + '.png';
       img.style.maxHeight = this.itemMaxHeight + 'px';
       img.style.maxWidth = this.itemMaxWidth + 'px';
       img.onload = () => {

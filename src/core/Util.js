@@ -2,6 +2,13 @@ export function randomInt(min, max) {
   return Math.floor((Math.random() * (max - min + 1)) + min);
 }
 
+export function lpad(number, width, chr) {
+  chr = typeof chr !== 'undefined' ? chr : '0';
+  number = number.toString();
+  while(number.length < width) number = chr + number;
+  return number;
+}
+
 export function randomColor() {
   const colors = [
     "#1ABC9C", "#2ECC71", "#3498DB", "#9B59B6",

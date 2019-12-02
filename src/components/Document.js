@@ -1,6 +1,6 @@
 import domtoimage from 'dom-to-image';
 
-import { defaultDomToImageOption, uuid } from 'core/Util';
+import { defaultDomToImageOption, lpad, uuid } from 'core/Util';
 import State from 'core/State';
 import A from 'core/Array';
 import BaseObject from './objects/BaseObject';
@@ -22,6 +22,10 @@ class Page extends BaseObject {
     this.thumbnailScale = 0.2;
     this.doc = null;
     this.pagethumb = null;
+  }
+
+  paddedOrder() {
+    return lpad(this.order, 4, '0');
   }
 
   addObject(type, at, states) {
@@ -90,8 +94,7 @@ class Page extends BaseObject {
     if (this.invalidate != true && force != true) return;
     this.invalidate = false;
 
-    domtoimage.toJpeg(this.node.parentElement, Object.assign(defaultDomToImageOption, {
-      quality: 0.5,
+    domtoimage.toPng(this.node.parentElement, Object.assign(defaultDomToImageOption, {
       width: parseInt(this.width * this.thumbnailScale),
       height: parseInt(this.height * this.thumbnailScale),
       style: {
@@ -210,6 +213,7 @@ class Document extends State {
       ...state,
     });
     this.objects = {};
+    this.addIgnoreState('pages');
 
     this.listen('Document:keep', (object) => {
       this.objects[object.uuid] = object;

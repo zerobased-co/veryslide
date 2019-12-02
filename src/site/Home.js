@@ -53,6 +53,29 @@ class HomeBase extends Component {
 
   render() {
     const slides = this.state.slides;
+    const slideComponent = (slide) => {
+      if (slide.data.info != null) {
+        if (slide.data.info.totalPages != null) {
+          return <span>{slide.data.info.title || slide.id} ({slide.data.info.totalPages} page(s))
+            {slide.data.info.thumbnail ?
+            <img src={slide.data.info.thumbnail} />
+            :
+            ''
+            }
+          </span>
+        } else if(slide.data.data != null) {
+          return <span>{slide.data.info.title || slide.id} ({slide.data.data.pages.length} page(s))
+            {slide.data.data.pages.length > 0 ?
+            <img src={slide.data.data.pages[0].thumbnail} />
+            :
+            ''
+            }
+          </span>
+        }
+      }
+
+      return <span>{slide.id}</span>
+    };
 
     return (
       <AuthUserContext.Consumer>
@@ -66,28 +89,18 @@ class HomeBase extends Component {
               slides.length == 0 ?
               <p>No slide found.</p>
               :
-              slides.map((slide, idx) => {     
+              slides.map((slide, idx) => {
                 const url = generatePath(ROUTES.SLIDE, { id: slide.id });
                 return (
                   <li key={slide.id}>
                     <Link to={url}>
-                      {(slide.data.info != null && slide.data.data != null) ?
-                      <span>{slide.data.info.title || slide.id} ({slide.data.data.pages.length} page(s))
-                        {slide.data.data.pages.length > 0 ?
-                        <img src={slide.data.data.pages[0].thumbnail} />
-                        :
-                        ''
-                        }
-                      </span>
-                      :
-                      <span>{slide.id}</span>
-                      }
+                      {slideComponent(slide)}
                     </Link>
                     <a onClick={() => this.deleteSlide(slide.id)}>
                       <i className="fas fa-trash-alt"/>
                     </a>
                   </li>
-                ) 
+                )
               }
             )}
             </ul>

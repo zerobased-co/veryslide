@@ -41,6 +41,9 @@ class Firebase {
     uid: this.auth.currentUser.uid,
     info: info,
   });
+
+  /* Misc */
+  serverTimestamp = () => app.firestore.FieldValue.serverTimestamp();
 }
 
 export default Firebase;

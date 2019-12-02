@@ -13,6 +13,7 @@ class SlideBase extends Component {
     super(props);
     this.state = {
       loaded: false,
+      progress: '',
     };
 
     this.slideId = props.match.params.id;
@@ -22,27 +23,59 @@ class SlideBase extends Component {
   componentDidMount() {
     this.props.firebase.slide(this.slideId).get().then(doc => {
       if (doc.exists) {
-        this.setState({loaded: true});
 
         const data = doc.data();
-        let slideData = data.data;
+        let slideData = {};
 
-        if (slideData != null) {
-          if (typeof slideData === 'string') {
-            // for old type
-            slideData = JSON.parse(slideData);
-          }
+        if (data.info != null && data.info.latestRevision != null) {
+          // get latest revision
+          //let loaded = 0;
+          //let totalPages = data.info.totalPages;
+          let latestRevisionRef = this.props.firebase.slide(this.slideId).collection('revisions').doc(data.info.latestRevision);
+
+          latestRevisionRef.get().then(slide => {
+            slideData = slide.data().data;
+            slideData.pages = [];
+
+            // get all pages
+            latestRevisionRef.collection('pages').get().then(qs => {
+
+              qs.forEach(page => {
+                //console.log(page.id, page.data());
+                slideData.pages.push(page.data());
+                //loaded += 1;
+              });
+
+              // let's initiate
+              this.veryslide = new Veryslide({
+                target: this.veryslideRef.current,
+                info: data.info || {},
+                data: slideData,
+                slideId: this.slideId,
+                firebase: this.props.firebase,
+              });
+              this.setState({loaded: true});
+            });
+          });
         } else {
-          slideData = {}
+          // for old type
+          slideData = data.data;
+          if (slideData != null) {
+            if (typeof slideData === 'string') {
+              slideData = JSON.parse(slideData);
+            }
+          } else {
+            slideData = {}
+          }
+          this.veryslide = new Veryslide({
+            target: this.veryslideRef.current,
+            info: data.info || {},
+            data: slideData,
+            slideId: this.slideId,
+            firebase: this.props.firebase,
+          });
+          this.setState({loaded: true});
         }
-
-        this.veryslide = new Veryslide({
-          target: this.veryslideRef.current,
-          info: data.info || {},
-          data: slideData,
-          slideId: this.slideId,
-          firebase: this.props.firebase,
-        });
       }
       else {
         // TBD: then create one on the fly?
@@ -57,11 +90,10 @@ class SlideBase extends Component {
   render() {
     return (
       <div>
-        {this.state.loaded ? (
-          <div className='Veryslide' ref={this.veryslideRef} />
-        ) : (
-          <div className='Loading'>Loading slide...</div>
-        )}
+        {!this.state.loaded &&
+          <div className='Loading'>Loading slide... {this.state.progress}</div>
+        }
+        <div className='Veryslide' ref={this.veryslideRef} />
       </div>
     );
   }

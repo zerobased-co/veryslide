@@ -3,8 +3,9 @@ const path = require('path');
 const Dotenv = require('dotenv-webpack');
 
 module.exports = (env, argv) => {
+  var mode = argv.mode || 'development';
   return {
-    mode: argv.mode || 'development',
+    mode,
     entry: ['react-hot-loader/patch', './src/index.js', ],
     module: {
       rules: [
@@ -44,7 +45,7 @@ module.exports = (env, argv) => {
         'process.env.MODE': JSON.stringify(argv.mode),
       }),
     ],
-    devtool: 'inline-source-map',
+    devtool: (mode === 'development') ? 'inline-source-map' : 'source-map',
     devServer: {
       contentBase: './dist',
       historyApiFallback: true,

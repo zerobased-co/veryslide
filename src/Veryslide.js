@@ -53,18 +53,44 @@ class Veryslide extends State {
   save() {
     this.editor.loading(true);
     // TBD: On Firestore, we don't have to bake into string and make it back to json object again.
-    let json = this.doc.serialize();
-    console.log(json.length);
+    let data = JSON.parse(this.doc.serialize());
+    let editor = this.editor;
 
-    let data = JSON.parse(json);
+    // TBD: only owner can save slide, not by collaborators (future)
+    this.firebase.slide(this.slideId).collection('revisions').add({
+      data: data,
+      timestamp: this.firebase.serverTimestamp(),
+    }).then((docRef) => {
+      // and now save pages
+      let saved = 0;
+      this.doc.pages.forEach(page => {
+        let data = JSON.parse(page.serialize());
+        docRef.collection('pages').doc(page.paddedOrder()).set(
+          data
+        ).then(() => {
+          saved += 1;
+          console.log(saved);
+        });
+      });
 
-    // TBD: permission check
-    this.firebase.slide(this.slideId).update({data}).then(() => {
-      this.editor.loading(false);
-      // TBD: TOAST THIS MESSAGE
-      //alert('Successfully saved.');
+      // update latest revision with thumbnail
+      this.info.latestRevision = docRef.id;
+      this.info.totalPages = this.doc.pages.length;
+
+      // if there is a thumbnail, then store it for list view
+      if (this.doc.pages.length > 0) {
+        this.info.thumbnail = this.doc.pages[0].thumbnail;
+      }
+      this.firebase.slide(this.slideId).update({
+        data: null, // to remove old data (not used)
+        info: this.info
+      }).then((docRef) => {
+        this.editor.loading(false);
+        // TBD: TOAST THIS MESSAGE
+        //alert('Successfully saved.');
+      });
     }).catch(function(error) {
-      this.editor.loading(false);
+      editor.loading(false);
       console.log("Error saving document:", error);
     });
   }

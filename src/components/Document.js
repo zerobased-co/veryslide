@@ -94,7 +94,8 @@ class Page extends BaseObject {
     if (this.invalidate != true && force != true) return;
     this.invalidate = false;
 
-    domtoimage.toPng(this.node.parentElement, Object.assign(defaultDomToImageOption, {
+    domtoimage.toJpeg(this.node.parentElement, Object.assign(defaultDomToImageOption, {
+      quality: 0.5,
       width: parseInt(this.width * this.thumbnailScale),
       height: parseInt(this.height * this.thumbnailScale),
       style: {

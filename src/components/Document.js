@@ -32,23 +32,24 @@ class Page extends BaseObject {
     let object = null;
 
     // set default states
-    states = states || {};
+    let init_state = {};
     // for supporting legacy documents (has duplicated uuids)
     if ('uuid' in states) {
+      init_state = {uuid: states['uuid']};
       if (states['uuid'] in this.doc.objects) {
-        states['uuid'] = uuid(); // give new uuid
+        init_states['uuid'] = uuid(); // give new uuid
       }
     }
 
     switch(type) {
       case 'TextBox':
-        object = new TextBox(states);
+        object = new TextBox(init_state);
         break;
       case 'ImageBox':
-        object = new ImageBox(states);
+        object = new ImageBox(init_state);
         break;
       case 'ImageList':
-        object = new ImageList(states);
+        object = new ImageList(init_state);
         break;
     }
     object.page = this;

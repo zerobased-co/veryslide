@@ -86,7 +86,7 @@ class Filter extends View {
       idx += 1;
     });
     this.state['filter'] = filter;
-    this.onChange(this.filter);
+    this.onChange(filter);
   }
 
   get_currentFilter(idx, type) {

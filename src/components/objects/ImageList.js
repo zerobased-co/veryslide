@@ -83,6 +83,12 @@ class ImageList extends Box {
   }
 
   deserialize(data) {
+    // remove duplicated filter items (this was a bug!)
+    data['filter'] = data['filter'].filter((item, index, self) =>
+      index === self.findIndex((t) => (
+        t.field === item.field
+      ))
+    )
     super.deserialize(data);
 
     // wait until asset is ready

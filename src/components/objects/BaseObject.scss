@@ -27,11 +27,16 @@
   left: 0;
   top: 0;
   opacity: 1;
+  flex-direction: column;
 
   img {
     width: 50%;
     height: 50%;
     max-width: 64px;
     max-height: 64px;
+  }
+
+  p {
+    color: white;
   }
 }

@@ -52,6 +52,7 @@ class Veryslide extends State {
 
   save() {
     this.editor.loading(true);
+    this.editor.setLoadingText('Saving pages...');
     // TBD: On Firestore, we don't have to bake into string and make it back to json object again.
     let data = JSON.parse(this.doc.serialize());
     let editor = this.editor;
@@ -63,13 +64,14 @@ class Veryslide extends State {
     }).then((docRef) => {
       // and now save pages
       let saved = 0;
+      const total = this.doc.pages.length;
       this.doc.pages.forEach(page => {
         let data = JSON.parse(page.serialize());
         docRef.collection('pages').doc(page.paddedOrder()).set(
           data
         ).then(() => {
           saved += 1;
-          console.log(saved);
+          editor.setLoadingText(`Saving ${saved} of ${total} pages...`);
         });
       });
 

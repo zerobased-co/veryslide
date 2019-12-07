@@ -1,5 +1,5 @@
 import State from 'core/State';
-import { showLoadingIndicator } from 'core/Util';
+import { showLoadingIndicator, setLoadingText } from 'core/Util';
 
 class Node extends State {
   constructor(state) {
@@ -59,6 +59,10 @@ class Node extends State {
 
   loading(isLoading) {
     showLoadingIndicator(this, isLoading);
+  }
+
+  setLoadingText(text) {
+    setLoadingText(this, text);
   }
 
   addEventListener(eventType, handler, target) {

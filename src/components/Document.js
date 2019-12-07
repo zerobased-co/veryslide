@@ -37,7 +37,7 @@ class Page extends BaseObject {
     if ('uuid' in states) {
       init_state = {uuid: states['uuid']};
       if (states['uuid'] in this.doc.objects) {
-        init_states['uuid'] = uuid(); // give new uuid
+        init_state['uuid'] = uuid(); // give new uuid
       }
     }
 

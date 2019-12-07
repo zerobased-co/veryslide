@@ -62,34 +62,31 @@ class Veryslide extends State {
       data: data,
       timestamp: this.firebase.serverTimestamp(),
     }).then((docRef) => {
-      // and now save pages
-      let saved = 0;
-      const total = this.doc.pages.length;
+      /* Save multiple pages at once */
+      let batch = this.firebase.db.batch();
       this.doc.pages.forEach(page => {
         let data = JSON.parse(page.serialize());
-        docRef.collection('pages').doc(page.paddedOrder()).set(
-          data
-        ).then(() => {
-          saved += 1;
-          editor.setLoadingText(`Saving ${saved} of ${total} pages...`);
-        });
+        let pageRef = docRef.collection('pages').doc(page.paddedOrder());
+        batch.set(pageRef, data);
       });
 
-      // update latest revision with thumbnail
-      this.info.latestRevision = docRef.id;
-      this.info.totalPages = this.doc.pages.length;
+      batch.commit().then(() => {
+        // update latest revision with thumbnail
+        this.info.latestRevision = docRef.id;
+        this.info.totalPages = this.doc.pages.length;
 
-      // if there is a thumbnail, then store it for list view
-      if (this.doc.pages.length > 0) {
-        this.info.thumbnail = this.doc.pages[0].thumbnail;
-      }
-      this.firebase.slide(this.slideId).update({
-        data: null, // to remove old data (not used)
-        info: this.info
-      }).then((docRef) => {
-        this.editor.loading(false);
-        // TBD: TOAST THIS MESSAGE
-        //alert('Successfully saved.');
+        // if there is a thumbnail, then store it for list view
+        if (this.doc.pages.length > 0) {
+          this.info.thumbnail = this.doc.pages[0].thumbnail;
+        }
+        this.firebase.slide(this.slideId).update({
+          data: null, // to remove old data (not used)
+          info: this.info
+        }).then((docRef) => {
+          this.editor.loading(false);
+          // TBD: TOAST THIS MESSAGE
+          //alert('Successfully saved.');
+        });
       });
     }).catch(function(error) {
       editor.loading(false);

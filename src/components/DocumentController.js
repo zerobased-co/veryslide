@@ -582,9 +582,33 @@ class DocumentController extends State {
     });
 
     this.listen('Controller:copyStyle', () => {
+      // TBD
     });
 
     this.listen('Controller:pasteStyle', () => {
+      // TBD
+    });
+
+    this.listen('Controller:selectAll', () => {
+
+      if (this.selected.length && this.selected[0].type === 'Page') {
+        // Select all pages
+        this.send('Controller:deselect');
+        this.doc.pages.forEach((page) => {
+          page.select();
+          this.selected.push(page);
+        });
+      } else {
+        // Select in the focused page
+        if (this.focusedPage == null) return;
+
+        this.send('Controller:deselect');
+        this.focusedPage.objects.forEach((obj) => {
+          obj.select();
+          this.selected.push(obj);
+        });
+      }
+      this.send('Property:setPanelFor', this.selected);
     });
   }
 

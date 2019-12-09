@@ -18,9 +18,9 @@ const FONTLIST = [
   ['Open Sans'],
   ['Roboto'],
   ['', '----'],
-  ['Noto Sans KR', '노토 산스'],
-  ['Nanum Gothic', '나눔 고딕'],
-  ['Nanum Myeongjo', '나눔 명조'],
+  ['Noto Sans KR'],
+  ['Nanum Gothic'],
+  ['Nanum Myeongjo'],
 ];
 
 class PanelForDocument extends Panel {
@@ -32,6 +32,12 @@ class PanelForDocument extends Panel {
 }
 
 class PanelForPage extends Panel {
+  duplicatePage() {
+    this.send('Controller:addPage', null, {
+        color: this.object.color,
+    });
+  }
+
   render() {
     super.render();
     [
@@ -40,6 +46,9 @@ class PanelForPage extends Panel {
         ui.createText('Background'),
         new ui.ColorButton().pair(this.object, 'color'),
       ),
+
+      new ui.TitleBar({'title': 'Action'}),
+      ui.createButton('Duplicate', () => this.duplicatePage() ),
     ].forEach(item => this.appendChild(item));
     return this.node;
   }

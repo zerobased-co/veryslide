@@ -242,11 +242,8 @@ class Document extends State {
 
     let page = new Page(states);
     page.doc = this;
-
-    if (states == null) {
-      page.width = this.width;
-      page.height = this.height;
-    }
+    page.width = this.width;
+    page.height = this.height;
 
     if (at == null) {
       page.order = this.pages.length;

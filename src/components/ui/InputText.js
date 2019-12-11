@@ -10,46 +10,44 @@ class InputText extends View {
   }
 
   render() {
-    super.render();
-    this.input = document.createElement('input');
-    this.input.type = 'text';
-    this.input.addEventListener('keydown', this.handler.bind(this));
-    this.input.addEventListener('focus', this.focus.bind(this));
-    this.input.addEventListener('blur', this.blur.bind(this));
-    this.node.appendChild(this.input);
+    this.node = document.createElement('input');
+    this.node.type = 'text';
+    this.node.addEventListener('keydown', this.handler.bind(this));
+    this.node.addEventListener('focus', this.focus.bind(this));
+    this.node.addEventListener('blur', this.blur.bind(this));
     return this.node;
   }
 
   on_value(text) {
-    this.input.value = text;
+    this.node.value = text;
   }
 
   focus(event) {
-    this.input.select();
+    this.node.select();
   }
 
   blur(event) {
-    if (this.value != this.input.value) {
-      this.value = this.input.value;
+    if (this.value != this.node.value) {
+      this.value = this.node.value;
       this.onChange(this.value);
     }
   }
 
   handler(event) {
-    if (event.target !== this.input) {
+    if (event.target !== this.node) {
       return;
     }
 
     if (event.keyCode === 13) {
-      this.value = this.input.value;
-      this.input.select();
+      this.value = this.node.value;
+      this.node.select();
       this.onChange(this.value);
     }
   }
-  
+
   onNotify(value) {
     this.state.value = value;
-    this.input.value = value;
+    this.node.value = value;
   }
 }
 

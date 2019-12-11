@@ -1,4 +1,5 @@
 import Node from '/core/Node';
+import A from 'core/Array';
 
 class View extends Node {
   constructor(state) {
@@ -106,6 +107,26 @@ class View extends Node {
     } else {
       this.node.appendChild(child);
     }
+  }
+
+  removeChild(child) {
+    if (child.hasOwnProperty('children') && child.hasOwnProperty('state')) {
+      A.remove(this.children, child);
+      this.node.removeChild(child.node);
+    } else {
+      this.node.removeChild(child);
+    }
+  }
+
+  centerize() {
+    if (this.parent == null) return;
+
+    let parentRect = this.parent.node.getBoundingClientRect();
+    let clientRect = this.node.getBoundingClientRect()
+
+    this.node.style.display = 'absolute';
+    this.node.style.left = parseInt(parentRect.width / 2 - clientRect.width / 2) + 'px';
+    this.node.style.top = parseInt(parentRect.height / 2 - clientRect.height / 2) + 'px';
   }
 }
 

@@ -64,13 +64,17 @@ class PanelForBox extends Panel {
         ui.V(
           ui.H(
             ui.createText('Position'),
-            ui.createInputText(this.object, 'x'),
-            ui.createInputText(this.object, 'y'),
+            ui.HGroup(
+              ui.createInputText(this.object, 'x'),
+              ui.createInputText(this.object, 'y'),
+            )
           ),
           ui.H(
             ui.createText('Size'),
-            ui.createInputText(this.object, 'width'),
-            ui.createInputText(this.object, 'height'),
+            ui.HGroup(
+              ui.createInputText(this.object, 'width'),
+              ui.createInputText(this.object, 'height'),
+            )
           ),
         ),
       ),

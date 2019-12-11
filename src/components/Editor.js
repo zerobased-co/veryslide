@@ -4,10 +4,29 @@ import A from '/core/Array';
 import ui from './ui/UI';
 import View from './ui/View';
 import Panel from './ui/Panel';
+import Dialog from './ui/Dialog';
 import PageList from './PageList';
 import AssetList from './AssetList';
 import Property from './Property';
 import Handler from './Handler';
+
+
+class ExportDialog extends Dialog {
+  constructor(state) {
+    super({
+      ...state,
+    });
+
+    [
+      new ui.TitleBar({'title': 'Export'}),
+      ui.HGroup(
+        ui.createButton('Export as PNG', () => { this.send('Controller:savePage', 'png'); }),
+        ui.createButton('Export as PDF', () => { this.send('Controller:savePage', 'pdf'); }),
+      ),
+      ui.createButton('Close', () => { this.close(); }),
+    ].forEach(item => this.appendChild(item));
+  }
+}
 
 
 class Menu extends View {
@@ -40,9 +59,7 @@ class Menu extends View {
 
       new ui.Text({'title': 'Misc'}),
       ui.HGroup(
-        ui.createButton('PNG', () => { this.send('Controller:savePage', 'png'); }),
-        ui.createButton('PDF', () => { this.send('Controller:savePage', 'pdf'); }),
-        //ui.createButton('All',   () => { this.send('Controller:saveAllPage', 'image'); }),
+        ui.createButton('Export', () => { this.send('Editor:export'); }),
         ui.createButton('Save',  () => { this.send('Veryslide:save'); }),
         ui.createButton('Play',  () => { this.send('Viewport:setPresentationMode', true); }),
       ),
@@ -607,6 +624,12 @@ class Editor extends View {
       className: 'vs-editor',
       doc: null,
       ...state,
+    });
+
+    this.listen('Editor:export', () => {
+      const dialog = new ExportDialog();
+      this.appendChild(dialog);
+      dialog.modal();
     });
   }
 

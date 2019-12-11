@@ -30,6 +30,7 @@ class Page extends BaseObject {
 
   addObject(type, at, states) {
     let object = null;
+    states = states || {};
 
     // set default states
     let init_state = {};

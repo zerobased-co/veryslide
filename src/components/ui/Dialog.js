@@ -8,6 +8,18 @@ class Dialog extends View {
     });
 
     this.overlay = null;
+    this.addEventListener('keydown', this.keydown, document);
+  }
+
+  render() {
+    super.render();
+  }
+
+  keydown(event) {
+    if (event.keyCode === 27) {
+      event.preventDefault();
+      this.close();
+    }
   }
 
   modal() {
@@ -18,6 +30,7 @@ class Dialog extends View {
     this.parent.appendChild(this.overlay);
 
     this.show();
+    this.node.focus();
     this.centerize();
   }
 

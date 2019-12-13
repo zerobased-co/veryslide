@@ -14,16 +14,66 @@ import Handler from './Handler';
 class ExportDialog extends Dialog {
   constructor(state) {
     super({
+      pages: 'current',
+      type: 'png',
+      scale: 1,
+      customPage: '',
+      doc: null,
       ...state,
     });
 
     [
       new ui.TitleBar({'title': 'Export'}),
-      ui.HGroup(
-        ui.createButton('Export as PNG', () => { this.send('Controller:savePage', 'png'); }),
-        ui.createButton('Export as PDF', () => { this.send('Controller:savePage', 'pdf'); }),
+      ui.H(
+        ui.createText('Pages'),
+        new ui.Select({
+          options: [
+            ['current', 'Current page'],
+            // TBD
+            //['all', 'All pages'],
+            //['custom', 'Custom'],
+          ],
+        }).pair(this, 'pages'),
+        /*
+        new ui.InputText({
+          'placeholder': 'e.g. 1-4, 2, 10-',
+          'className': 'vs-inputtext-140',
+        }).pair(this, 'customPage'),
+        */
       ),
-      ui.createButton('Close', () => { this.close(); }),
+      ui.H(
+        ui.createText('Scale'),
+        new ui.InputText().pair(this, 'scale'),
+      ),
+      ui.H(
+        ui.createText('Type'),
+        ui.V(
+          ui.H(
+            new ui.Select({
+              options: [
+                ['png', 'PNG'],
+                ['pdf', 'PDF'],
+              ],
+            }).pair(this, 'type'),
+          ),
+        ),
+      ),
+      new ui.Separator(),
+      ui.HE(
+        ui.createButton('Export', () => {
+          // ‘from and to’ use 1-based index(human-friendly), not zero-based.
+          let from = 1;
+          let to = this.doc.pages.length;
+
+          if (this.pages == 'current') {
+            from = to = this.doc.focusedPageIndex + 1;
+          }
+
+          this.close();
+          this.send('Controller:exportPage', this.type, this.scale, from, to);
+        }),
+        ui.createButton('Close', () => { this.close(); }),
+      ),
     ].forEach(item => this.appendChild(item));
   }
 }
@@ -627,7 +677,7 @@ class Editor extends View {
     });
 
     this.listen('Editor:export', () => {
-      const dialog = new ExportDialog();
+      const dialog = new ExportDialog({doc: this.doc});
       this.appendChild(dialog);
       dialog.modal();
     });

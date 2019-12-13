@@ -4,6 +4,7 @@ class InputText extends View {
   constructor(state) {
     super({
       className: 'vs-inputtext',
+      placeholder: '',
       value: '',
       ...state,
     });
@@ -12,6 +13,7 @@ class InputText extends View {
   render() {
     this.node = document.createElement('input');
     this.node.type = 'text';
+    this.node.placeholder = this.placeholder;
     this.node.addEventListener('keydown', this.handler.bind(this));
     this.node.addEventListener('focus', this.focus.bind(this));
     this.node.addEventListener('blur', this.blur.bind(this));

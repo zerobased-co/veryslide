@@ -21,6 +21,11 @@ $button-radius: 5px;
   flex: 1;
 }
 
+.vs-horizon-end {
+  @extend .vs-horizon;
+  justify-content: flex-end;
+}
+
 .vs-horizon + .vs-horizon {
   margin-top: 4px;
 }
@@ -156,6 +161,12 @@ $button-radius: 5px;
   text-align: center;
 }
 
+.vs-inputtext-140 {
+  @extend .vs-inputtext;
+  width: 140px;
+  text-align: left;
+}
+
 .vs-inputfile input[type='file'] {
   width: 180px;
 }
@@ -219,8 +230,14 @@ $button-radius: 5px;
   border-radius: 3px;
   padding: 5px;
   z-index: 1000;
+  min-width: 320px;
 
   // basically hidden
   top: 0;
   left: -9999px;
+}
+
+.vs-separator {
+  border-bottom: 1px solid #ccc;
+  margin: 5px 0;
 }

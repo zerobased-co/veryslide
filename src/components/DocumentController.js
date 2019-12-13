@@ -398,12 +398,23 @@ class DocumentController extends State {
       this.history.record('ADD', wasSelected, this.focusedPage);
     });
 
-    this.savePage = (page, format) => {
+    this.exportPage = (format, scale, from, to) => {
       // TBD: DO NOT DUPLICATE CODE MYSELF LIKE THIS
       // TBD: we have to hide things before capturing
+      scale = parseFloat(scale);
+      let page = this.doc.pages[from - 1];
+      this.send('PageList:selectPage', page);
+
       switch(format) {
         case 'pdf':
-          const scale = 2;
+          this.editor.loading(true);
+          let pdf = new jsPDF({
+            orientation: 'landscape',
+            unit: 'pt',
+            format: [this.doc.width, this.doc.height],
+            compressPdf: true,
+          });
+
           domtoimage.toPng(page.node.parentElement, Object.assign(defaultDomToImageOption, {
             width: page.width * scale,
             height: page.height * scale,
@@ -414,13 +425,6 @@ class DocumentController extends State {
             // TBD: Why should we get page number here? Too slow.
             let pageNo = this.doc.pages.indexOf(page) + 1;
             let filename = 'veryslide-' + this.slideId + '-' + String(pageNo).padStart(3, '0');
-
-            let pdf = new jsPDF({
-              orientation: 'landscape',
-              unit: 'pt',
-              format: [page.width, page.height],
-              compressPdf: true,
-            });
 
             var parentRect = page.node.parentElement.getBoundingClientRect();
             let rescale = 1 / this.editor.viewport.scale;
@@ -439,16 +443,18 @@ class DocumentController extends State {
               );
             });
             pdf.save(filename + '.pdf');
+            this.editor.loading(false);
           }).catch((error) => {
             console.log('Error on while saving:', error);
           });
           break;
         case 'png':
+          this.editor.loading(true);
           domtoimage.toPng(page.node.parentElement, Object.assign(defaultDomToImageOption, {
-            width: page.width,
-            height: page.height,
+            width: page.width * scale,
+            height: page.height * scale,
             style: {
-              'transform': 'scale(1)',
+              'transform': 'scale(' + scale + ')',
             },
           })).then((dataUrl) => {
             // TBD: Why should we get page number here? Too slow.
@@ -464,6 +470,7 @@ class DocumentController extends State {
 
             // Cleanup the DOM
             document.body.removeChild(link);
+            this.editor.loading(false);
           }).catch((error) => {
             console.log('Error on while saving:', error);
           });
@@ -471,11 +478,11 @@ class DocumentController extends State {
       }
     }
 
-    this.listen('Controller:savePage', (format) => {
-      if (this.focusedPage == null) return;
-      this.savePage(this.focusedPage, format);
+    this.listen('Controller:exportPage', (format, scale, from, to) => {
+      this.exportPage(format, scale, from, to);
     });
 
+/*
     // TBD: NOT LIKE THIS AT ALL
     this.listen('Controller:saveAllPage', (format) => {
       this.doc.pages.forEach((page, i) => {
@@ -487,6 +494,7 @@ class DocumentController extends State {
         }, i * 2000);
       });
     });
+  */
 
     this.listen('Controller:addAsset', (type, name, meta) => {
       console.log('addAsset', type, name, meta);

@@ -11,6 +11,7 @@ import CheckBox from './CheckBox';
 import ColorButton from './ColorButton';
 import Select from './Select';
 import Filter from './Filter';
+import Separator from './Separator';
 import { Tab, TabGroup } from './Tab';
 
 class UI {
@@ -29,6 +30,7 @@ class UI {
     this.ColorButton = ColorButton;
     this.Select = Select;
     this.Filter = Filter;
+    this.Separator = Separator;
     this.Tab = Tab;
     this.TabGroup = TabGroup;
   }
@@ -64,6 +66,13 @@ class UI {
 
   H(...children) {
     return new Horizon({
+      children,
+    });
+  }
+
+  HE(...children) {
+    return new Horizon({
+      className: 'vs-horizon-end',
       children,
     });
   }

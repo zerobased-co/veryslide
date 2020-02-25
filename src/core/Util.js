@@ -112,6 +112,7 @@ export const defaultDomToImageOption = {
 }
 
 export function getValidUrl(url) {
+  url = url.replace(/(\r\n|\n|\r| )/gm, '');
   const pattern = /^((http|https|ftp):\/\/)/;
   if (!pattern.test(url)) {
     return 'http://' + url;

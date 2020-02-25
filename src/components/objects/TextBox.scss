@@ -5,21 +5,14 @@
 .vs-textbox {
   @extend .vs-object;
 
-  .vs-clipnode {
-    overflow: hidden;
-    width: 100%;
-    height: 100%;
-    display: flex;
+  .vs-textnode {
+    word-wrap: break-word;
+    word-break: break-all;
+    white-space: pre-wrap;
+    display: block;
 
-    .vs-textnode {
-      word-wrap: break-word;
-      word-break: break-all;
-      white-space: pre-wrap;
-      display: block;
-
-      &:read-write:focus {
-        outline: none;
-      }
+    &:read-write:focus {
+      outline: none;
     }
   }
 }

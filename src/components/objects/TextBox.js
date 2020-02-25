@@ -51,6 +51,10 @@ class TextBox extends Box {
     });
     this.clipNode.appendChild(this.textNode);
 
+    // Set observers for overflow check
+    this.observer = new ResizeObserver(this.check_overflow.bind(this));
+    this.observer.observe(this.textNode);
+    this.observer.observe(this.clipNode);
     return this.node;
   }
 
@@ -218,6 +222,16 @@ class TextBox extends Box {
   is_overflowed() {
     return (this.clipNode.clientWidth < this.textNode.clientWidth)
         || (this.clipNode.clientHeight < this.textNode.clientHeight);
+  }
+
+  solve_overflow() {
+    if (this.clipNode.clientWidth < this.textNode.clientWidth) {
+      this.width = this.textNode.clientWidth + this.padding * 2 + 2;
+    }
+
+    if (this.clipNode.clientHeight < this.textNode.clientHeight) {
+      this.height = this.textNode.clientHeight + this.padding * 2 + 2;
+    }
   }
 }
 

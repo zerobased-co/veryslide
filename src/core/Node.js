@@ -12,6 +12,7 @@ class Node extends State {
     this.content = '';
     this.selected = false;
     this.focused = false;
+    this.hidden = false;
     this.eventListeners = [];
 
     this.render();
@@ -37,6 +38,19 @@ class Node extends State {
 
   clear() {
     this.content = '';
+  }
+
+  show(isShow) {
+    this.hidden = (isShow == null) ? false : !isShow;
+    if (this.hidden) {
+      this.node.classList.add('vs-hidden');
+    } else {
+      this.node.classList.remove('vs-hidden');
+    }
+  }
+
+  hide() {
+    return this.show(false);
   }
 
   select(selected) {

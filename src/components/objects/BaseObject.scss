@@ -14,6 +14,17 @@
   }
 }
 
+.vs-hidden {
+  display: none !important;
+}
+
+.vs-clipnode {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
 .vs-overflow-marker {
   position: absolute;
   bottom: 0;
@@ -29,12 +40,7 @@
   align-items: center;
   justify-content: center;
 
-  display: none;
   z-index: 10000;
-
-  &.overflowed {
-    display: inherit;
-  }
 }
 
 .vs-loading {

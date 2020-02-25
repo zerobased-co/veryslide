@@ -3,15 +3,20 @@
 .vs-imagelist {
   @extend .vs-object;
 
-  border: 1px solid black;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  overflow: hidden;
+  .vs-imagelist-inner {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
 
-  img {
-    width: auto;
-    margin: 5px;
+    .vs-aligner {
+      display:flex;
+      justify-content:center;
+      align-items:center;
+
+      img {
+        width: auto;
+      }
+    }
   }
 }

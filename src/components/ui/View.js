@@ -9,7 +9,6 @@ class View extends Node {
       children: [],
 
       enabled: true,
-      shown: true,
       ...state,
     });
   }
@@ -28,19 +27,6 @@ class View extends Node {
     if (from === this.pairTarget && key === this.pairKey) {
       this.onNotify(value);
     }
-  }
-
-  show(isShow) {
-    this.shown = (isShow == null) ? true : isShow;
-    if (this.shown) {
-      this.node.classList.remove('vs-hidden');
-    } else {
-      this.node.classList.add('vs-hidden');
-    }
-  }
-
-  hide() {
-    return this.show(false);
   }
 
   enable(isEnable) {

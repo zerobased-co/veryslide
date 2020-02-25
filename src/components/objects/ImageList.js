@@ -84,11 +84,13 @@ class ImageList extends Box {
 
   deserialize(data) {
     // remove duplicated filter items (this was a bug!)
-    data['filter'] = data['filter'].filter((item, index, self) =>
-      index === self.findIndex((t) => (
-        t.field === item.field
-      ))
-    )
+    if (data.hasOwnProperty('filter')) {
+      data['filter'] = data['filter'].filter((item, index, self) =>
+        index === self.findIndex((t) => (
+          t.field === item.field
+        ))
+      )
+    }
     super.deserialize(data);
 
     // wait until asset is ready
@@ -113,26 +115,43 @@ class ImageList extends Box {
 
   clear() {
     super.clear();
-    this.node.innerHTML = '';
+    this.clipNode.innerHTML = '';
     this.filter = [];
     this.selectedItems = [];
     this.loadedCount = 0;
   }
 
+  render() {
+    super.render();
+    this.clipNode = document.createElement('div');
+    this.clipNode.className = 'vs-clipnode';
+    this.node.appendChild(this.clipNode);
+
+    this.innerNode = document.createElement('div');
+    this.innerNode.className = 'vs-imagelist-inner';
+    this.clipNode.appendChild(this.innerNode);
+
+    // Set observer and timer for overflow check
+    this.observer = new ResizeObserver(this.check_overflow.bind(this));
+    this.observer.observe(this.innerNode);
+    this.observer.observe(this.clipNode);
+    return this.node;
+  }
+
   shuffle() {
-    var children = this.node.childNodes;
+    var children = this.innerNode.childNodes;
     var frag = document.createDocumentFragment();
     while (children.length) {
       frag.appendChild(children[Math.floor(Math.random() * children.length)]);
     }
-    this.node.appendChild(frag);
+    this.innerNode.appendChild(frag);
   }
 
   apply() {
     if (this.items.length == 0) return;
     if (this.filter.length == 0) return;
 
-    this.node.innerHTML = '';
+    this.innerNode.innerHTML = '';
     this.selectedItems = [];
     this.loadedCount = 0;
     this.page.invalidate = true;
@@ -156,8 +175,9 @@ class ImageList extends Box {
     for(let i = 0; i < this.selectedItems.length; i++) {
       let item = this.selectedItems[i];
       let node = document.createElement('a');
-      node.className = 'aligner';
+      node.className = 'vs-aligner';
       node.href = getValidUrl(item[this.linkColumn]);
+      node.target = '_blank';
       node.style.margin = this.itemMargin + 'px';
 
       let img = document.createElement('img');
@@ -169,10 +189,11 @@ class ImageList extends Box {
       }
 
       node.appendChild(img);
-      this.node.appendChild(node);
+      this.innerNode.appendChild(node);
     }
 
     this.record();
+    this.check_overflow();
   }
 
   loaded() {
@@ -180,6 +201,7 @@ class ImageList extends Box {
     if (this.loadedCount >= this.selectedItems.length) {
       this.loading(false);
     }
+    this.check_overflow();
   }
 
   update() {
@@ -195,32 +217,47 @@ class ImageList extends Box {
   }
 
   on_itemDirection(direction) {
-    this.node.style.flexDirection = direction;
+    this.innerNode.style.flexDirection = direction;
   }
 
   on_itemAlign(align) {
-    this.node.style.justifyContent = align;
+    this.innerNode.style.justifyContent = align;
   }
 
   on_itemMaxWidth(width) {
-    var children = Array.from(this.node.getElementsByClassName('aligner'));
+    var children = Array.from(this.innerNode.getElementsByClassName('vs-aligner'));
     children.forEach(function(item){
       item.firstChild.style.maxWidth = width + 'px';
     });
   }
 
   on_itemMaxHeight(height) {
-    var children = Array.from(this.node.getElementsByClassName('aligner'));
+    var children = Array.from(this.innerNode.getElementsByClassName('vs-aligner'));
     children.forEach(function(item){
       item.firstChild.style.maxHeight = height + 'px';
     });
   }
 
   on_itemMargin(margin) {
-    var children = Array.from(this.node.getElementsByClassName('aligner'));
+    var children = Array.from(this.innerNode.getElementsByClassName('vs-aligner'));
     children.forEach(function(item){
       item.style.margin = margin + 'px';
     });
+  }
+
+  is_overflowed() {
+    return (this.clipNode.clientWidth < this.innerNode.scrollWidth)
+        || (this.clipNode.clientHeight < this.innerNode.scrollHeight);
+  }
+
+  solve_overflow() {
+    if (this.clipNode.clientWidth < this.innerNode.scrollWidth) {
+      this.width = this.innerNode.scrollWidth + this.padding * 2 + 2;
+    }
+
+    if (this.clipNode.clientHeight < this.innerNode.scrollHeight) {
+      this.height = this.innerNode.scrollHeight + this.padding * 2 + 2;
+    }
   }
 }
 

@@ -292,7 +292,7 @@ class DocumentController extends State {
     });
 
     this.listen('Controller:move', (direction) => {
-      if (this.isPresentationMode) {
+      if (this.editor.viewport.isPresentationMode) {
         switch(direction) {
           case 'Left':
           case 'Up':

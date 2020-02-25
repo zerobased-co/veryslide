@@ -614,7 +614,7 @@ class Viewport extends View {
       this.node.requestFullscreen();
     } else {
       this.editor.node.classList.remove('Presentation');
-      // TBD: this makes `Document not active` error occasionally, but I'm not sure how to prevent it.
+      // NOTE: this makes `Document not active` error occasionally, but I'm not sure how to prevent it.
       document.exitFullscreen().catch(() => {});;
       this.send('PageList:selectPage', this.page, false);
     }

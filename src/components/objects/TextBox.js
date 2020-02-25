@@ -27,7 +27,12 @@ class TextBox extends Box {
 
   render() {
     super.render();
+    this.clipNode = document.createElement('div');
+    this.clipNode.className = 'vs-clipnode';
+    this.node.appendChild(this.clipNode);
+
     this.textNode = document.createElement('div');
+    this.textNode.className = 'vs-textnode';
     this.textNode.addEventListener('paste', function (e) {
       e.preventDefault();
 
@@ -44,7 +49,7 @@ class TextBox extends Box {
         document.execCommand('paste', false, text);
       }
     });
-    this.node.appendChild(this.textNode);
+    this.clipNode.appendChild(this.textNode);
 
     return this.node;
   }
@@ -185,24 +190,24 @@ class TextBox extends Box {
 
   on_align(align) {
     if (align == 'left') {
-      this.node.style.textAlign = 'left';
-      this.node.style.justifyContent = 'flex-start';
+      this.clipNode.style.textAlign = 'left';
+      this.clipNode.style.justifyContent = 'flex-start';
     } else if (align == 'right') {
-      this.node.style.textAlign = 'right';
-      this.node.style.justifyContent = 'flex-end';
+      this.clipNode.style.textAlign = 'right';
+      this.clipNode.style.justifyContent = 'flex-end';
     } else if (align == 'center') {
-      this.node.style.textAlign = 'center';
-      this.node.style.justifyContent = 'center';
+      this.clipNode.style.textAlign = 'center';
+      this.clipNode.style.justifyContent = 'center';
     }
   }
 
   on_verticalAlign(align) {
     if (align == 'top') {
-      this.node.style.alignItems = 'flex-start';
+      this.clipNode.style.alignItems = 'flex-start';
     } else if (align == 'bottom') {
-      this.node.style.alignItems = 'flex-end';
+      this.clipNode.style.alignItems = 'flex-end';
     } else if (align == 'middle') {
-      this.node.style.alignItems = 'center';
+      this.clipNode.style.alignItems = 'center';
     }
   }
 
@@ -210,9 +215,9 @@ class TextBox extends Box {
     this.textNode.style.wordBreak = value;
   }
 
-  is_overflow() {
-    return (this.node.clientWidth < this.textNode.clientWidth)
-        || (this.node.clientHeight < this.textNode.clientHeight);
+  is_overflowed() {
+    return (this.clipNode.clientWidth < this.textNode.clientWidth)
+        || (this.clipNode.clientHeight < this.textNode.clientHeight);
   }
 }
 

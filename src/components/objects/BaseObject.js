@@ -23,6 +23,7 @@ class BaseObject extends Node {
     this.page = null;
     this.handler = null;
     this.addNumberState('x', 'y', 'width', 'height', 'order', 'opacity');
+    this.overflowed = false;
 
     // for supporting legacy objects (before Oct 2019)
     if (typeof this.uuid === 'undefined') {
@@ -68,6 +69,18 @@ class BaseObject extends Node {
         this.invalidate = true;
       }
     }
+
+    // check overflow
+    const overflowing = this.is_overflowed();
+
+    if (overflowing !== this.overflowed) {
+      if (overflowing) {
+        this.overflow_marker.classList.add('overflowed');
+      } else {
+        this.overflow_marker.classList.remove('overflowed');
+      }
+      this.overflowed = overflowing;
+    }
   }
 
   on_x(x) {
@@ -96,6 +109,10 @@ class BaseObject extends Node {
 
   on_opacity(opacity) {
     this.node.style.opacity = opacity;
+  }
+
+  is_overflowed() {
+    return false;
   }
 
   apply(style) {
@@ -138,6 +155,13 @@ class BaseObject extends Node {
       debugNode.innerHTML = this.uuid;
       this.node.appendChild(debugNode);
     }
+
+    // add overflow marker
+    this.overflow_marker = document.createElement('div');
+    this.overflow_marker.className = 'vs-overflow-marker';
+    this.overflow_marker.innerHTML = '&#43;'
+    this.overflow_marker.setAttribute('data-render-ignore', 'true');
+    this.node.appendChild(this.overflow_marker);
     return this.node;
   }
 }

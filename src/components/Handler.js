@@ -41,14 +41,10 @@ class Handler extends View {
     this.listen('Object:hideHandler', this.hideHandler.bind(this));
 
     if (this.object) {
-      this.object.page.node.appendChild(this.node);
+      this.object.node.appendChild(this.node);
       this.object.addPairing(this);
       this.alignToObject(this.object);
       this.updateTransform();
-
-      if (typeof this.object['is_overflow'] === 'function') {
-        // TBD: Show overflow dot
-      }
     }
   }
 
@@ -77,18 +73,14 @@ class Handler extends View {
   }
 
   alignToObject(object) {
-    this.x = object.x;
-    this.y = object.y;
     this.width = object.width;
     this.height = object.height;
   }
 
   on_x(x) {
-    this.node.style.left = x + 'px';
   }
 
   on_y(y) {
-    this.node.style.top = y + 'px';
   }
 
   on_width(width) {

@@ -24,6 +24,7 @@ class Handler extends View {
       width: 0,
       height: 0,
       order: 0,
+      dots: [],
       ...state,
     });
 
@@ -94,10 +95,9 @@ class Handler extends View {
   updateTransform() {
     if (this.viewport == null) return;
 
-    let dots = this.node.getElementsByClassName('vs-dot');
-    for(var i = 0; i < dots.length; i++) {
-      let type = dots[i].dataset.type;
-      dots[i].style.transform = dotPreset[type]['transform'] + ' scale(' + (1 / this.viewport.scale) + ')';
+    for(var i = 0; i < this.dots.length; i++) {
+      let type = this.dots[i].dataset.type;
+      this.dots[i].style.transform = dotPreset[type]['transform'] + ' scale(' + (1 / this.viewport.scale) + ')';
     }
   }
 
@@ -268,14 +268,14 @@ class Handler extends View {
     this.removeEventListener('mouseup', document);
   }
 
-  mousedown(event, fromEditor) {
+  mousedown(event, fromOutside, dot) {
     if (this.object == null) return;
     if (global.grabbing == true) return;
 
     event.stopPropagation();
     event.preventDefault();
 
-    if (event.shiftKey && !fromEditor && !event.target.classList.contains('vs-dot')) {
+    if (!fromOutside && event.shiftKey && !event.target.classList.contains('vs-dot')) {
       this.send('Controller:deselect', this.object);
       return;
     }
@@ -293,7 +293,11 @@ class Handler extends View {
       height: this.object.height,
     };
 
-    if (event.target.classList.contains('vs-dot')) {
+    if (typeof dot !== 'undefined') {
+      this.transform = dot;
+      this.currentDot = this.dots[dot];
+      this.currentDot.classList.add('vs-showme');
+    } else if (event.target.classList.contains('vs-dot')) {
       this.transform = event.target.dataset.type;
       this.currentDot = event.target;
       this.currentDot.classList.add('vs-showme');
@@ -327,6 +331,7 @@ class Handler extends View {
       dot.className = 'vs-dot d' + i;
       dot.dataset.type = i;
       this.node.appendChild(dot);
+      this.dots.push(dot);
     }
 
     // To be ignored

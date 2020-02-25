@@ -4,6 +4,39 @@ import global from 'core/Global';
 import './BaseObject.scss';
 import Handler from '../Handler';
 
+class OverflowMarker extends Node {
+  constructor(state) {
+    super({
+      className: 'vs-overflow-marker vs-hidden',
+      object: null,
+      ...state,
+    });
+    this.addEventListener('mousedown', this.onMouseDown);
+  }
+
+  onMouseDown = (event) => {
+    if (this.object) {
+      event.stopPropagation();
+      event.preventDefault();
+
+      if (event.detail >= 2) {
+        // Match size not to be overflowed
+        this.object.solve_overflow();
+      } else {
+        this.send('Controller:select', this.object);
+        this.object.handler.mousedown(event, true, 5); // pass event to south dot
+      }
+    }
+  }
+
+  render() {
+    this.node = super.render();
+    this.node.innerHTML = '&#43;'
+    this.node.setAttribute('data-render-ignore', 'true');
+    return this.node;
+  }
+}
+
 class BaseObject extends Node {
   constructor(state) {
     super({
@@ -37,9 +70,13 @@ class BaseObject extends Node {
     // Page does not support handler
     if (this.type == 'Page') return;
 
-    if (this.handler) this.handler.destroy();
     if (selected !== false) {
-      this.handler = new Handler({ object: this });
+      if (this.handler === null) {
+        this.handler = new Handler({ object: this });
+      }
+    } else {
+      if (this.handler) this.handler.destroy();
+      this.handler = null;
     }
   }
 

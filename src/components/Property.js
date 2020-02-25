@@ -206,9 +206,14 @@ class PanelForImageBox extends PanelForBox {
       new ui.TitleBar({'title': 'Image'}),
       ui.H(
         ui.createText('Reset'),
-        ui.createButton('Original size', () => {
-          this.object.resetSize();
-        }),
+        ui.HGroup(
+          ui.createButton('Original size', () => {
+            this.object.resetSize();
+          }),
+          ui.createButton('Original ratio', () => {
+            this.object.resetRatio();
+          }),
+        ),
       ),
     ].forEach(item => this.appendChild(item));
 

@@ -34,7 +34,15 @@ class ImageBox extends Box {
     this.width = this.imageNode.naturalWidth;
     this.height = this.imageNode.naturalHeight;
   }
-  
+
+  resetRatio() {
+    if (this.imageNode.naturalWidth > this.imageNode.naturalHeight) {
+      this.height = parseInt(this.imageNode.naturalHeight * (this.width / this.imageNode.naturalWidth));
+    } else {
+      this.width = parseInt(this.imageNode.naturalWidth * (this.height / this.imageNode.naturalHeight));
+    }
+  }
+
   render() {
     let node = super.render();
     this.imageNode = document.createElement('img');

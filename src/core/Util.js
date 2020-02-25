@@ -84,11 +84,7 @@ export function showLoadingIndicator(elem, isLoading, duration) {
     let icon = document.createElement('img');
     icon.src = '/static/icons/loading.svg';
 
-    let text = document.createElement('p');
-    text.innerText = '';
-
     elem.loadingNode.append(icon);
-    elem.loadingNode.append(text);
     elem.node.append(elem.loadingNode);
   }
 }
@@ -98,6 +94,10 @@ export function setLoadingText(elem, text) {
     let textElem = elem.loadingNode.querySelector('p');
     if (textElem) {
       textElem.innerText = text;
+    } else {
+      let textElem = document.createElement('p');
+      textElem.innerText = text;
+      elem.loadingNode.append(textElem);
     }
   }
 }

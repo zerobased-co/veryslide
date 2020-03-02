@@ -194,6 +194,7 @@ class BaseObject extends Node {
       let debugNode = document.createElement('div');
       debugNode.className = 'vs-debug';
       debugNode.innerHTML = this.uuid;
+      debugNode.setAttribute('data-render-ignore', 'true');
       this.node.appendChild(debugNode);
     }
 

@@ -123,6 +123,11 @@ class ImageList extends Box {
 
   render() {
     super.render();
+    this.coverNode = document.createElement('div');
+    this.coverNode.className = 'vs-covernode';
+    this.coverNode.setAttribute('data-render-ignore', 'true');
+    this.node.appendChild(this.coverNode);
+
     this.clipNode = document.createElement('div');
     this.clipNode.className = 'vs-clipnode';
     this.node.appendChild(this.clipNode);

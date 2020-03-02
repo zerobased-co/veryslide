@@ -2,6 +2,7 @@ import './ImageList.scss';
 import { parse } from 'papaparse';
 import Box from './Box';
 import { randomInt, getValidUrl } from 'core/Util';
+import ResizeObserver from 'resize-observer-polyfill';
 
 function isValidItem(item, filter) {
   let valid = true;

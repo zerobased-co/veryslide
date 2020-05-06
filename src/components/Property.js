@@ -124,6 +124,11 @@ class PanelForBox extends Panel {
       ),
 
       ui.H(
+        ui.createText('Rounding'),
+        new ui.InputText().pair(this.object, 'borderRadius'),
+      ),
+
+      ui.H(
         ui.createText('Opacity'),
         new ui.InputText().pair(this.object, 'opacity'),
       ),

@@ -13,11 +13,12 @@ class Box extends BaseObject {
       borderStyle: 'none',
       borderWidth: 1,
       borderColor: '#000000',
+      borderRadius: 0,
       padding: 10,
       ...state,
     });
 
-    this.addNumberState('borderWidth', 'padding');
+    this.addNumberState('borderWidth', 'borderRadius', 'padding');
   }
 
   on_borderStyle(style) {
@@ -30,6 +31,10 @@ class Box extends BaseObject {
 
   on_borderColor(color) {
     this.node.style.borderColor = color;
+  }
+
+  on_borderRadius(radius) {
+    this.node.style.borderRadius = radius + 'px';
   }
 
   on_padding(padding) {

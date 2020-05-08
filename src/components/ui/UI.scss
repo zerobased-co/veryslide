@@ -237,3 +237,12 @@ $button-radius: 5px;
   border-bottom: 1px solid #ccc;
   margin: 5px 0;
 }
+
+.vs-textslider {
+  @extend .vs-horizon;
+}
+
+.vs-slider {
+  margin: 0;
+  height: 30px;
+}

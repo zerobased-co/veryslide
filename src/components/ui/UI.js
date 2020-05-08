@@ -12,6 +12,8 @@ import ColorButton from './ColorButton';
 import Select from './Select';
 import Filter from './Filter';
 import Separator from './Separator';
+import Slider from './Slider';
+import TextSlider from './TextSlider';
 import { Tab, TabGroup } from './Tab';
 
 class UI {
@@ -31,6 +33,8 @@ class UI {
     this.Select = Select;
     this.Filter = Filter;
     this.Separator = Separator;
+    this.Slider = Slider;
+    this.TextSlider = TextSlider;
     this.Tab = Tab;
     this.TabGroup = TabGroup;
   }

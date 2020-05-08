@@ -116,26 +116,30 @@ class PanelForBox extends Panel {
 
       ui.H(
         ui.createText('Border'),
-        new ui.Select({
-          options: [['none', '----'], ['solid', 'Solid'], ['dashed', 'Dashed']],
-        }).pair(this.object, 'borderStyle'),
-        new ui.InputText().pair(this.object, 'borderWidth'),
-        new ui.ColorButton().pair(this.object, 'borderColor'),
+        ui.V(
+          ui.H(
+            new ui.Select({
+              options: [['none', '----'], ['solid', 'Solid'], ['dashed', 'Dashed']],
+            }).pair(this.object, 'borderStyle'),
+            new ui.ColorButton().pair(this.object, 'borderColor'),
+          ),
+          new ui.TextSlider({min:0, max:100}).pair(this.object, 'borderWidth'),
+        ),
       ),
 
       ui.H(
         ui.createText('Rounding'),
-        new ui.InputText().pair(this.object, 'borderRadius'),
+        new ui.TextSlider({min:0, max:100}).pair(this.object, 'borderRadius'),
       ),
 
       ui.H(
         ui.createText('Opacity'),
-        new ui.InputText().pair(this.object, 'opacity'),
+        new ui.TextSlider({min:0, max:1, step: 0.01}).pair(this.object, 'opacity'),
       ),
 
       ui.H(
         ui.createText('Padding'),
-        new ui.InputText().pair(this.object, 'padding'),
+        new ui.TextSlider({min:0, max:100}).pair(this.object, 'padding'),
       ),
     ].forEach(item => this.appendChild(item));
     return this.node;

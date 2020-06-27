@@ -2,6 +2,7 @@ import './TextBox.scss';
 import Box from './Box';
 import global from '/core/Global';
 import ResizeObserver from 'resize-observer-polyfill';
+import { escapeHtml } from '/core/Util';
 
 class TextBox extends Box {
   constructor(state) {
@@ -131,10 +132,11 @@ class TextBox extends Box {
   }
 
   updateText() {
+    const text = escapeHtml(this.text);
     if (this.link != '') {
-      this.textNode.innerHTML = '<a href="' + this.link + '">' + this.text + '</a>';
+      this.textNode.innerHTML = '<a href="' + this.link + '">' + text + '</a>';
     } else {
-      this.textNode.innerHTML = this.text;
+      this.textNode.innerHTML = text;
     }
   }
 

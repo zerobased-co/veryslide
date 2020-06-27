@@ -120,3 +120,25 @@ export function getValidUrl(url) {
     return url;
   }
 }
+
+var entityMap = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+  '/': '&#x2F;',
+  '`': '&#x60;',
+  '=': '&#x3D;'
+};
+
+export function escapeHtml(html) {
+  return String(html).replace(/[&<>"'`=\/]/g, function (s) {
+    return entityMap[s];
+  });
+}
+
+export function unescapeHtml(html) {
+  var doc = new DOMParser().parseFromString(html, "text/html");
+  return doc.documentElement.textContent;
+}

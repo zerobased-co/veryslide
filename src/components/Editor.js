@@ -557,7 +557,7 @@ class Viewport extends View {
   }
 
   keydown(event) {
-    if (event.target !== document.body && event.target !== this.node) {
+    if (global.editingObject !== null) {
       return;
     }
 
@@ -572,7 +572,7 @@ class Viewport extends View {
   }
 
   keyup(event) {
-    if (event.target !== document.body && event.target !== this.node) {
+    if (global.editingObject !== null) {
       return;
     }
 

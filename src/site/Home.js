@@ -51,6 +51,10 @@ class HomeBase extends Component {
     });
   }
 
+  duplicateSlide(id) {
+    console.log("duplicateSlide", id);
+  }
+
   render() {
     const slides = this.state.slides;
     const slideComponent = (slide) => {
@@ -82,7 +86,7 @@ class HomeBase extends Component {
         {authUser => (
           <div>
             <h2>My slides</h2>
-            <ul>{
+            <ul className="Slides">{
               slides == null ?
               <p>Loading...</p>
               :
@@ -96,8 +100,11 @@ class HomeBase extends Component {
                     <Link to={url}>
                       {slideComponent(slide)}
                     </Link>
-                    <a onClick={() => this.deleteSlide(slide.id)}>
-                      <i className="fas fa-trash-alt"/>
+                    <a className="Button" onClick={() => this.duplicateSlide(slide.id)}>
+                      <i className="fas fa-copy"/>Duplicate
+                    </a>
+                    <a className="Button" onClick={() => this.deleteSlide(slide.id)}>
+                      <i className="fas fa-trash-alt"/>Delete
                     </a>
                   </li>
                 )

@@ -29,7 +29,13 @@ class Slider extends View {
     const value = Math.min(Math.max(this.node.value, this.min), this.max);
 
     this.value = value;
-    this.onChange(value);
+    if (event.type === 'change') { // record changes only for 'change' event
+      this.onChange(value);
+    } else {
+      global.temporary = true; // TBD: do not use global variable
+      this.onChange(value);
+      global.temporary = false; // TBD: do not use global variable
+    }
   }
 
   render() {

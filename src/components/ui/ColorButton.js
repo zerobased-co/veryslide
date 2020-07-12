@@ -38,9 +38,9 @@ class ColorButton extends View {
     }, color, (newColor) => {
       // dragging
       this.color = newColor;
-      global.temporary = true;
+      global.temporary = true; // TBD: do not use global variable
       this.onChange(newColor);
-      global.temporary = false;
+      global.temporary = false; // TBD: do not use global variable
     }, () => {}, (newColor) => {
       // finished to choose
       this.color = newColor;

@@ -60,21 +60,25 @@ class HomeBase extends Component {
     const slideComponent = (slide) => {
       if (slide.data.info != null) {
         if (slide.data.info.totalPages != null) {
-          return <span>{slide.data.info.title || slide.id} ({slide.data.info.totalPages} page(s))
+          return <div className="Slide">
             {slide.data.info.thumbnail ?
             <img src={slide.data.info.thumbnail} />
             :
             ''
             }
-          </span>
+            <span>{slide.data.info.title || slide.id}</span>
+            <span>{slide.data.info.totalPages} page(s)</span>
+          </div>
         } else if(slide.data.data != null) {
-          return <span>{slide.data.info.title || slide.id} ({slide.data.data.pages.length} page(s))
+          return <div className="Slide">
             {slide.data.data.pages.length > 0 ?
             <img src={slide.data.data.pages[0].thumbnail} />
             :
             ''
             }
-          </span>
+            <span>{slide.data.info.title || slide.id}</span>
+            <span>{slide.data.data.pages.length} page(s)</span>
+          </div>
         }
       }
 
@@ -100,11 +104,8 @@ class HomeBase extends Component {
                     <Link to={url}>
                       {slideComponent(slide)}
                     </Link>
-                    <a className="Button" onClick={() => this.duplicateSlide(slide.id)}>
-                      <i className="fas fa-copy"/>Duplicate
-                    </a>
-                    <a className="Button" onClick={() => this.deleteSlide(slide.id)}>
-                      <i className="fas fa-trash-alt"/>Delete
+                    <a className="Button NoText NoBorder" alt="Delete" onClick={() => this.deleteSlide(slide.id)}>
+                      <i className="fas fa-trash-alt"/>
                     </a>
                   </li>
                 )

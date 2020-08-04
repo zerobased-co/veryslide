@@ -54,10 +54,6 @@ class Select extends View {
   }
 
   change(event) {
-    if (this.select.value === '') {
-      return;
-    }
-
     this.value = this.select.value;
     this.onChange(this.select.value);
   }

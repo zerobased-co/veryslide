@@ -75,7 +75,9 @@ class Filter extends View {
     let filter = [];
 
     this.operators.forEach((operator) => {
-      if (operator.value != '') {
+      if (operator.value === '') {
+        this.values[idx].value = '';
+      } else {
         filter.push({
           'field': this.fields[idx],
           'operator': operator.value,

@@ -4,6 +4,20 @@ import DocumentController from './components/DocumentController';
 import channel from 'core/Channel.js';
 import State from 'core/State.js';
 
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  doc,
+  addDoc,
+  getDoc,
+  getDocs,
+  deleteDoc,
+  updateDoc,
+  writeBatch,
+} from 'firebase/firestore';
+
 class Veryslide extends State {
   constructor(state) {
     super({
@@ -50,7 +64,7 @@ class Veryslide extends State {
     // TBD
   }
 
-  save() {
+  async save() {
     this.editor.loading(true);
     this.editor.setLoadingText('Saving pages...');
     // TBD: On Firestore, we don't have to bake into string and make it back to json object again.
@@ -58,40 +72,37 @@ class Veryslide extends State {
     let editor = this.editor;
 
     // TBD: only owner can save slide, not by collaborators (future)
-    this.firebase.slide(this.slideId).collection('revisions').add({
+    const slideRef = doc(this.firebase.db, 'slides', this.slideId);
+    const revRef = await addDoc(collection(slideRef, 'revisions'), {
       data: data,
       timestamp: this.firebase.serverTimestamp(),
-    }).then((docRef) => {
-      /* Save multiple pages at once */
-      let batch = this.firebase.db.batch();
-      this.doc.pages.forEach(page => {
-        let data = JSON.parse(page.serialize());
-        let pageRef = docRef.collection('pages').doc(page.paddedOrder());
-        batch.set(pageRef, data);
-      });
-
-      batch.commit().then(() => {
-        // update latest revision with thumbnail
-        this.info.latestRevision = docRef.id;
-        this.info.totalPages = this.doc.pages.length;
-
-        // if there is a thumbnail, then store it for list view
-        if (this.doc.pages.length > 0) {
-          this.info.thumbnail = this.doc.pages[0].thumbnail;
-        }
-        this.firebase.slide(this.slideId).update({
-          data: null, // to remove old data (not used)
-          info: this.info
-        }).then((docRef) => {
-          this.editor.loading(false);
-          // TBD: TOAST THIS MESSAGE
-          //alert('Successfully saved.');
-        });
-      });
-    }).catch(function(error) {
-      editor.loading(false);
-      console.log("Error saving document:", error);
     });
+
+    /* Save multiple pages at once */
+    let batch = writeBatch(this.firebase.db);
+    this.doc.pages.forEach(page => {
+      let data = JSON.parse(page.serialize());
+      let pageRef = doc(revRef, 'pages', page.paddedOrder());
+      batch.set(pageRef, data);
+    });
+
+    await batch.commit();
+
+    // update latest revision with thumbnail
+    this.info.latestRevision = revRef.id;
+    this.info.totalPages = this.doc.pages.length;
+
+    // if there is a thumbnail, then store it for list view
+    if (this.doc.pages.length > 0) {
+      this.info.thumbnail = this.doc.pages[0].thumbnail;
+    }
+
+    await updateDoc(slideRef, {
+      data: null, // to remove old data (not used)
+      info: this.info
+    });
+
+    this.editor.loading(false);
   }
 
   destroy() {

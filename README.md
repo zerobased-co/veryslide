@@ -2,11 +2,11 @@
 veryslide.com homepage
 
 ## Run
-Add `FIREBASE_CONFIG` as a JSON string with Firebase configuration.
+Copy `config.template.js` into `config.js` and put Firebase config values into it.
 
 ```shell
-$ npm install
-$ npm run start
+$ yarn install
+$ yarn run start
 ```
 
 ## Test

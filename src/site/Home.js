@@ -18,37 +18,22 @@ class HomeBase extends Component {
     };
   }
 
-  componentDidMount() {
-    this.props.firebase.currentUser().get().then(doc => {
-      if (doc.exists) {
-        this.setState({data: doc.data()});
-      } else {
-        console.log("No such document!");
-      }
-    }).catch(function(error) {
-        console.log("Error getting document:", error);
+  async componentDidMount() {
+    const slidesSnapshot = await this.props.firebase.mySlides();
+    let slides = [];
+    slidesSnapshot.forEach((slide) => {
+      slides.push({id: slide.id, data: slide.data()});
     });
-
-    this.props.firebase.mySlides().get().then(qs => {
-      let slides = [];
-      qs.docs.map(slide => {
-        slides.push({id: slide.id, data: slide.data()});
-      });
-      this.setState({slides});
-    }).catch(function(error) {
-        console.log("Error getting document:", error);
-    });
+    this.setState({slides});
   }
 
-  deleteSlide(id) {
+  async deleteSlide(id) {
     console.log("deleteSlide", id);
-    this.props.firebase.slide(id).delete().then(() => {
-      this.setState(prevState => ({
-        slides: prevState.slides.filter(el => el.id != id)
-      }));
-    }).catch(function(error) {
-        console.log("Error deleting document:", error);
-    });
+    await this.props.firebase.deleteSlide(id);
+
+    this.setState(prevState => ({
+      slides: prevState.slides.filter(el => el.id != id)
+    }));
   }
 
   duplicateSlide(id) {

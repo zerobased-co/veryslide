@@ -4,6 +4,7 @@ import { withRouter } from 'react-router-dom';
 import { compose } from 'recompose';
 
 import { withFirebase } from './Firebase';
+import { collection, doc, getDoc, getDocs, } from 'firebase/firestore';
 import * as ROUTES from './constants/routes';
 
 import Veryslide from '../Veryslide';
@@ -18,69 +19,67 @@ class SlideBase extends Component {
 
     this.slideId = props.match.params.id;
     this.veryslideRef = React.createRef();
+    this.db = this.props.firebase.db;
   }
 
-  componentDidMount() {
-    this.props.firebase.slide(this.slideId).get().then(doc => {
-      if (doc.exists) {
+  async componentDidMount() {
+    const docSnap = await this.props.firebase.slide(this.slideId);
+    if (docSnap.exists) {
 
-        const data = doc.data();
-        let slideData = {};
+      const data = docSnap.data();
+      let slideData = {};
 
-        if (data.info != null && data.info.latestRevision != null) {
-          // get latest revision
-          //let loaded = 0;
-          //let totalPages = data.info.totalPages;
-          let latestRevisionRef = this.props.firebase.slide(this.slideId).collection('revisions').doc(data.info.latestRevision);
+      if (data.info != null && data.info.latestRevision != null) {
+        // get latest revision
+        //let loaded = 0;
+        //let totalPages = data.info.totalPages;
+        const latestRevRef = doc(this.db, 'slides', this.slideId, 'revisions', data.info.latestRevision);
+        const latestRev = await getDoc(latestRevRef);
 
-          latestRevisionRef.get().then(slide => {
-            slideData = slide.data().data;
-            slideData.pages = [];
+        slideData = latestRev.data().data;
+        slideData.pages = [];
 
-            // get all pages
-            latestRevisionRef.collection('pages').get().then(qs => {
+        // get all pages
+        const pagesRef = collection(latestRevRef, 'pages');
+        const pages = await getDocs(pagesRef);
+        pages.forEach(page => {
+          //console.log(page.id, page.data());
+          slideData.pages.push(page.data());
+          //loaded += 1;
+        });
 
-              qs.forEach(page => {
-                //console.log(page.id, page.data());
-                slideData.pages.push(page.data());
-                //loaded += 1;
-              });
-
-              // let's initiate
-              this.veryslide = new Veryslide({
-                target: this.veryslideRef.current,
-                info: data.info || {},
-                data: slideData,
-                slideId: this.slideId,
-                firebase: this.props.firebase,
-              });
-              this.setState({loaded: true});
-            });
-          });
-        } else {
-          // for old type
-          slideData = data.data;
-          if (slideData != null) {
-            if (typeof slideData === 'string') {
-              slideData = JSON.parse(slideData);
-            }
-          } else {
-            slideData = {}
+        // let's initiate
+        this.veryslide = new Veryslide({
+          target: this.veryslideRef.current,
+          info: data.info || {},
+          data: slideData,
+          slideId: this.slideId,
+          firebase: this.props.firebase,
+        });
+        this.setState({loaded: true});
+      } else {
+        // for old type
+        slideData = data.data;
+        if (slideData != null) {
+          if (typeof slideData === 'string') {
+            slideData = JSON.parse(slideData);
           }
-          this.veryslide = new Veryslide({
-            target: this.veryslideRef.current,
-            info: data.info || {},
-            data: slideData,
-            slideId: this.slideId,
-            firebase: this.props.firebase,
-          });
-          this.setState({loaded: true});
+        } else {
+          slideData = {}
         }
+        this.veryslide = new Veryslide({
+          target: this.veryslideRef.current,
+          info: data.info || {},
+          data: slideData,
+          slideId: this.slideId,
+          firebase: this.props.firebase,
+        });
+        this.setState({loaded: true});
       }
-      else {
-        // TBD: then create one on the fly?
-      }
-    });
+    }
+    else {
+      // TBD: then create one on the fly?
+    }
   }
 
   componentWillUnmount() {
@@ -199,15 +198,12 @@ class SlideNewBase extends Component {
     };
   }
 
-  createSlide = (info) => {
+  createSlide = async (info) => {
     this.setState({loading: true});
 
-    this.props.firebase.newSlide(info).then(slide => {
-      const url = generatePath(ROUTES.SLIDE, { id: slide.id });
-      this.props.history.replace(url);
-    }).catch(function(error) {
-        console.log("Error creating document:", error);
-    });
+    const docRef = await this.props.firebase.newSlide(info);
+    const url = generatePath(ROUTES.SLIDE, { id: docRef.id });
+    this.props.history.replace(url);
   }
 
   render() {

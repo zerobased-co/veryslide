@@ -1,12 +1,17 @@
 const webpack = require('webpack');
 const path = require('path');
-const Dotenv = require('dotenv-webpack');
+const config = require('./config');
 
 module.exports = (env, argv) => {
   var mode = argv.mode || 'development';
   return {
     mode,
-    entry: ['react-hot-loader/patch', './src/index.js', ],
+
+    entry: [
+      'react-hot-loader/patch',
+      './src/index.js',
+    ],
+
     module: {
       rules: [
         {
@@ -22,6 +27,7 @@ module.exports = (env, argv) => {
               loader: 'css-loader',
               options: {
                 sourceMap: true,
+                url: false,
               },
             },
             {
@@ -34,20 +40,22 @@ module.exports = (env, argv) => {
         },
       ],
     },
+
     output: {
       filename: 'bundle.js',
       path: path.resolve(__dirname, 'dist'),
     },
+
     plugins: [
-      new Dotenv(),
       new webpack.HotModuleReplacementPlugin(),
       new webpack.DefinePlugin({
         'process.env.MODE': JSON.stringify(argv.mode),
+        'process.env.FIREBASE_CONFIG': JSON.stringify(config.firebaseConfig),
       }),
     ],
     devtool: (mode === 'development') ? 'inline-source-map' : 'source-map',
     devServer: {
-      contentBase: './dist',
+      static: './dist',
       historyApiFallback: true,
       hot: true,
     },

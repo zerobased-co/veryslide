@@ -1,49 +1,66 @@
-import app from 'firebase/app';
-import 'firebase/auth';
-import 'firebase/firestore';
-import 'firebase/storage';
+import { initializeApp } from 'firebase/app';
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  sendPasswordResetEmail,
+} from 'firebase/auth';
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  doc,
+  addDoc,
+  getDoc,
+  getDocs,
+  deleteDoc,
+  serverTimestamp as sts ,
+} from 'firebase/firestore';
+import { getStorage } from "firebase/storage";
 
 class Firebase {
   constructor() {
-    app.initializeApp(JSON.parse(process.env.FIREBASE_CONFIG));
-
-    this.auth = app.auth();
-    this.db = app.firestore();
-    this.storage = app.storage();
+    this.app = initializeApp(process.env.FIREBASE_CONFIG);
+    this.auth = getAuth(this.app);
+    this.db = getFirestore(this.app);
+    this.storage = getStorage(this.app);
   }
 
   /* Auth */
   doCreateUserWithEmailAndPassword = (email, password) =>
-    this.auth.createUserWithEmailAndPassword(email, password);
+    createUserWithEmailAndPassword(this.auth, email, password);
 
   doSignInWithEmailAndPassword = (email, password) =>
-    this.auth.signInWithEmailAndPassword(email, password);
+    signInWithEmailAndPassword(this.auth, email, password);
 
   doSignOut = () =>
-    this.auth.signOut();
+    signOut(this.auth);
 
   doPasswordReset = (email) =>
-    this.auth.sendPasswordResetEmail(email);
+    sendPasswordResetEmail(this.auth, email);
 
   doPasswordUpdate = (password) =>
     this.auth.currentUser.updatePassword(password);
 
   /* Database */
-  users = () => this.db.collection('users');
-  user = (uid) => this.db.collection('users').doc(uid);
+  users = () => collection(this.db, 'users');
+  user = (uid) => getDoc(doc(this.db, 'users', uid));
   currentUser = () => this.user(this.auth.currentUser.uid);
 
-  slide = (id) => this.db.collection('slides').doc(id);
-  mySlides = () => this.db.collection('slides').where(
+  slide = (id) => getDoc(doc(this.db, 'slides', id));
+  deleteSlide = (id) => deleteDoc(doc(this.db, 'slides', id));
+  mySlides = () => getDocs(query(collection(this.db, 'slides'), where(
     'uid', '==', this.auth.currentUser.uid
-  );
-  newSlide = (info) => this.db.collection('slides').add({
+  )));
+  newSlide = (info) => addDoc(collection(this.db, 'slides'), {
     uid: this.auth.currentUser.uid,
     info: info,
   });
 
   /* Misc */
-  serverTimestamp = () => app.firestore.FieldValue.serverTimestamp();
+  serverTimestamp = () => sts();
 }
 
 export default Firebase;

@@ -11,6 +11,8 @@ import TextBox from './objects/TextBox';
 import ImageBox from './objects/ImageBox';
 import ImageList from './objects/ImageList';
 
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+
 class DocumentController extends State {
   constructor(state) {
     super({
@@ -632,11 +634,10 @@ class DocumentController extends State {
 
   fileUpload(file, path) {
     return new Promise((resolve, reject) => {
-      let storageRef = this.firebase.storage.ref();
-      let fileRef = storageRef.child(path);
-      fileRef.put(file).then((snapshot) => {
-        snapshot.ref.getDownloadURL().then(function(downloadURL) {
-          resolve(downloadURL);
+      let fileRef = ref(this.firebase.storage, path);
+      uploadBytes(fileRef, file).then((snapshot) => {
+        getDownloadURL(fileRef).then(function(url) {
+          resolve(url);
         });
       }).catch((err) => {
         // TBD: error handling

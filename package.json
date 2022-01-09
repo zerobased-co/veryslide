@@ -17,6 +17,7 @@
     "@babel/core": "^7.10.4",
     "@babel/plugin-proposal-class-properties": "^7.10.4",
     "@babel/plugin-proposal-object-rest-spread": "^7.10.4",
+    "@babel/plugin-transform-runtime": "^7.16.7",
     "@babel/preset-env": "^7.10.4",
     "@babel/preset-react": "^7.10.4",
     "@babel/register": "^7.10.4",
@@ -55,6 +56,5 @@
     "webpack-dev-server": "^4.7.2"
   },
   "dependencies": {
-    "@babel/plugin-transform-runtime": "^7.16.7"
   }
 }

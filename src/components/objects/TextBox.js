@@ -29,10 +29,6 @@ class TextBox extends Box {
 
   render() {
     super.render();
-    this.clipNode = document.createElement('div');
-    this.clipNode.className = 'vs-clipnode';
-    this.node.appendChild(this.clipNode);
-
     this.textNode = document.createElement('div');
     this.textNode.className = 'vs-textnode';
     this.textNode.addEventListener('paste', function (e) {
@@ -51,12 +47,12 @@ class TextBox extends Box {
         document.execCommand('paste', false, text);
       }
     });
-    this.clipNode.appendChild(this.textNode);
+    this.box.appendChild(this.textNode);
 
     // Set observers for overflow check
     this.observer = new ResizeObserver(this.check_overflow.bind(this));
     this.observer.observe(this.textNode);
-    this.observer.observe(this.clipNode);
+    this.observer.observe(this.box);
     return this.node;
   }
 
@@ -197,24 +193,24 @@ class TextBox extends Box {
 
   on_align(align) {
     if (align == 'left') {
-      this.clipNode.style.textAlign = 'left';
-      this.clipNode.style.justifyContent = 'flex-start';
+      this.box.style.textAlign = 'left';
+      this.box.style.justifyContent = 'flex-start';
     } else if (align == 'right') {
-      this.clipNode.style.textAlign = 'right';
-      this.clipNode.style.justifyContent = 'flex-end';
+      this.box.style.textAlign = 'right';
+      this.box.style.justifyContent = 'flex-end';
     } else if (align == 'center') {
-      this.clipNode.style.textAlign = 'center';
-      this.clipNode.style.justifyContent = 'center';
+      this.box.style.textAlign = 'center';
+      this.box.style.justifyContent = 'center';
     }
   }
 
   on_verticalAlign(align) {
     if (align == 'top') {
-      this.clipNode.style.alignItems = 'flex-start';
+      this.box.style.alignItems = 'flex-start';
     } else if (align == 'bottom') {
-      this.clipNode.style.alignItems = 'flex-end';
+      this.box.style.alignItems = 'flex-end';
     } else if (align == 'middle') {
-      this.clipNode.style.alignItems = 'center';
+      this.box.style.alignItems = 'center';
     }
   }
 
@@ -223,16 +219,16 @@ class TextBox extends Box {
   }
 
   is_overflowed() {
-    return (this.clipNode.clientWidth < this.textNode.clientWidth)
-        || (this.clipNode.clientHeight < this.textNode.clientHeight);
+    return (this.box.clientWidth < this.textNode.clientWidth)
+        || (this.box.clientHeight < this.textNode.clientHeight);
   }
 
   solve_overflow() {
-    if (this.clipNode.clientWidth < this.textNode.clientWidth) {
+    if (this.box.clientWidth < this.textNode.clientWidth) {
       this.width = this.textNode.clientWidth + this.padding * 2 + 2;
     }
 
-    if (this.clipNode.clientHeight < this.textNode.clientHeight) {
+    if (this.box.clientHeight < this.textNode.clientHeight) {
       this.height = this.textNode.clientHeight + this.padding * 2 + 2;
     }
   }

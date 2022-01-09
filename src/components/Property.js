@@ -141,6 +141,16 @@ class PanelForBox extends Panel {
         ui.createText('Padding'),
         new ui.TextSlider({min:0, max:100}).pair(this.object, 'padding'),
       ),
+
+      ui.H(
+        ui.createText('Blur'),
+        new ui.TextSlider({min:0, max:100}).pair(this.object, 'blur'),
+      ),
+
+      ui.H(
+        ui.createText('Clipping'),
+        new ui.CheckBox({}).pair(this.object, 'clip'),
+      ),
     ].forEach(item => this.appendChild(item));
     return this.node;
   }

@@ -15,6 +15,8 @@ class Box extends BaseObject {
       borderColor: '#000000',
       borderRadius: 0,
       padding: 5,
+      blur: 0,
+      clip: true,
       ...state,
     });
 
@@ -39,6 +41,32 @@ class Box extends BaseObject {
 
   on_padding(padding) {
     this.node.style.padding = padding + 'px';
+  }
+
+  on_blur(blur) {
+    this.box.style.filter = 'blur(' + blur + 'px)';
+  }
+
+  on_clip(clip) {
+    if (clip) {
+      this.clipNode.style.overflow = 'hidden';
+    } else {
+      this.clipNode.style.overflow = 'visible';
+    }
+  }
+
+  render() {
+    super.render();
+
+    this.clipNode = document.createElement('div');
+    this.clipNode.className = 'vs-clipnode';
+    this.node.appendChild(this.clipNode);
+
+    this.box = document.createElement('div');
+    this.box.className = 'vs-innerbox';
+    this.clipNode.appendChild(this.box);
+
+    return this.box;
   }
 }
 

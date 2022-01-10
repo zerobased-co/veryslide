@@ -15,7 +15,7 @@ class Box extends BaseObject {
       borderColor: '#000000',
       borderRadius: 0,
       padding: 5,
-      blur: 0,
+      filterBlur: 0,
       clip: true,
       ...state,
     });
@@ -43,7 +43,7 @@ class Box extends BaseObject {
     this.node.style.padding = padding + 'px';
   }
 
-  on_blur(blur) {
+  on_filterBlur(blur) {
     this.box.style.filter = 'blur(' + blur + 'px)';
   }
 

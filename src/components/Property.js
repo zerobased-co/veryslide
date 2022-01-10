@@ -144,7 +144,7 @@ class PanelForBox extends Panel {
 
       ui.H(
         ui.createText('Blur'),
-        new ui.TextSlider({min:0, max:100}).pair(this.object, 'blur'),
+        new ui.TextSlider({min:0, max:100}).pair(this.object, 'filterBlur'),
       ),
 
       ui.H(

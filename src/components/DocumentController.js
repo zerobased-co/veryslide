@@ -1,4 +1,4 @@
-import { toPng } from 'html-to-image';
+import domtoimage from 'dom-to-image';
 import jsPDF from 'jspdf';
 
 import { uuid, defaultDomToImageOption } from 'core/Util';
@@ -415,7 +415,7 @@ class DocumentController extends State {
 
           let pdf = new jsPDF({
             orientation: 'landscape',
-            unit: 'pt',
+            unit: 'px',
             format: [this.doc.width, this.doc.height],
             compressPdf: true,
           });
@@ -432,14 +432,15 @@ class DocumentController extends State {
             this.editor.setLoadingText(`Exporting page ${i}…`);
 
             const dataUrl = await
-              toPng(page.node, Object.assign(defaultDomToImageOption, {
-                width: page.width * scale,
-                height: page.height * scale,
+              domtoimage.toPng(page.node, Object.assign(defaultDomToImageOption, {
+                width: parseInt(page.width * scale),
+                height: parseInt(page.height * scale),
                 style: {
+                  'transform-origin': 'left top',
                   'transform': 'scale(' + scale + ')',
                 },
               }));
-            pdf.addImage(dataUrl, 'PNG', 0, 0, page.width, page.height);
+            pdf.addImage(dataUrl, 'PNG', 0, 0, this.doc.width, this.doc.height);
 
             var parentRect = page.node.getBoundingClientRect();
             let rescale = 1 / this.editor.viewport.scale;
@@ -467,27 +468,27 @@ class DocumentController extends State {
             let page = this.doc.pages[i - 1];
             this.send('Controller:select', page);
 
-            toPng(page.node, Object.assign(defaultDomToImageOption, {
-              width: page.width * scale,
-              height: page.height * scale,
-              style: {
-                'transform': 'scale(' + scale + ')',
-              },
-            })).then((dataUrl) => {
-              let filename = 'veryslide-' + this.slideId + '-' + String(i).padStart(3, '0');
+            const dataUrl = await 
+              domtoimage.toPng(page.node, Object.assign(defaultDomToImageOption, {
+                width: parseInt(page.width * scale),
+                height: parseInt(page.height * scale),
+                style: {
+                  'transform-origin': 'left top',
+                  'transform': 'scale(' + scale + ')',
+                },
+              }));
 
-              let link = document.createElement("a");
-              link.download = filename + '.png';
-              link.href = dataUrl;
+            let filename = 'veryslide-' + this.slideId + '-' + String(i).padStart(3, '0');
 
-              document.body.appendChild(link);
-              link.click();
+            let link = document.createElement("a");
+            link.download = filename + '.png';
+            link.href = dataUrl;
 
-              // Cleanup the DOM
-              document.body.removeChild(link);
-            }).catch((error) => {
-              console.log('Error on while saving:', error);
-            });
+            document.body.appendChild(link);
+            link.click();
+
+            // Cleanup the DOM
+            document.body.removeChild(link);
           }
           this.editor.loading(false);
           break;

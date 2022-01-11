@@ -81,11 +81,13 @@ $border-color: #afafb2;
   height: 100%;
   overflow-y: auto;
   background: #E1E2E4;
+  counter-reset: number;
 }
 
 .vs-pagethumb {
   background: transparent;
   display: flex;
+  counter-increment: number;
 
   &.select {
     background: #FF206F;
@@ -111,6 +113,15 @@ $border-color: #afafb2;
     border: 1px solid #ccc;
     box-shadow: 0 0 5px 2px #ddd;
     transition: all 0.1s ease-out;
+
+    &::before {
+      content: counter(number)" ";
+      position: absolute;
+      padding: 2px 5px;
+      font-size: 10px;
+      background: gray;
+      color: white;
+    }
 
     img {
       width: 100%;

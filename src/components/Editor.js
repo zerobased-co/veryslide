@@ -30,15 +30,13 @@ class ExportDialog extends Dialog {
           options: [
             ['current', 'Current page'],
             ['all', 'All pages'],
-            //['custom', 'Custom'],
+            ['custom', 'Custom'],
           ],
         }).pair(this, 'pages'),
-        /*
         new ui.InputText({
           'placeholder': 'e.g. 1-4, 2, 10-',
           'className': 'vs-inputtext-140',
         }).pair(this, 'customPage'),
-        */
       ),
       ui.H(
         ui.createText('Scale'),
@@ -66,10 +64,35 @@ class ExportDialog extends Dialog {
 
           if (this.pages == 'current') {
             from = to = this.doc.focusedPageIndex + 1;
-          }
+          } else if (this.pages == 'custom') {
+            const re = /(\d*)(-?)(\d*)/;
+            let match = this.customPage.match(re);
+            if (match) {
+              console.log(match);
+              if (match[1]) {
+                from = parseInt(match[1]);
+              } else {
+                from = 1;
+              }
 
+              if (match[2]) {
+                to = this.doc.pages.length;
+              } else {
+                to = from;
+              }
+
+              if (match[3]) {
+                to = parseInt(match[3]);
+              }
+            } else {
+              from = -1;
+            }
+          }
           this.close();
-          this.send('Controller:exportPage', this.type, this.scale, from, to);
+
+          if (from != -1) {
+            this.send('Controller:exportPage', this.type, this.scale, from, to);
+          }
         }),
         ui.createButton('Close', () => { this.close(); }),
       ),

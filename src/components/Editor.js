@@ -462,6 +462,7 @@ class Viewport extends View {
     if (this.page == null) return;
     if (this.isPresentationMode) return;
     if (global.grabbing) return;
+    if (global.exporting) return;
     this.page.updateThumbnail();
   }
 

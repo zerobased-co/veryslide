@@ -1,9 +1,10 @@
-import domtoimage from 'dom-to-image';
+import { toPng } from 'html-to-image';
 import jsPDF from 'jspdf';
 
 import { uuid, defaultDomToImageOption } from 'core/Util';
 import A from 'core/Array';
 import State from 'core/State';
+import global from '/core/Global';
 
 import { Page } from './Document';
 import History from './History';
@@ -163,6 +164,8 @@ class DocumentController extends State {
 
       if (this.selected.length === 1 && item.type === 'Page') {
         this.send('Controller:focusPage', item);
+        // reset pasted count when new page selected
+        this.pasted = -1;
       }
     });
 
@@ -362,7 +365,7 @@ class DocumentController extends State {
       this.send('Controller:deselect');
 
      // TBD: do not use pasted count, change this to calculate new position
-      if (this.pasted < 0) { this.pasted = 0; }
+      if (this.pasted < -1) { this.pasted = -1; }
       this.pasted += 1;
 
       this.clipboard.forEach((item) => {
@@ -404,10 +407,11 @@ class DocumentController extends State {
       // TBD: DO NOT DUPLICATE CODE MYSELF LIKE THIS
       // TBD: we have to hide things before capturing
       scale = parseFloat(scale);
+      this.editor.loading(true);
+      global.exporting = true;
 
       switch(format) {
         case 'pdf':
-          this.editor.loading(true);
 
           let pdf = new jsPDF({
             orientation: 'landscape',
@@ -428,7 +432,7 @@ class DocumentController extends State {
             this.editor.setLoadingText(`Exporting page ${i}…`);
 
             const dataUrl = await
-              domtoimage.toPng(page.node.parentElement, Object.assign(defaultDomToImageOption, {
+              toPng(page.node, Object.assign(defaultDomToImageOption, {
                 width: page.width * scale,
                 height: page.height * scale,
                 style: {
@@ -437,7 +441,7 @@ class DocumentController extends State {
               }));
             pdf.addImage(dataUrl, 'PNG', 0, 0, page.width, page.height);
 
-            var parentRect = page.node.parentElement.getBoundingClientRect();
+            var parentRect = page.node.getBoundingClientRect();
             let rescale = 1 / this.editor.viewport.scale;
             page.node.querySelectorAll('a').forEach((link) => {
               var rect = link.getBoundingClientRect();
@@ -457,16 +461,13 @@ class DocumentController extends State {
             }
           }
           pdf.save(filename + '.pdf');
-          this.editor.loading(false);
           break;
         case 'png':
-          this.editor.loading(true);
-
           for(let i = from; i <= to; i++) {
             let page = this.doc.pages[i - 1];
             this.send('Controller:select', page);
 
-            domtoimage.toPng(page.node.parentElement, Object.assign(defaultDomToImageOption, {
+            toPng(page.node, Object.assign(defaultDomToImageOption, {
               width: page.width * scale,
               height: page.height * scale,
               style: {
@@ -491,6 +492,8 @@ class DocumentController extends State {
           this.editor.loading(false);
           break;
       }
+      this.editor.loading(false);
+      global.exporting = false;
     }
 
     this.listen('Controller:exportPage', (format, scale, from, to) => {

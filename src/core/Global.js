@@ -8,6 +8,7 @@ class Global {
     this.editingObject = null;
     this.ambiguous = '?';
     this.temporary = false;
+    this.exporting = false;
   }
 }
 

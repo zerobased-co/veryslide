@@ -400,16 +400,15 @@ class DocumentController extends State {
       this.history.record('ADD', wasSelected, this.focusedPage);
     });
 
-    this.exportPage = (format, scale, from, to) => {
+    this.exportPage = async (format, scale, from, to) => {
       // TBD: DO NOT DUPLICATE CODE MYSELF LIKE THIS
       // TBD: we have to hide things before capturing
       scale = parseFloat(scale);
-      let page = this.doc.pages[from - 1];
-      this.send('PageList:selectPage', page);
 
       switch(format) {
         case 'pdf':
           this.editor.loading(true);
+
           let pdf = new jsPDF({
             orientation: 'landscape',
             unit: 'pt',
@@ -417,21 +416,29 @@ class DocumentController extends State {
             compressPdf: true,
           });
 
-          domtoimage.toPng(page.node.parentElement, Object.assign(defaultDomToImageOption, {
-            width: page.width * scale,
-            height: page.height * scale,
-            style: {
-              'transform': 'scale(' + scale + ')',
-            },
-          })).then((dataUrl) => {
-            // TBD: Why should we get page number here? Too slow.
-            let pageNo = this.doc.pages.indexOf(page) + 1;
-            let filename = 'veryslide-' + this.slideId + '-' + String(pageNo).padStart(3, '0');
+          let filename = 'veryslide-' + this.slideId;
+
+          if (from == to) {
+            filename = 'veryslide-' + this.slideId + '-' + String(from).padStart(3, '0');
+          }
+
+          for(let i = from; i <= to; i++) {
+            let page = this.doc.pages[i - 1];
+            this.send('Controller:select', page);
+            this.editor.setLoadingText(`Exporting page ${i}…`);
+
+            const dataUrl = await
+              domtoimage.toPng(page.node.parentElement, Object.assign(defaultDomToImageOption, {
+                width: page.width * scale,
+                height: page.height * scale,
+                style: {
+                  'transform': 'scale(' + scale + ')',
+                },
+              }));
+            pdf.addImage(dataUrl, 'PNG', 0, 0, page.width, page.height);
 
             var parentRect = page.node.parentElement.getBoundingClientRect();
             let rescale = 1 / this.editor.viewport.scale;
-            // TBD: clean up
-            pdf.addImage(dataUrl, 'PNG', 0, 0, page.width, page.height);
             page.node.querySelectorAll('a').forEach((link) => {
               var rect = link.getBoundingClientRect();
               pdf.link(
@@ -444,38 +451,44 @@ class DocumentController extends State {
                 }
               );
             });
-            pdf.save(filename + '.pdf');
-            this.editor.loading(false);
-          }).catch((error) => {
-            console.log('Error on while saving:', error);
-          });
+
+            if (i < to) {
+              pdf.addPage();
+            }
+          }
+          pdf.save(filename + '.pdf');
+          this.editor.loading(false);
           break;
         case 'png':
           this.editor.loading(true);
-          domtoimage.toPng(page.node.parentElement, Object.assign(defaultDomToImageOption, {
-            width: page.width * scale,
-            height: page.height * scale,
-            style: {
-              'transform': 'scale(' + scale + ')',
-            },
-          })).then((dataUrl) => {
-            // TBD: Why should we get page number here? Too slow.
-            let pageNo = this.doc.pages.indexOf(page) + 1;
-            let filename = 'veryslide-' + this.slideId + '-' + String(pageNo).padStart(3, '0');
 
-            let link = document.createElement("a");
-            link.download = filename + '.png';
-            link.href = dataUrl;
+          for(let i = from; i <= to; i++) {
+            let page = this.doc.pages[i - 1];
+            this.send('Controller:select', page);
 
-            document.body.appendChild(link);
-            link.click();
+            domtoimage.toPng(page.node.parentElement, Object.assign(defaultDomToImageOption, {
+              width: page.width * scale,
+              height: page.height * scale,
+              style: {
+                'transform': 'scale(' + scale + ')',
+              },
+            })).then((dataUrl) => {
+              let filename = 'veryslide-' + this.slideId + '-' + String(i).padStart(3, '0');
 
-            // Cleanup the DOM
-            document.body.removeChild(link);
-            this.editor.loading(false);
-          }).catch((error) => {
-            console.log('Error on while saving:', error);
-          });
+              let link = document.createElement("a");
+              link.download = filename + '.png';
+              link.href = dataUrl;
+
+              document.body.appendChild(link);
+              link.click();
+
+              // Cleanup the DOM
+              document.body.removeChild(link);
+            }).catch((error) => {
+              console.log('Error on while saving:', error);
+            });
+          }
+          this.editor.loading(false);
           break;
       }
     }
@@ -483,20 +496,6 @@ class DocumentController extends State {
     this.listen('Controller:exportPage', (format, scale, from, to) => {
       this.exportPage(format, scale, from, to);
     });
-
-/*
-    // TBD: NOT LIKE THIS AT ALL
-    this.listen('Controller:saveAllPage', (format) => {
-      this.doc.pages.forEach((page, i) => {
-        setTimeout(() => {
-          this.send('PageList:selectPage', page);
-          setTimeout(() => {
-            this.savePage(page, format);
-          }, 500);
-        }, i * 2000);
-      });
-    });
-  */
 
     this.listen('Controller:addAsset', (type, name, meta) => {
       console.log('addAsset', type, name, meta);

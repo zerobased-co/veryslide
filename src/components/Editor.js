@@ -29,8 +29,7 @@ class ExportDialog extends Dialog {
         new ui.Select({
           options: [
             ['current', 'Current page'],
-            // TBD
-            //['all', 'All pages'],
+            ['all', 'All pages'],
             //['custom', 'Custom'],
           ],
         }).pair(this, 'pages'),
@@ -616,7 +615,7 @@ class Viewport extends View {
       this.editor.node.classList.remove('Presentation');
       // NOTE: this makes `Document not active` error occasionally, but I'm not sure how to prevent it.
       document.exitFullscreen().catch(() => {});;
-      this.send('PageList:selectPage', this.page, false);
+      //this.send('Controller:select', this.page);
     }
     this.updateTransform();
   }

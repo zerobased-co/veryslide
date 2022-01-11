@@ -53,7 +53,7 @@ module.exports = (env, argv) => {
         'process.env.FIREBASE_CONFIG': JSON.stringify(config.firebaseConfig),
       }),
     ],
-    devtool: (mode === 'development') ? 'inline-source-map' : 'source-map',
+    devtool: (mode === 'development') ? 'eval-source-map' : 'source-map',
     devServer: {
       static: './dist',
       historyApiFallback: true,

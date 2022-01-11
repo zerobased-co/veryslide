@@ -14,8 +14,8 @@ import Handler from './Handler';
 class ExportDialog extends Dialog {
   constructor(state) {
     super({
-      pages: 'current',
-      type: 'png',
+      pages: 'all',
+      type: 'pdf',
       scale: 1,
       customPage: '',
       doc: null,
@@ -28,8 +28,8 @@ class ExportDialog extends Dialog {
         ui.createText('Pages'),
         new ui.Select({
           options: [
-            ['current', 'Current page'],
-            ['all', 'All pages'],
+            ['all', 'All'],
+            ['current', 'Current'],
             ['custom', 'Custom'],
           ],
         }).pair(this, 'pages'),
@@ -48,8 +48,8 @@ class ExportDialog extends Dialog {
           ui.H(
             new ui.Select({
               options: [
-                ['png', 'PNG'],
                 ['pdf', 'PDF'],
+                ['png', 'PNG'],
               ],
             }).pair(this, 'type'),
           ),

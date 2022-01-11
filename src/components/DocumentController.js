@@ -1,5 +1,7 @@
 import domtoimage from 'dom-to-image';
 import jsPDF from 'jspdf';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 
 import { uuid, defaultDomToImageOption } from 'core/Util';
 import A from 'core/Array';
@@ -410,6 +412,9 @@ class DocumentController extends State {
       this.editor.loading(true);
       global.exporting = true;
 
+      let filename = 'veryslide-' + this.slideId;
+      let totalPages = to - from + 1;
+
       switch(format) {
         case 'pdf':
 
@@ -420,16 +425,16 @@ class DocumentController extends State {
             compressPdf: true,
           });
 
-          let filename = 'veryslide-' + this.slideId;
-
           if (from == to) {
-            filename = 'veryslide-' + this.slideId + '-' + String(from).padStart(3, '0');
+            filename += '-' + String(from).padStart(3, '0');
           }
 
           for(let i = from; i <= to; i++) {
             let page = this.doc.pages[i - 1];
             this.send('Controller:select', page);
-            this.editor.setLoadingText(`Exporting page ${i}…`);
+
+            let progress = parseInt((i - from + 1) * 100 / (to - from + 1));
+            this.editor.setLoadingText(`Exporting page ${i} (${progress}%)`);
 
             const dataUrl = await
               domtoimage.toPng(page.node, Object.assign(defaultDomToImageOption, {
@@ -464,35 +469,54 @@ class DocumentController extends State {
           pdf.save(filename + '.pdf');
           break;
         case 'png':
-          for(let i = from; i <= to; i++) {
-            let page = this.doc.pages[i - 1];
+          let zip;
+
+          if (from == to) {
+            // Just a png
+            let page = this.doc.pages[from - 1];
             this.send('Controller:select', page);
 
-            const dataUrl = await 
-              domtoimage.toPng(page.node, Object.assign(defaultDomToImageOption, {
-                width: parseInt(page.width * scale),
-                height: parseInt(page.height * scale),
-                style: {
-                  'transform-origin': 'left top',
-                  'transform': 'scale(' + scale + ')',
-                },
-              }));
+            domtoimage.toBlob(page.node, Object.assign(defaultDomToImageOption, {
+              width: parseInt(page.width * scale),
+              height: parseInt(page.height * scale),
+              style: {
+                'transform-origin': 'left top',
+                'transform': 'scale(' + scale + ')',
+              },
+            })).then((blob) => {
+              saveAs(blob, filename + '-' + String(from).padStart(3, '0') + '.png');
+            });
+          } else {
+            // Compress with zip
+            zip = new JSZip();
 
-            let filename = 'veryslide-' + this.slideId + '-' + String(i).padStart(3, '0');
+            for(let i = from; i <= to; i++) {
+              let page = this.doc.pages[i - 1];
+              this.send('Controller:select', page);
 
-            let link = document.createElement("a");
-            link.download = filename + '.png';
-            link.href = dataUrl;
+              let progress = parseInt((i - from + 1) * 100 / (to - from + 1));
+              this.editor.setLoadingText(`Exporting page ${i} (${progress}%)`);
 
-            document.body.appendChild(link);
-            link.click();
+              const blob = await 
+                domtoimage.toBlob(page.node, Object.assign(defaultDomToImageOption, {
+                  width: parseInt(page.width * scale),
+                  height: parseInt(page.height * scale),
+                  style: {
+                    'transform-origin': 'left top',
+                    'transform': 'scale(' + scale + ')',
+                  },
+                }));
 
-            // Cleanup the DOM
-            document.body.removeChild(link);
+              zip.file(String(i).padStart(3, '0') + '.png', blob, {binary: true});
+            }
+
+            zip.generateAsync({type: "blob"}).then((blob) => {
+              saveAs(blob, filename + '.zip');
+            });
           }
-          this.editor.loading(false);
           break;
       }
+
       this.editor.loading(false);
       global.exporting = false;
     }

@@ -1,5 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowCircleRight } from '@fortawesome/free-solid-svg-icons'
+
 import { SignInLink } from './SignIn';
 import Footer from './Footer';
 import { AuthUserContext } from './Session';
@@ -19,7 +22,8 @@ const Landing = () => (
               <div>
                 <p>Welcome back, {authUser.displayName}.</p>
                 <Link to={ROUTES.HOME} className="Button Primary Large">
-                  Go to my page<i className="fas fa-arrow-circle-right right"></i>
+                  Go to my page
+                    <FontAwesomeIcon icon={faArrowCircleRight} className="right" />
                 </Link>
               </div>
 
@@ -27,7 +31,8 @@ const Landing = () => (
 
               <div>
                 <Link to={ROUTES.SIGNUP} className="Button Primary Large">
-                  Sign up<i className="fas fa-arrow-circle-right right"></i>
+                  Sign up
+                    <FontAwesomeIcon icon={faArrowCircleRight} className="right" />
                 </Link>
                 <SignInLink />
               </div>

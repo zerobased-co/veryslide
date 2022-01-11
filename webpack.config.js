@@ -1,9 +1,12 @@
 const webpack = require('webpack');
 const path = require('path');
 const config = require('./config');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const CompressionPlugin = require("compression-webpack-plugin");
 
 module.exports = (env, argv) => {
   var mode = argv.mode || 'development';
+
   return {
     mode,
 
@@ -52,7 +55,12 @@ module.exports = (env, argv) => {
         'process.env.MODE': JSON.stringify(argv.mode),
         'process.env.FIREBASE_CONFIG': JSON.stringify(config.firebaseConfig),
       }),
-    ],
+    ].concat(
+      mode === 'production' ? [
+        new CompressionPlugin(),
+        new BundleAnalyzerPlugin(),
+      ] : []
+    ),
     devtool: (mode === 'development') ? 'eval-source-map' : 'source-map',
     devServer: {
       static: './dist',

@@ -1,5 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlusCircle } from '@fortawesome/free-solid-svg-icons'
 
 import { AuthUserContext } from './Session';
 import * as ROUTES from './constants/routes';
@@ -21,7 +23,8 @@ const NavigationAuth = () => (
   <ul>
     <li>
       <Link className="Button Primary" to={ROUTES.SLIDE_NEW}>
-        <i className="fas fa-plus-circle"/>New Slide
+        <FontAwesomeIcon icon={faPlusCircle} />
+        New Slide
       </Link>
     </li>
     <li>

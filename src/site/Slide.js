@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { generatePath } from 'react-router';
 import { withRouter } from 'react-router-dom';
 import { compose } from 'recompose';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faArrowsAlt, faExpand, faTimes, faMagic } from '@fortawesome/free-solid-svg-icons'
 
 import { withFirebase } from './Firebase';
 import { collection, doc, getDoc, getDocs, } from 'firebase/firestore';
@@ -160,11 +162,11 @@ class SlideNewForm extends Component {
       <div>
         <form onSubmit={this.onSubmit}>
           <div className="InputGroup">
-            <i className="fas fa-edit"/>
+            <FontAwesomeIcon icon={faEdit} />
             <input name="title" value={this.state.title} onChange={this.handleTitle} type="text" placeholder="Slide Title" />
           </div>
           <div className="InputGroup">
-            <i className="fas fa-arrows-alt"/>
+            <FontAwesomeIcon icon={faArrowsAlt} />
             <select name="size" onChange={this.handleSize}>
               {sizeList}
               <option value="custom">Custom size...</option>
@@ -172,14 +174,14 @@ class SlideNewForm extends Component {
           </div>
           {this.state.customSize &&
             <div className="InputGroup">
-              <i className="fas fa-expand"/>
+              <FontAwesomeIcon icon={faExpand} />
               <input name="width" value={this.state.width} onChange={this.handleWidth} type="number" placeholder="Width" />
-              <i className="fas fa-times"/>
+              <FontAwesomeIcon icon={faTimes} />
               <input name="height" value={this.state.height} onChange={this.handleHeight} type="number" placeholder="Height" />
             </div>
           }
           <button className="Primary" type="submit">
-            <i className="fas fa-magic"/>
+            <FontAwesomeIcon icon={faMagic} />
             Create
           </button>
         </form>

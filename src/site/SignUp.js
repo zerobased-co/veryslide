@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import { compose } from 'recompose';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faEnvelope, faCheck, faCheckDouble } from '@fortawesome/free-solid-svg-icons'
 
 import { withFirebase } from './Firebase';
 import * as ROUTES from './constants/routes';
@@ -83,19 +85,19 @@ class SignUpFormBase extends Component {
         {error && <p className="Label Error">{error.message}</p>}
         <form onSubmit={this.onSubmit}>
           <div className="InputGroup">
-            <i className="fas fa-user"/>
+            <FontAwesomeIcon icon={faUser} />
             <input name="username" value={username} onChange={this.onChange} type="text" placeholder="Full Name" required />
           </div>
           <div className="InputGroup">
-            <i className="fas fa-envelope"/>
+            <FontAwesomeIcon icon={faEnvelope} />
             <input name="email" value={email} onChange={this.onChange} type="text" placeholder="Email Address" required />
           </div>
           <div className="InputGroup">
-            <i className="fas fa-check"/>
+            <FontAwesomeIcon icon={faCheck} />
             <input name="passwordOne" value={passwordOne} onChange={this.onChange} type="password" placeholder="Password" required />
           </div>
           <div className="InputGroup">
-            <i className="fas fa-check-double"/>
+            <FontAwesomeIcon icon={faCheckDouble} />
             <input name="passwordTwo" value={passwordTwo} onChange={this.onChange} type="password" placeholder="Confirm Password" required />
           </div>
           <button className="Primary" disabled={isInvalid} type="submit">

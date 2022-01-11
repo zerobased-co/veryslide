@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import { compose } from 'recompose';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEnvelope, faKey } from '@fortawesome/free-solid-svg-icons'
 
 import { SignUpLink } from './SignUp';
 import { PasswordForgetLink } from './PasswordForget';
@@ -62,11 +64,11 @@ class SignInFormBase extends Component {
         {error && <p className="Label Error">{error.message}</p>}
         <form onSubmit={this.onSubmit}>
           <div className="InputGroup">
-            <i className="fas fa-envelope"/>
+            <FontAwesomeIcon icon={faEnvelope} />
             <input name="email" value={email} onChange={this.onChange} type="text" placeholder="Email Address" required />
           </div>
           <div className="InputGroup">
-            <i className="fas fa-key"/>
+            <FontAwesomeIcon icon={faKey} />
             <input name="password" value={password} onChange={this.onChange} type="password" placeholder="Password" required />
           </div>
           <button className="Primary" disabled={isInvalid} type="submit">

@@ -1,8 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
 // TBD: Too big library size
-import '@fortawesome/fontawesome-free/js/all';
-import '@fortawesome/fontawesome-free/js/solid';
+//import '@fortawesome/fontawesome-free/js/all';
+//import '@fortawesome/fontawesome-free/js/solid';
 
 import App from "./site/App.js";
 import Firebase, { FirebaseContext } from './site/Firebase';

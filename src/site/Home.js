@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { generatePath } from 'react-router';
 import { compose } from 'recompose';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrashAlt } from '@fortawesome/free-solid-svg-icons'
 
 import { withFirebase } from './Firebase';
 import { AuthUserContext, withAuthorization } from './Session';
@@ -90,7 +92,7 @@ class HomeBase extends Component {
                       {slideComponent(slide)}
                     </Link>
                     <a className="Button NoText NoBorder" alt="Delete" onClick={() => this.deleteSlide(slide.id)}>
-                      <i className="fas fa-trash-alt"/>
+                      <FontAwesomeIcon icon={faTrashAlt} />
                     </a>
                   </li>
                 )

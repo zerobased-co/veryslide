@@ -16,6 +16,7 @@ class Box extends BaseObject {
       borderRadius: 0,
       padding: 5,
       filterBlur: 0,
+      backdropBlur: 0,
       clip: true,
       ...state,
     });
@@ -45,6 +46,10 @@ class Box extends BaseObject {
 
   on_filterBlur(blur) {
     this.box.style.filter = 'blur(' + blur + 'px)';
+  }
+
+  on_backdropBlur(blur) {
+    this.node.style.backdropFilter = 'blur(' + blur + 'px)';
   }
 
   on_clip(clip) {

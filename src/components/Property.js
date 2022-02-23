@@ -148,6 +148,11 @@ class PanelForBox extends Panel {
       ),
 
       ui.H(
+        ui.createText('Blur BG'),
+        new ui.TextSlider({min:0, max:100}).pair(this.object, 'backdropBlur'),
+      ),
+
+      ui.H(
         ui.createText('Clipping'),
         new ui.CheckBox({}).pair(this.object, 'clip'),
       ),

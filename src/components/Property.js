@@ -12,6 +12,7 @@ const FONTLIST = [
   ['monospace', 'Monospace'],
   ['', '----'],
   ['Inconsolata'],
+  ['Inter'],
   ['Lato'],
   ['Merriweather'],
   ['Montserrat'],

@@ -14,6 +14,7 @@ class TextBox extends Box {
       color: '#FFFFFF00',
       textColor: '#000000',
       size: 14,
+      lineHeight: 1.4,
       bold: false,
       italic: false,
       underline: false,
@@ -117,6 +118,10 @@ class TextBox extends Box {
 
   on_size(size) {
     this.textNode.style.fontSize = size + 'px';
+  }
+
+  on_lineHeight(height) {
+    this.textNode.style.lineHeight = height;
   }
 
   on_text(text) {

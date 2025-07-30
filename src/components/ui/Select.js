@@ -38,7 +38,7 @@ class Select extends View {
 
     options.forEach(option => {
       let tag = document.createElement('option');
-      if (typeof option === 'string') {
+      if (typeof option === 'string' || typeof option === 'number') {
         tag.value = option;
         tag.innerText = option;
       } else {

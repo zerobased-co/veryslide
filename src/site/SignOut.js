@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { compose } from 'recompose';
 
 import { withFirebase } from './Firebase';
 import * as ROUTES from './constants/routes';
@@ -23,4 +22,4 @@ function SignOutButton(props) {
   );
 }
 
-export default compose(withFirebase)(SignOutButton);
+export default withFirebase(SignOutButton);

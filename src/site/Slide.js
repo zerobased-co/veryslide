@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { generatePath, useParams, useNavigate } from 'react-router-dom';
-import { compose } from 'recompose';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faArrowsAlt, faExpand, faTimes, faMagic } from '@fortawesome/free-solid-svg-icons'
 
@@ -205,13 +204,9 @@ class SlideNewForm extends Component {
   }
 }
 
-const Slide = compose(
-  withFirebase,
-)(SlideBase);
+const Slide = withFirebase(SlideBase);
 
-const SlideNew = compose(
-  withFirebase,
-)(SlideNewBase);
+const SlideNew = withFirebase(SlideNewBase);
 
 export default Slide;
 

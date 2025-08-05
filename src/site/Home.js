@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { generatePath } from 'react-router';
-import { compose } from 'recompose';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons'
 
@@ -109,9 +108,6 @@ class HomeBase extends Component {
 
 const condition = authUser => !!authUser;
 
-const Home = compose(
-  withFirebase,
-  withAuthorization(condition),
-)(HomeBase);
+const Home = withFirebase(withAuthorization(condition)(HomeBase));
 
 export default Home;

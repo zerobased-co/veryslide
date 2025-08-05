@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { compose } from 'recompose';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faEnvelope, faCheck, faCheckDouble } from '@fortawesome/free-solid-svg-icons'
 
@@ -103,9 +102,7 @@ function SignUpFormBase(props) {
   );
 }
 
-const SignUpForm = compose(
-  withFirebase,
-)(SignUpFormBase);
+const SignUpForm = withFirebase(SignUpFormBase);
 
 const SignUpLink = () => (
   <p>

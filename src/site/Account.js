@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { compose } from 'recompose';
 
 import SignOutButton from './SignOut';
 import { PasswordForgetForm } from './PasswordForget';
@@ -38,8 +37,6 @@ class AccountPageBase extends Component {
 
 const condition = authUser => !!authUser;
 
-const AccountPage = compose(
-  withAuthorization(condition),
-)(AccountPageBase);
+const AccountPage = withAuthorization(condition)(AccountPageBase);
 
 export default AccountPage;

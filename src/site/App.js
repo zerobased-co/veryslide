@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Outlet } from 'react-router-dom';
 
 import "./App.scss";
 import Navigation from './Navigation';
@@ -17,17 +17,15 @@ import { withAuthentication } from './Session';
 import * as ROUTES from './constants/routes';
 
 
-const NavRoute = ({exact, path, component: Component}) => (
-  <Route exact={exact} path={path} render={(props) => (
-    <div className="VerySlideWeb">
-      <Navigation/>
-      <div className="Content">
-        <Component {...props}/>
-      </div>
-      <Footer/>
+const NavLayout = () => (
+  <div className="VerySlideWeb">
+    <Navigation/>
+    <div className="Content">
+      <Outlet />
     </div>
-  )}/>
-)
+    <Footer/>
+  </div>
+);
 
 class App extends Component {
   constructor(props) {
@@ -41,19 +39,19 @@ class App extends Component {
   render() {
     return (
       <Router>
-        <Switch>
-          <Route exact path={ROUTES.LANDING} component={Landing} />
-
-          <NavRoute path={ROUTES.SIGNUP} component={SignUp} />
-          <NavRoute path={ROUTES.SIGNIN} component={SignIn} />
-          <NavRoute path={ROUTES.PASSWORD_FORGET} component={PasswordForget} />
-          <NavRoute path={ROUTES.HOME} component={Home} />
-          <NavRoute path={ROUTES.ACCOUNT} component={Account} />
-          <NavRoute path={ROUTES.ADMIN} component={Admin} />
-
-          <NavRoute exact path={ROUTES.SLIDE_NEW} component={SlideNew} />
-          <Route path={ROUTES.SLIDE} component={Slide} />
-        </Switch>
+        <Routes>
+          <Route path={ROUTES.LANDING} element={<Landing />} />
+          <Route path="/" element={<NavLayout />}>
+            <Route path={ROUTES.SIGNUP} element={<SignUp />} />
+            <Route path={ROUTES.SIGNIN} element={<SignIn />} />
+            <Route path={ROUTES.PASSWORD_FORGET} element={<PasswordForget />} />
+            <Route path={ROUTES.HOME} element={<Home />} />
+            <Route path={ROUTES.ACCOUNT} element={<Account />} />
+            <Route path={ROUTES.ADMIN} element={<Admin />} />
+            <Route path={ROUTES.SLIDE_NEW} element={<SlideNew />} />
+          </Route>
+          <Route path={ROUTES.SLIDE} element={<Slide />} />
+        </Routes>
       </Router>
     );
   }

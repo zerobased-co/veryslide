@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { Link, withRouter } from 'react-router-dom';
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { compose } from 'recompose';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faKey } from '@fortawesome/free-solid-svg-icons'
@@ -27,61 +27,54 @@ const INITIAL_STATE = {
   error: null,
 };
 
-class SignInFormBase extends Component {
-  constructor(props) {
-    super(props);
+function SignInFormBase(props) {
+  const [state, setState] = React.useState(INITIAL_STATE);
+  const navigate = useNavigate();
 
-    this.state = { ...INITIAL_STATE };
-  }
+  const onSubmit = event => {
+    const { email, password } = state;
 
-  onSubmit = event => {
-    const { email, password } = this.state;
-
-    this.props.firebase
+    props.firebase
       .doSignInWithEmailAndPassword(email, password)
       .then(() => {
-        this.setState({ ...INITIAL_STATE });
-        this.props.history.push(ROUTES.HOME);
+        setState({ ...INITIAL_STATE });
+        navigate(ROUTES.HOME);
       })
       .catch(error => {
-        this.setState({ error });
+        setState(prev => ({ ...prev, error }));
       });
 
     event.preventDefault();
   };
 
-  onChange = event => {
-    this.setState({ [event.target.name]: event.target.value });
+  const onChange = event => {
+    setState(prev => ({ ...prev, [event.target.name]: event.target.value }));
   };
 
-  render() {
-    const { email, password, error } = this.state;
+  const { email, password, error } = state;
+  const isInvalid = password === '' || email === '';
 
-    const isInvalid = password === '' || email === '';
-
-    return (
-      <div>
-        {error && <p className="Label Error">{error.message}</p>}
-        <form onSubmit={this.onSubmit}>
-          <div className="InputGroup">
-            <FontAwesomeIcon icon={faEnvelope} />
-            <input name="email" value={email} onChange={this.onChange} type="text" placeholder="Email Address" required />
-          </div>
-          <div className="InputGroup">
-            <FontAwesomeIcon icon={faKey} />
-            <input name="password" value={password} onChange={this.onChange} type="password" placeholder="Password" required />
-          </div>
-          <button className="Primary" disabled={isInvalid} type="submit">
-            Sign In
-          </button>
-        </form>
-      </div>
-    );
-  }
+  return (
+    <div>
+      {error && <p className="Label Error">{error.message}</p>}
+      <form onSubmit={onSubmit}>
+        <div className="InputGroup">
+          <FontAwesomeIcon icon={faEnvelope} />
+          <input name="email" value={email} onChange={onChange} type="text" placeholder="Email Address" required />
+        </div>
+        <div className="InputGroup">
+          <FontAwesomeIcon icon={faKey} />
+          <input name="password" value={password} onChange={onChange} type="password" placeholder="Password" required />
+        </div>
+        <button className="Primary" disabled={isInvalid} type="submit">
+          Sign In
+        </button>
+      </form>
+    </div>
+  );
 }
 
 const SignInForm = compose(
-  withRouter,
   withFirebase,
 )(SignInFormBase);
 

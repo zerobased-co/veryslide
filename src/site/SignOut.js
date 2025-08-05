@@ -1,30 +1,26 @@
-import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { compose } from 'recompose';
 
 import { withFirebase } from './Firebase';
 import * as ROUTES from './constants/routes';
 
-class SignOutButton extends Component {
-  constructor(props) {
-    super(props);
-  }
+function SignOutButton(props) {
+  const navigate = useNavigate();
 
-  onSignOut = event => {
+  const onSignOut = event => {
     event.preventDefault();
 
-    this.props.firebase.doSignOut().then(() => {
-      this.props.history.push(ROUTES.LANDING);
+    props.firebase.doSignOut().then(() => {
+      navigate(ROUTES.LANDING);
     });
   };
 
-  render() {
-    return (
-      <button className="Button" type="button" onClick={this.onSignOut}>
-        Sign Out
-      </button>
-    );
-  }
+  return (
+    <button className="Button" type="button" onClick={onSignOut}>
+      Sign Out
+    </button>
+  );
 }
 
-export default compose(withRouter, withFirebase)(SignOutButton);
+export default compose(withFirebase)(SignOutButton);

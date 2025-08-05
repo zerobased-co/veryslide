@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { generatePath } from 'react-router';
-import { withRouter } from 'react-router-dom';
+import { generatePath, useParams, useNavigate } from 'react-router-dom';
 import { compose } from 'recompose';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faArrowsAlt, faExpand, faTimes, faMagic } from '@fortawesome/free-solid-svg-icons'
@@ -11,93 +10,108 @@ import * as ROUTES from './constants/routes';
 
 import Veryslide from '../Veryslide';
 
-class SlideBase extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      loaded: false,
-      progress: '',
-    };
+function SlideBase(props) {
+  const { id } = useParams();
+  const [loaded, setLoaded] = React.useState(false);
+  const [progress, setProgress] = React.useState('');
+  const veryslideRef = React.useRef();
+  const db = props.firebase.db;
+  const veryslideInstance = React.useRef(null);
 
-    this.slideId = props.match.params.id;
-    this.veryslideRef = React.createRef();
-    this.db = this.props.firebase.db;
-  }
+  React.useEffect(() => {
+    let isMounted = true;
+    async function fetchSlide() {
+      const docSnap = await props.firebase.slide(id);
+      if (!isMounted) return;
+      if (docSnap.exists) {
+        const data = docSnap.data();
+        let slideData = {};
 
-  async componentDidMount() {
-    const docSnap = await this.props.firebase.slide(this.slideId);
-    if (docSnap.exists) {
+        if (data.info != null && data.info.latestRevision != null) {
+          const latestRevRef = doc(db, 'slides', id, 'revisions', data.info.latestRevision);
+          const latestRev = await getDoc(latestRevRef);
 
-      const data = docSnap.data();
-      let slideData = {};
+          slideData = latestRev.data().data;
+          slideData.pages = [];
 
-      if (data.info != null && data.info.latestRevision != null) {
-        // get latest revision
-        //let loaded = 0;
-        //let totalPages = data.info.totalPages;
-        const latestRevRef = doc(this.db, 'slides', this.slideId, 'revisions', data.info.latestRevision);
-        const latestRev = await getDoc(latestRevRef);
+          const pagesRef = collection(latestRevRef, 'pages');
+          const pages = await getDocs(pagesRef);
+          pages.forEach(page => {
+            slideData.pages.push(page.data());
+          });
 
-        slideData = latestRev.data().data;
-        slideData.pages = [];
-
-        // get all pages
-        const pagesRef = collection(latestRevRef, 'pages');
-        const pages = await getDocs(pagesRef);
-        pages.forEach(page => {
-          //console.log(page.id, page.data());
-          slideData.pages.push(page.data());
-          //loaded += 1;
-        });
-
-        // let's initiate
-        this.veryslide = new Veryslide({
-          target: this.veryslideRef.current,
-          info: data.info || {},
-          data: slideData,
-          slideId: this.slideId,
-          firebase: this.props.firebase,
-        });
-        this.setState({loaded: true});
-      } else {
-        // for old type
-        slideData = data.data;
-        if (slideData != null) {
-          if (typeof slideData === 'string') {
-            slideData = JSON.parse(slideData);
-          }
+          veryslideInstance.current = new Veryslide({
+            target: veryslideRef.current,
+            info: data.info || {},
+            data: slideData,
+            slideId: id,
+            firebase: props.firebase,
+          });
+          setLoaded(true);
         } else {
-          slideData = {}
+          slideData = data.data;
+          if (slideData != null) {
+            if (typeof slideData === 'string') {
+              slideData = JSON.parse(slideData);
+            }
+          } else {
+            slideData = {};
+          }
+          veryslideInstance.current = new Veryslide({
+            target: veryslideRef.current,
+            info: data.info || {},
+            data: slideData,
+            slideId: id,
+            firebase: props.firebase,
+          });
+          setLoaded(true);
         }
-        this.veryslide = new Veryslide({
-          target: this.veryslideRef.current,
-          info: data.info || {},
-          data: slideData,
-          slideId: this.slideId,
-          firebase: this.props.firebase,
-        });
-        this.setState({loaded: true});
       }
     }
-    else {
-      // TBD: then create one on the fly?
-    }
-  }
+    fetchSlide();
+    return () => {
+      isMounted = false;
+      if (veryslideInstance.current) {
+        veryslideInstance.current.destroy();
+      }
+    };
+  }, [id, db, props.firebase]);
 
-  componentWillUnmount() {
-    this.veryslide.destroy();
-  }
+  return (
+    <div>
+      {!loaded &&
+        <div className='Loading'>Loading slide... {progress}</div>
+      }
+      <div className='Veryslide' ref={veryslideRef} />
+    </div>
+  );
+}
 
-  render() {
-    return (
-      <div>
-        {!this.state.loaded &&
-          <div className='Loading'>Loading slide... {this.state.progress}</div>
-        }
-        <div className='Veryslide' ref={this.veryslideRef} />
+function SlideNewBase(props) {
+  const [loading, setLoading] = React.useState(false);
+  const navigate = useNavigate();
+
+  const createSlide = async (info) => {
+    setLoading(true);
+
+    const docRef = await props.firebase.newSlide(info);
+    const url = generatePath(ROUTES.SLIDE, { id: docRef.id });
+    navigate(url, { replace: true });
+  };
+
+  return (
+    loading ?
+      <div className="Loading">
+        Now creating a new document...
       </div>
-    );
-  }
+      :
+      <div className="Center">
+        <div>
+          <h2>Create new slide</h2>
+          <SlideNewForm action={createSlide}/>
+        </div>
+      </div>
+  );
 }
 
 class SlideNewForm extends Component {
@@ -113,6 +127,7 @@ class SlideNewForm extends Component {
   }
 
   onSubmit = (event) => {
+    event.preventDefault();
     let info = {
       title: this.state.title,
       width: parseInt(this.state.width),
@@ -190,51 +205,11 @@ class SlideNewForm extends Component {
   }
 }
 
-
-class SlideNewBase extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      loading: false,
-    };
-  }
-
-  createSlide = async (info) => {
-    this.setState({loading: true});
-
-    const docRef = await this.props.firebase.newSlide(info);
-    const url = generatePath(ROUTES.SLIDE, { id: docRef.id });
-    this.props.history.replace(url);
-  }
-
-  render() {
-    return (
-      this.state.loading ?
-
-      <div className="Loading">
-        Now creating a new document...
-      </div>
-
-      :
-
-      <div className="Center">
-        <div>
-          <h2>Create new slide</h2>
-          <SlideNewForm action={this.createSlide}/>
-        </div>
-      </div>
-    );
-  }
-}
-
 const Slide = compose(
-  withRouter,
   withFirebase,
 )(SlideBase);
 
 const SlideNew = compose(
-  withRouter,
   withFirebase,
 )(SlideNewBase);
 

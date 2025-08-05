@@ -3,6 +3,7 @@ const path = require('path');
 const config = require('./config');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CompressionPlugin = require("compression-webpack-plugin");
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 module.exports = (env, argv) => {
   var mode = argv.mode || 'development';
@@ -11,7 +12,6 @@ module.exports = (env, argv) => {
     mode,
 
     entry: [
-      'react-hot-loader/patch',
       './src/index.js',
     ],
 
@@ -50,7 +50,7 @@ module.exports = (env, argv) => {
     },
 
     plugins: [
-      new webpack.HotModuleReplacementPlugin(),
+      new ReactRefreshWebpackPlugin(),
       new webpack.DefinePlugin({
         'process.env.MODE': JSON.stringify(argv.mode),
         'process.env.FIREBASE_CONFIG': JSON.stringify(config.firebaseConfig),

@@ -112,6 +112,7 @@ webpack-stats.json
 
 .DS_Store
 .firebase
+.swp
 
 # Coverage files
 coverage/

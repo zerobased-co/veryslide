@@ -1,5 +1,3 @@
-// Karma configuration
-// Generated on Sun Sep 01 2019 15:09:52 GMT+0900 (Korean Standard Time)
 const path = require('path');
 
 var webpackConfig = require('./webpack.config.js');
@@ -13,7 +11,7 @@ module.exports = function(config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['mocha'],
+    frameworks: ['mocha', 'webpack'],
 
 
     // list of files / patterns to load in the browser

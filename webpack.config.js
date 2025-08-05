@@ -44,6 +44,13 @@ module.exports = (env, argv) => {
       ],
     },
 
+    resolve: {
+      modules: [
+        path.resolve(__dirname, 'src'),
+        'node_modules'
+      ],
+    },
+
     output: {
       filename: 'bundle.js',
       path: path.resolve(__dirname, 'dist'),
@@ -52,7 +59,7 @@ module.exports = (env, argv) => {
     plugins: [
       new ReactRefreshWebpackPlugin(),
       new webpack.DefinePlugin({
-        'process.env.MODE': JSON.stringify(argv.mode),
+        'process.env.MODE': JSON.stringify(mode),
         'process.env.FIREBASE_CONFIG': JSON.stringify(config.firebaseConfig),
       }),
     ].concat(

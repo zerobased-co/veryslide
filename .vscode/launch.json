@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Karma Tests",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/karma/bin/karma",
+      "args": ["start", "--no-single-run", "--browsers=ChromeDebugging"],
+      "env": {
+        "BABEL_ENV": "test"
+      },
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "Debug Karma Tests with Grep",
+      "type": "node", 
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/karma/bin/karma",
+      "args": ["start", "--no-single-run", "--browsers=ChromeDebugging", "--grep=History"],
+      "env": {
+        "BABEL_ENV": "test"
+      },
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    }
+  ]
+}

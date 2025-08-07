@@ -1,5 +1,3 @@
-const path = require('path');
-
 var webpackConfig = require('./webpack.config.js');
 
 module.exports = function(config) {
@@ -31,7 +29,7 @@ module.exports = function(config) {
       'test/index.js': ['webpack', 'sourcemap'],
     },
 
-    webpack: webpackConfig,
+    webpack: webpackConfig({}, { mode: 'development', test: true }),
     webpackMiddleware: {
       stats: 'errors-only',
     },

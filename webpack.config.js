@@ -1,17 +1,17 @@
 const webpack = require('webpack');
 const path = require('path');
 const config = require('./config');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const CompressionPlugin = require("compression-webpack-plugin");
-const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 module.exports = (env, argv) => {
   var mode = argv.mode || 'development';
 
+  var isProd = mode === 'production';
+  var isTest = argv.test || false;
+
   return {
     mode,
 
-    entry: [
+    entry: isTest ? undefined : [
       './src/index.js',
     ],
 
@@ -51,28 +51,34 @@ module.exports = (env, argv) => {
       ],
     },
 
-    output: {
+    output: isProd ? {
       filename: 'bundle.js',
       path: path.resolve(__dirname, 'dist'),
-    },
+    } : undefined,
 
     plugins: [
-      new ReactRefreshWebpackPlugin(),
+      // Common plugins
       new webpack.DefinePlugin({
         'process.env.MODE': JSON.stringify(mode),
         'process.env.FIREBASE_CONFIG': JSON.stringify(config.firebaseConfig),
       }),
     ].concat(
-      mode === 'production' ? [
-        new CompressionPlugin(),
-        new BundleAnalyzerPlugin(),
+      // for production build
+      isProd ? [
+        new (require("compression-webpack-plugin"))(),
+        new (require('webpack-bundle-analyzer').BundleAnalyzerPlugin)(),
+      ] :
+      // for development build, not for testing
+      !isTest ? [
+        new (require('@pmmmwh/react-refresh-webpack-plugin'))(),
       ] : []
     ),
-    devtool: (mode === 'development') ? 'eval-source-map' : 'source-map',
-    devServer: {
+
+    devtool: isProd ? 'source-map' : 'eval-source-map',
+    devServer: (!isProd && !isTest) ? {
       static: './dist',
       historyApiFallback: true,
       hot: true,
-    },
+    } : undefined,
   };
 };

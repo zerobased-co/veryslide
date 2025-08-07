@@ -19,5 +19,5 @@ Veryslide uses below items to test itself.
  - [karma-coverage](https://github.com/karma-runner/karma-coverage): To make coverage report
 
 ```shell
-$ npm run test
+$ yarn run test
 ```

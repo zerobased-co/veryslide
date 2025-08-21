@@ -17,7 +17,7 @@ module.exports = function(config) {
       'test/index.js',
     ],
     preprocessors: {
-      'test/index.js': ['webpack', 'sourcemap'],
+      'test/**/*.js': ['webpack', 'sourcemap'],
     },
 
     webpack: webpackConfig({}, { mode: 'development', test: true }),
@@ -41,10 +41,11 @@ module.exports = function(config) {
 
     browsers: ['ChromeHeadless'],
     browserNoActivityTimeout: 60000,
+    debugger: true,
 
     customLaunchers: {
       ChromeDebugging: {
-        base: 'Chrome',
+        base: 'ChromeHeadless',
         flags: ['--remote-debugging-port=9333']
       }
     },

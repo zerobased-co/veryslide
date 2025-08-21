@@ -7,6 +7,7 @@ module.exports = (env, argv) => {
 
   var isProd = mode === 'production';
   var isTest = argv.test || false;
+  var isDev = !isProd && !isTest;
 
   return {
     mode,
@@ -51,13 +52,14 @@ module.exports = (env, argv) => {
       ],
     },
 
-    output: isProd ? {
+    output: !isTest ? {
       filename: 'bundle.js',
       path: path.resolve(__dirname, 'dist'),
     } : undefined,
 
     plugins: [
       // Common plugins
+      // Injecting variables while bundling
       new webpack.DefinePlugin({
         'process.env.MODE': JSON.stringify(mode),
         'process.env.FIREBASE_CONFIG': JSON.stringify(config.firebaseConfig),
@@ -70,12 +72,11 @@ module.exports = (env, argv) => {
       ] :
       // for development build, not for testing
       !isTest ? [
-        new (require('@pmmmwh/react-refresh-webpack-plugin'))(),
       ] : []
     ),
 
     devtool: isProd ? 'source-map' : 'eval-source-map',
-    devServer: (!isProd && !isTest) ? {
+    devServer: isDev ? {
       static: './dist',
       historyApiFallback: true,
       hot: true,

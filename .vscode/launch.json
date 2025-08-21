@@ -7,21 +7,20 @@
       "request": "launch",
       "program": "${workspaceFolder}/node_modules/karma/bin/karma",
       "args": ["start", "--no-single-run", "--browsers=ChromeDebugging"],
-      "env": {
-        "BABEL_ENV": "test"
-      },
+      "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"
     },
     {
-      "name": "Debug Karma Tests with Grep",
-      "type": "node", 
+      "name": "Debug Webpack Dev Server",
+      "type": "node",
       "request": "launch",
-      "program": "${workspaceFolder}/node_modules/karma/bin/karma",
-      "args": ["start", "--no-single-run", "--browsers=ChromeDebugging", "--grep=History"],
+      "program": "${workspaceFolder}/node_modules/webpack-dev-server/bin/webpack-dev-server.js",
+      "args": ["--config", "${workspaceFolder}/webpack.config.js"],
       "env": {
-        "BABEL_ENV": "test"
+        "NODE_ENV": "development"
       },
+      "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"
     }

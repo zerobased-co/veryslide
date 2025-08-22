@@ -21,7 +21,10 @@ class Box extends BaseObject {
       ...state,
     });
 
-    this.addNumberState('borderWidth', 'borderRadius', 'padding');
+    this.addNumberState(
+      'borderWidth', 'borderRadius', 'padding',
+      'filterBlur', 'backdropBlur',
+    );
   }
 
   on_borderStyle(style) {

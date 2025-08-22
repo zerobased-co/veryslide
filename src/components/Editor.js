@@ -118,6 +118,9 @@ class Menu extends View {
       ),
 
       ui.HGroup(
+        ui.createButton('-', () => { this.send('Viewport:zoomOut'); }, 'vs-button xs'),
+        this.zoomInput = ui.createInputText(this.getViewport(), 'zoomDisplay'),
+        ui.createButton('+', () => { this.send('Viewport:zoomIn'); }, 'vs-button xs'),
         ui.createButton('Reset zoom', () => { this.resetZoom(); }),
         this.btnSnap = ui.createButton('Snap Off', () => { this.toggleSnap(); }),
       ),
@@ -145,6 +148,7 @@ class Menu extends View {
     this.listen('Menu:resetZoom', this.resetZoom);
     this.listen('Menu:toggleSnap', this.toggleSnap);
     this.listen('Menu:historyChanged', this.historyChanged);
+    this.listen('Menu:zoomChanged', this.updateZoomDisplay);
 
     this.btnUndo.enable(false);
     this.btnRedo.enable(false);
@@ -153,6 +157,14 @@ class Menu extends View {
   historyChanged(undoable, redoable) {
     this.btnUndo.enable(undoable);
     this.btnRedo.enable(redoable);
+  }
+
+  getViewport() {
+    return this.send('Viewport:get')[0];
+  }
+
+  updateZoomDisplay(scale) {
+    this.zoomDisplay.title = Math.round(scale * 100) + '%';
   }
 
   openFileDialog() {
@@ -299,6 +311,8 @@ class Viewport extends View {
     this.listen('Viewport:clear', this.clear);
     this.listen('Viewport:move', this.move);
     this.listen('Viewport:zoom', this.zoom);
+    this.listen('Viewport:zoomIn', this.zoomIn);
+    this.listen('Viewport:zoomOut', this.zoomOut);
     this.listen('Viewport:toggleSnap', this.toggleSnap);
     this.listen('Viewport:setPresentationMode', this.setPresentationMode);
 
@@ -567,16 +581,19 @@ class Viewport extends View {
   zoom(scale) {
     this.scale = scale;
     this.updateTransform();
+    this.send('Menu:zoomChanged', this.scale);
   }
 
   zoomOut() {
     this.scale = this.scale - 0.1;
     this.updateTransform();
+    this.send('Menu:zoomChanged', this.scale);
   }
 
   zoomIn() {
     this.scale = this.scale + 0.1;
     this.updateTransform();
+    this.send('Menu:zoomChanged', this.scale);
   }
 
   keydown(event) {

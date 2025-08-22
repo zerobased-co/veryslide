@@ -95,6 +95,13 @@ $button-radius: 5px;
     font-size: 0.7em;
   }
 
+  &.xs {
+    min-width: 24px;
+    width: 24px;
+    padding: 0px 4px;
+    font-size: 0.7em;
+  }
+
   &.vs-disabled {
     color: #888;
   }

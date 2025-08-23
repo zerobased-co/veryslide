@@ -16,7 +16,6 @@ import Slide, { SlideNew } from './Slide';
 import { withAuthentication } from './Session';
 import * as ROUTES from './constants/routes';
 
-
 const NavLayout = () => (
   <div className="VerySlideWeb">
     <Navigation/>
@@ -46,6 +45,5 @@ const App = () => {
     </Router>
   );
 };
-
 
 export default withAuthentication(App);

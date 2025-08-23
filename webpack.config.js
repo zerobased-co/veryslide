@@ -68,7 +68,11 @@ module.exports = (env, argv) => {
       // for production build
       isProd ? [
         new (require("compression-webpack-plugin"))(),
-        new (require('webpack-bundle-analyzer').BundleAnalyzerPlugin)(),
+        new (require('webpack-bundle-analyzer').BundleAnalyzerPlugin)({
+          analyzerMode: 'static',
+          openAnalyzer: false,
+          reportFilename: 'bundle-report.html',
+        }),
       ] :
       // for development build, not for testing
       !isTest ? [

@@ -2,7 +2,7 @@ var webpackConfig = require('./webpack.config.js');
 
 module.exports = function(config) {
   const grepPattern = config.grep || process.argv.find(arg => arg.startsWith('--grep='))?.split('=')[1] || '';
-  
+
   config.set({
     basePath: '',
     frameworks: ['mocha', 'webpack'],

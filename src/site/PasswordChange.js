@@ -32,9 +32,9 @@ const PasswordChangeFormBase = ({ firebase }) => {
   };
 
   const onChange = event => {
-    setState(prevState => ({ 
-      ...prevState, 
-      [event.target.name]: event.target.value 
+    setState(prevState => ({
+      ...prevState,
+      [event.target.name]: event.target.value
     }));
   };
 

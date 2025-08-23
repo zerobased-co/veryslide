@@ -17,7 +17,7 @@ const Landing = () => (
           <h2>Forge and share versatile slides.</h2>
           <AuthUserContext.Consumer>
             {authUser =>
-              authUser ? 
+              authUser ?
 
               <div>
                 <p>Welcome back, {authUser.displayName}.</p>
@@ -27,7 +27,7 @@ const Landing = () => (
                 </Link>
               </div>
 
-              : 
+              :
 
               <div>
                 <Link to={ROUTES.SIGNUP} className="Button Primary Large">

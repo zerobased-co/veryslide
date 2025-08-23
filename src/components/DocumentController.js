@@ -497,7 +497,7 @@ class DocumentController extends State {
               let progress = parseInt((i - from + 1) * 100 / (to - from + 1));
               this.editor.setLoadingText(`Exporting page ${i} (${progress}%)`);
 
-              const blob = await 
+              const blob = await
                 domtoimage.toBlob(page.node, Object.assign(defaultDomToImageOption, {
                   width: parseInt(page.width * scale),
                   height: parseInt(page.height * scale),

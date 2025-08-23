@@ -419,7 +419,7 @@ class Viewport extends View {
       } else {
         if (!event.shiftKey && !event.metaKey) {
           this.send('Controller:deselect');
-          
+
           // Check if click is within page bounds
           let cx = (x - this.translate.x) / this.scale;
           let cy = (y - this.translate.y) / this.scale;
@@ -617,12 +617,12 @@ class Viewport extends View {
 
   zoomWithCenter(newScale) {
     if (this.page == null) return;
-    
+
     const viewportWidth = this.node.clientWidth;
     const viewportHeight = this.node.clientHeight;
     const pageWidth = this.page.width;
     const pageHeight = this.page.height;
-    
+
     this.scale = newScale;
     this.translate.x = (viewportWidth - pageWidth * this.scale) / 2;
     this.translate.y = (viewportHeight - pageHeight * this.scale) / 2;
@@ -636,22 +636,22 @@ class Viewport extends View {
 
   fitWidth() {
     if (this.page == null) return;
-    
+
     const viewportWidth = this.node.clientWidth;
     const pageWidth = this.page.width;
     const scale = viewportWidth / pageWidth;
-    
+
     this.zoomWithCenter(scale);
   }
 
   selectObject(direction) {
     if (this.page == null) return;
-    
+
     const currentSelection = this.send('Controller:getSelection')[0];
     const allObjects = this.page.objects;
-    
+
     if (allObjects.length === 0) return;
-    
+
     if (currentSelection.length === 0) {
       const targetIndex = direction > 0 ? 0 : allObjects.length - 1;
       this.send('Controller:select', allObjects[targetIndex]);

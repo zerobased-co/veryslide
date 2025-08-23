@@ -34,4 +34,3 @@ const withAuthorization = condition => Component => {
 };
 
 export default withAuthorization;
-

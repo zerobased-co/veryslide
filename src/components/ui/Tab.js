@@ -68,7 +68,7 @@ class TabGroup extends View {
   render() {
     super.render();
 
-    this.appendChild(new Vertical({children: [ 
+    this.appendChild(new Vertical({children: [
       this.tabView = new Horizon(),
       this.contentview = new View(),
     ]}));

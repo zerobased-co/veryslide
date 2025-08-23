@@ -23,11 +23,11 @@ class AssetList extends View {
     let assetItem = ui.H(
       ui.createText(asset.name),
       ui.createText(asset.assetType),
-      ui.createButton('Update', () => { 
+      ui.createButton('Update', () => {
         asset.node.loading(true);
         asset.update();
       }),
-      ui.createButton('Remove', () => { 
+      ui.createButton('Remove', () => {
         this.send('Controller:removeAsset', asset);
         assetItem.node.remove();
       })

@@ -71,6 +71,7 @@ module.exports = (env, argv) => {
         new (require('webpack-bundle-analyzer').BundleAnalyzerPlugin)({
           analyzerMode: 'static',
           openAnalyzer: false,
+          statsOptions: { source: false, modules: false },
           reportFilename: 'bundle-report.html',
         }),
       ] :

@@ -105,24 +105,28 @@ class Menu extends View {
   constructor(state) {
     super({
       className: 'vs-menu',
+      editor: null,
       ...state,
     });
+
 
     [
       new ui.Text({'title': 'Page'}),
       ui.createButton('Add',    () => { this.send('Controller:addPage'); }),
-
       ui.HGroup(
         this.btnUndo = ui.createButton('Undo', () => this.send('Controller:history', 'Undo')),
         this.btnRedo = ui.createButton('Redo', () => this.send('Controller:history', 'Redo')),
       ),
 
+      new ui.Text({'title': 'Zoom'}),
       ui.HGroup(
-        ui.createButton('-', () => { this.send('Viewport:zoomOut'); }, 'vs-button xs'),
-        this.zoomInput = ui.createInputText(this.getViewport(), 'zoomDisplay'),
-        ui.createButton('+', () => { this.send('Viewport:zoomIn'); }, 'vs-button xs'),
-        ui.createButton('Reset zoom', () => { this.resetZoom(); }),
-        this.btnSnap = ui.createButton('Snap Off', () => { this.toggleSnap(); }),
+        ui.createButton('-', () => { this.send('Viewport:zoomToPreset', -1); }, 'vs-button xs'),
+        this.zoomDisplay = new ui.InputText({
+          value: '100%',
+        }),
+        ui.createButton('+', () => { this.send('Viewport:zoomToPreset', 1); }, 'vs-button xs'),
+        ui.createButton('Reset', () => { this.resetZoom(); }),
+        this.btnSnap = ui.createButton('Snap', () => { this.toggleSnap(); }),
       ),
 
       new ui.Text({'title': 'Object'}),
@@ -150,6 +154,15 @@ class Menu extends View {
     this.listen('Menu:historyChanged', this.historyChanged);
     this.listen('Menu:zoomChanged', this.updateZoomDisplay);
 
+    this.zoomDisplay.onChange = (value) => {
+      let numericValue = value.replace('%', '');
+      if (!isNaN(numericValue) && numericValue !== '') {
+        let scale = parseFloat(numericValue) / 100;
+        this.send('Viewport:zoom', scale);
+        this.zoomDisplay.node.blur();
+      }
+    };
+
     this.btnUndo.enable(false);
     this.btnRedo.enable(false);
   }
@@ -159,13 +172,10 @@ class Menu extends View {
     this.btnRedo.enable(redoable);
   }
 
-  getViewport() {
-    return this.send('Viewport:get')[0];
+  updateZoomDisplay(scale) {
+    this.zoomDisplay.value = Math.round(scale * 100) + '%';
   }
 
-  updateZoomDisplay(scale) {
-    this.zoomDisplay.title = Math.round(scale * 100) + '%';
-  }
 
   openFileDialog() {
     // create hidden file input
@@ -193,17 +203,17 @@ class Menu extends View {
   }
 
   resetZoom() {
-    this.send('Viewport:zoom', 1.0);
-    this.send('Viewport:move', [0, 0]);
+    this.send('Viewport:resetZoom');
   }
 
   toggleSnap() {
     let snap = this.send('Viewport:toggleSnap')[0];
-    if (snap) {
-      this.btnSnap.title = 'Snap On';
-    } else {
-      this.btnSnap.title = 'Snap Off';
-    }
+    // TBD: 나중에 눌림 버튼 만들어지면 교체
+    // if (snap) {
+    //   this.btnSnap.title = 'Snap On';
+    // } else {
+    //   this.btnSnap.title = 'Snap Off';
+    // }
   }
 }
 
@@ -293,6 +303,7 @@ class Viewport extends View {
   constructor(state) {
     super({
       className: 'vs-viewport',
+      editor: null,
       ...state,
     });
 
@@ -303,7 +314,7 @@ class Viewport extends View {
     this.translate = {x: 0, y: 0};
     this.lastTranslate = {x: 0, y: 0};
     this.scale = 1.0;
-    //this.zoomLevel = [10, 25, 50, 75, 100, 200, 400];
+    this.scalePresets = [0.1, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 3.0, 4.0];
     this.isPresentationMode = false;
 
     this.listen('Viewport:get', () => { return this });
@@ -311,8 +322,8 @@ class Viewport extends View {
     this.listen('Viewport:clear', this.clear);
     this.listen('Viewport:move', this.move);
     this.listen('Viewport:zoom', this.zoom);
-    this.listen('Viewport:zoomIn', this.zoomIn);
-    this.listen('Viewport:zoomOut', this.zoomOut);
+    this.listen('Viewport:resetZoom', this.resetZoom);
+    this.listen('Viewport:zoomToPreset', this.zoomToPreset);
     this.listen('Viewport:toggleSnap', this.toggleSnap);
     this.listen('Viewport:setPresentationMode', this.setPresentationMode);
 
@@ -320,10 +331,13 @@ class Viewport extends View {
     this.keydownEvents = [
     // shift, ctrl,  alt,   meta,  keycodes, func
       [false, false, false, false, [32], () => this.beginGrab()],
-      [false, false, false, false, [173, 189], () => this.zoomOut()],
-      [false, false, false, false, [61, 187], () => this.zoomIn()],
+      [false, false, false, false, [173, 189], () => this.zoomToPreset(-1)],
+      [false, false, false, false, [61, 187], () => this.zoomToPreset(1)],
+      [false, false, false, false, [220], () => this.fitWidth()],
+      [false, false, false, false, [9], () => this.selectObject(1)],
+      [true,  false, false, false, [9], () => this.selectObject(-1)],
       [false, false, false, false, [83], () => this.send('Menu:toggleSnap', null)],
-      [false, false, false, false, [48], () => this.send('Menu:resetZoom', null)],
+      [false, false, false, false, [48], () => this.resetZoom()],
       [false, false, false, false, [46, 8], () => this.send('Controller:remove')],
       [false, false, false, false, [219], () => this.send('Controller:order', 'backward')],
       [false, false, false, false, [221], () => this.send('Controller:order', 'forward')],
@@ -389,8 +403,8 @@ class Viewport extends View {
       handled = true;
     } else {
       // TBD: mutiply matrix to x and y before finding
-      let cx = x / this.scale - this.translate.x;
-      let cy = y / this.scale - this.translate.y;
+      let cx = (x - this.translate.x) / this.scale;
+      let cy = (y - this.translate.y) / this.scale;
       let objects = this.page.findObjects(cx, cy);
       if (objects.length > 0) {
         const lastObject = objects.slice(-1)[0];
@@ -406,6 +420,13 @@ class Viewport extends View {
       } else {
         if (!event.shiftKey && !event.metaKey) {
           this.send('Controller:deselect');
+
+          // Check if click is within page bounds
+          let cx = (x - this.translate.x) / this.scale;
+          let cy = (y - this.translate.y) / this.scale;
+          if (cx >= 0 && cx <= this.page.width && cy >= 0 && cy <= this.page.height) {
+            this.send('Controller:select', this.page);
+          }
         }
         this.mode = 'select';
         this.setSelector(x, y);
@@ -584,16 +605,63 @@ class Viewport extends View {
     this.send('Menu:zoomChanged', this.scale);
   }
 
-  zoomOut() {
-    this.scale = this.scale - 0.1;
+
+  zoomToPreset(direction) {
+    let newScale;
+    if (direction > 0) {
+      newScale = this.scalePresets.find(preset => preset > this.scale) || this.scalePresets[this.scalePresets.length - 1];
+    } else {
+      newScale = this.scalePresets.slice().reverse().find(preset => preset < this.scale) || this.scalePresets[0];
+    }
+    this.zoomWithCenter(newScale);
+  }
+
+  zoomWithCenter(newScale) {
+    if (this.page == null) return;
+
+    const viewportWidth = this.node.clientWidth;
+    const viewportHeight = this.node.clientHeight;
+    const pageWidth = this.page.width;
+    const pageHeight = this.page.height;
+
+    this.scale = newScale;
+    this.translate.x = (viewportWidth - pageWidth * this.scale) / 2;
+    this.translate.y = (viewportHeight - pageHeight * this.scale) / 2;
     this.updateTransform();
     this.send('Menu:zoomChanged', this.scale);
   }
 
-  zoomIn() {
-    this.scale = this.scale + 0.1;
-    this.updateTransform();
-    this.send('Menu:zoomChanged', this.scale);
+  resetZoom() {
+    this.zoomWithCenter(1.0);
+  }
+
+  fitWidth() {
+    if (this.page == null) return;
+
+    const viewportWidth = this.node.clientWidth;
+    const pageWidth = this.page.width;
+    const scale = viewportWidth / pageWidth;
+
+    this.zoomWithCenter(scale);
+  }
+
+  selectObject(direction) {
+    if (this.page == null) return;
+
+    const currentSelection = this.send('Controller:getSelection')[0];
+    const allObjects = this.page.objects;
+
+    if (allObjects.length === 0) return;
+
+    if (currentSelection.length === 0) {
+      const targetIndex = direction > 0 ? 0 : allObjects.length - 1;
+      this.send('Controller:select', allObjects[targetIndex]);
+    } else {
+      const lastSelectedObject = currentSelection[currentSelection.length - 1];
+      const currentIndex = allObjects.indexOf(lastSelectedObject);
+      const targetIndex = (currentIndex + direction + allObjects.length) % allObjects.length;
+      this.send('Controller:select', allObjects[targetIndex]);
+    }
   }
 
   keydown(event) {
@@ -736,16 +804,14 @@ class Editor extends View {
 
   render() {
     super.render();
-    this.appendChild(this.menu = new Menu());
+    this.appendChild(this.menu = new Menu({editor: this}));
 
     let row = new ui.Horizon();
     this.appendChild(row);
 
     row.appendChild(this.navigator = new Navigator());
-    row.appendChild(this.viewport = new Viewport());
+    row.appendChild(this.viewport = new Viewport({editor: this}));
     row.appendChild(this.toolbox = new ToolBox());
-
-    this.viewport.editor = this;
 
     return this.node;
   }

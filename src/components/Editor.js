@@ -328,45 +328,57 @@ class Viewport extends View {
 
     this.interval = setInterval(this.updateThumbnail.bind(this), 2000);
     this.keydownEvents = [
-    // shift, ctrl,  alt,   meta,  keycodes, func
-      [false, false, false, false, [32], () => this.beginGrab()],
-      [false, false, false, false, [173, 189], () => this.zoomToPreset(-1)],
-      [false, false, false, false, [61, 187], () => this.zoomToPreset(1)],
-      [false, false, false, false, [220], () => this.fitWidth()],
-      [false, false, false, false, [9], () => this.selectObject(1)],
-      [true,  false, false, false, [9], () => this.selectObject(-1)],
-      [false, false, false, false, [83], () => this.send('Menu:toggleSnap', null)],
-      [false, false, false, false, [48], () => this.resetZoom()],
-      [false, false, false, false, [46, 8], () => this.send('Controller:remove')],
-      [false, false, false, false, [219], () => this.send('Controller:order', 'backward')],
-      [false, false, false, false, [221], () => this.send('Controller:order', 'forward')],
-      [false, false, false, true,  [66], () => this.send('Controller:style', 'Bold')],
-      [false, false, false, true,  [73], () => this.send('Controller:style', 'Italic')],
-      [false, false, false, true,  [85], () => this.send('Controller:style', 'Underline')],
-      [false, false, false, true,  [173, 189], () => this.send('Controller:style', 'Smaller')],
-      [false, false, false, true,  [61, 187], () => this.send('Controller:style', 'Bigger')],
-      [false, false, false, true,  [83], () => this.send('Veryslide:save')],
-      [false, false, false, false, [27], () => this.setPresentationMode(false)],
-      [false, false, false, false, [37], () => this.send('Controller:move', 'Left')],
-      [false, false, false, false, [38], () => this.send('Controller:move', 'Up')],
-      [false, false, false, false, [39], () => this.send('Controller:move', 'Right')],
-      [false, false, false, false, [40], () => this.send('Controller:move', 'Down')],
-      [true,  false, false, false, [37], () => this.send('Controller:move', 'BigLeft')],
-      [true,  false, false, false, [38], () => this.send('Controller:move', 'BigUp')],
-      [true,  false, false, false, [39], () => this.send('Controller:move', 'BigRight')],
-      [true,  false, false, false, [40], () => this.send('Controller:move', 'BigDown')],
-      [false, false, true,  false, [78], () => this.send('Controller:addPage')],
-      [false, false, false, true,  [89], () => this.send('Controller:history', 'Redo')],
-      [true,  false, false, true,  [90], () => this.send('Controller:history', 'Redo')],
-      [false, false, false, true,  [90], () => this.send('Controller:history', 'Undo')],
-      [false, false, true,  true,  [67], () => this.send('Controller:copyStyle')],
-      [false, false, true,  true,  [86], () => this.send('Controller:pasteStyle')],
-      [false, false, false, true,  [65], () => this.send('Controller:selectAll')],
-      [false, false, false, true,  [68], () => this.send('Controller:deselect')],
+      // Navigation
+      { key: 'Space', action: () => this.beginGrab(), desc: 'Start grab mode' },
+      { key: 'Tab', action: () => this.selectObject(1), desc: 'Select next object' },
+      { key: 'Shift+Tab', action: () => this.selectObject(-1), desc: 'Select previous object' },
+      { key: 'ArrowLeft', action: () => this.send('Controller:move', 'Left'), desc: 'Move left' },
+      { key: 'ArrowUp', action: () => this.send('Controller:move', 'Up'), desc: 'Move up' },
+      { key: 'ArrowRight', action: () => this.send('Controller:move', 'Right'), desc: 'Move right' },
+      { key: 'ArrowDown', action: () => this.send('Controller:move', 'Down'), desc: 'Move down' },
+      { key: 'Shift+ArrowLeft', action: () => this.send('Controller:move', 'BigLeft'), desc: 'Move left (large)' },
+      { key: 'Shift+ArrowUp', action: () => this.send('Controller:move', 'BigUp'), desc: 'Move up (large)' },
+      { key: 'Shift+ArrowRight', action: () => this.send('Controller:move', 'BigRight'), desc: 'Move right (large)' },
+      { key: 'Shift+ArrowDown', action: () => this.send('Controller:move', 'BigDown'), desc: 'Move down (large)' },
+
+      // Zoom & View
+      { key: 'Minus', action: () => this.zoomToPreset(-1), desc: 'Zoom out' },
+      { key: 'Equal', action: () => this.zoomToPreset(1), desc: 'Zoom in' },
+      { key: 'Backslash', action: () => this.fitWidth(), desc: 'Fit width' },
+      { key: 'Digit0', action: () => this.resetZoom(), desc: 'Reset zoom' },
+      { key: 'KeyS', action: () => this.send('Menu:toggleSnap', null), desc: 'Toggle snap' },
+      { key: 'Escape', action: () => this.setPresentationMode(false), desc: 'Exit presentation' },
+
+      // Object Operations
+      { key: 'Delete', action: () => this.send('Controller:remove'), desc: 'Delete object' },
+      { key: 'Backspace', action: () => this.send('Controller:remove'), desc: 'Delete object' },
+      { key: 'BracketLeft', action: () => this.send('Controller:order', 'backward'), desc: 'Send backward' },
+      { key: 'BracketRight', action: () => this.send('Controller:order', 'forward'), desc: 'Send forward' },
+
+      // Text Styling (Cmd/Ctrl)
+      { key: 'Cmd+KeyB', action: () => this.send('Controller:style', 'Bold'), desc: 'Bold' },
+      { key: 'Cmd+KeyI', action: () => this.send('Controller:style', 'Italic'), desc: 'Italic' },
+      { key: 'Cmd+KeyU', action: () => this.send('Controller:style', 'Underline'), desc: 'Underline' },
+      { key: 'Cmd+Minus', action: () => this.send('Controller:style', 'Smaller'), desc: 'Smaller font' },
+      { key: 'Cmd+Equal', action: () => this.send('Controller:style', 'Bigger'), desc: 'Bigger font' },
+
+      // Document Operations
+      { key: 'Cmd+KeyS', action: () => this.send('Veryslide:save'), desc: 'Save' },
+      { key: 'Alt+KeyN', action: () => this.send('Controller:addPage'), desc: 'Add page' },
+      { key: 'Cmd+KeyZ', action: () => this.send('Controller:history', 'Undo'), desc: 'Undo' },
+      { key: 'Cmd+KeyY', action: () => this.send('Controller:history', 'Redo'), desc: 'Redo' },
+      { key: 'Shift+Cmd+KeyZ', action: () => this.send('Controller:history', 'Redo'), desc: 'Redo' },
+
+      // Selection
+      { key: 'Cmd+KeyA', action: () => this.send('Controller:selectAll'), desc: 'Select all' },
+      { key: 'Cmd+KeyD', action: () => this.send('Controller:deselect'), desc: 'Deselect' },
+
+      // Style Copy/Paste
+      { key: 'Alt+Cmd+KeyC', action: () => this.send('Controller:copyStyle'), desc: 'Copy style' },
+      { key: 'Alt+Cmd+KeyV', action: () => this.send('Controller:pasteStyle'), desc: 'Paste style' },
     ];
     this.keyupEvents = [
-    // shift, ctrl,  alt,   meta,  keycodes, func
-      [false, false, false, false, [32], () => this.resetMode()],
+      { key: 'Space', action: () => this.resetMode(), desc: 'Reset grab mode' },
     ];
 
     ['copy', 'paste', 'cut', 'keydown', 'keyup'].forEach(e => {
@@ -668,14 +680,32 @@ class Viewport extends View {
       return;
     }
 
-    this.keydownEvents.forEach(item => {
-      if (event.shiftKey === item[0] && event.ctrlKey === item[1] &&
-          event.altKey === item[2] && event.metaKey === item[3] &&
-          item[4].indexOf(event.keyCode) !== -1) {
+    this.keydownEvents.forEach(shortcut => {
+      if (this.matchesKeyboardShortcut(event, shortcut.key)) {
         event.preventDefault();
-        item[5](event);
+        shortcut.action(event);
       }
     });
+  }
+
+  matchesKeyboardShortcut(event, keyString) {
+    const parts = keyString.split('+');
+    const key = parts[parts.length - 1];
+    const modifiers = parts.slice(0, -1);
+
+    const hasShift = modifiers.includes('Shift');
+    const hasCtrl = modifiers.includes('Ctrl');
+    const hasAlt = modifiers.includes('Alt');
+    const hasCmd = modifiers.includes('Cmd');
+
+    if (event.shiftKey !== hasShift ||
+        event.ctrlKey !== hasCtrl ||
+        event.altKey !== hasAlt ||
+        event.metaKey !== hasCmd) {
+      return false;
+    }
+
+    return event.code === key;
   }
 
   keyup(event) {
@@ -683,12 +713,10 @@ class Viewport extends View {
       return;
     }
 
-    this.keyupEvents.forEach(item => {
-      if (event.shiftKey === item[0] && event.ctrlKey === item[1] &&
-          event.altKey === item[2] && event.metaKey === item[3] &&
-          item[4].indexOf(event.keyCode) !== -1) {
+    this.keyupEvents.forEach(shortcut => {
+      if (this.matchesKeyboardShortcut(event, shortcut.key)) {
         event.preventDefault();
-        item[5](event);
+        shortcut.action(event);
       }
     });
   }

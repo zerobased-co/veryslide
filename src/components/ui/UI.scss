@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono&display=swap');
 $button-radius: 5px;
+$color-brand: #ff206f;
 
 .vs-view {
   position: relative;
@@ -252,4 +253,15 @@ $button-radius: 5px;
 .vs-slider {
   margin: 0;
   height: 30px;
+}
+
+.vs-logo {
+  color: $color-brand;
+  font-family: 'Montserrat', 'Helvetica Neue', 'Arial', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 900;
+  text-decoration: none;
+  margin-right: 1rem;
+  user-select: none;
+  cursor: default;
 }

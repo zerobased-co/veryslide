@@ -111,12 +111,11 @@ class Menu extends View {
 
 
     [
+      ui.createText('VerySlide', 'vs-logo'),
       new ui.Text({'title': 'Page'}),
       ui.createButton('Add',    () => { this.send('Controller:addPage'); }),
-      ui.HGroup(
-        this.btnUndo = ui.createButton('Undo', () => this.send('Controller:history', 'Undo')),
-        this.btnRedo = ui.createButton('Redo', () => this.send('Controller:history', 'Redo')),
-      ),
+      this.btnUndo = ui.createButton('Undo', () => this.send('Controller:history', 'Undo')),
+      this.btnRedo = ui.createButton('Redo', () => this.send('Controller:history', 'Redo')),
 
       new ui.Text({'title': 'Zoom'}),
       ui.HGroup(

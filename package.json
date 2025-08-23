@@ -16,6 +16,7 @@
   "devDependencies": {
     "@babel/cli": "^7.28.3",
     "@babel/core": "^7.28.3",
+    "@babel/eslint-parser": "^7.28.0",
     "@babel/plugin-transform-class-properties": "^7.27.1",
     "@babel/plugin-transform-object-rest-spread": "^7.28.0",
     "@babel/plugin-transform-runtime": "^7.28.3",
@@ -23,6 +24,7 @@
     "@babel/preset-react": "^7.27.1",
     "@babel/register": "^7.28.3",
     "@easylogic/colorpicker": "^1.9.69",
+    "@eslint/js": "^9.34.0",
     "@fortawesome/fontawesome-svg-core": "^7.0.0",
     "@fortawesome/free-solid-svg-icons": "^7.0.0",
     "@fortawesome/react-fontawesome": "^0.2.5",

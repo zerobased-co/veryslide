@@ -315,6 +315,9 @@ class Viewport extends View {
     this.scale = 1.0;
     this.scalePresets = [0.1, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 3.0, 4.0];
     this.isPresentationMode = false;
+    this.presentationPinCode = null;
+    this.remoteCommandListener = null;
+    this.presentationInfoElement = null;
 
     this.listen('Viewport:get', () => { return this });
     this.listen('Viewport:focusPage', this.focusPage);
@@ -737,6 +740,43 @@ class Viewport extends View {
     this.send('Controller:paste');
   }
 
+  generatePinCode() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  }
+
+  showPresentationInfo(pinCode) {
+    // 프레젠테이션 모드용 정보 표시
+    const info = document.createElement('div');
+    info.className = 'presentation-remote-info';
+    info.style.cssText = `
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 24px;
+      z-index: 10000;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    `;
+    info.innerHTML = `
+      <div style="color: #ffffffff; font-weight: bold;">Remote: ${pinCode}</div>
+    `;
+
+    this.node.appendChild(info);
+
+    setTimeout(() => {
+      if (info.parentNode) {
+        info.parentNode.removeChild(info);
+      }
+    }, 5000);
+
+    return info;
+  }
+
   setPresentationMode(mode) {
     if (mode === this.isPresentationMode) {
       return;
@@ -744,11 +784,32 @@ class Viewport extends View {
     this.isPresentationMode = mode;
 
     if (this.isPresentationMode) {
+      this.presentationPinCode = this.generatePinCode();
+
+      // 프레젠테이션 상태를 Controller에 알림
+      this.send('Controller:startPresentation', this.presentationPinCode);
+
       this.toggleSnap(false);
       this.send('Controller:deselect');
       this.editor.node.classList.add('Presentation');
       this.node.requestFullscreen();
+
+      // 풀스크린 모드로 전환 후 프레젠테이션 정보 표시
+      setTimeout(() => {
+        this.presentationInfoElement = this.showPresentationInfo(this.presentationPinCode);
+      }, 100);
     } else {
+      // 프레젠테이션 모드 종료를 Controller에 알림
+      this.send('Controller:stopPresentation');
+
+      // 프레젠테이션 정보 엘리먼트 제거
+      if (this.presentationInfoElement && this.presentationInfoElement.parentNode) {
+        this.presentationInfoElement.parentNode.removeChild(this.presentationInfoElement);
+        this.presentationInfoElement = null;
+      }
+
+      this.presentationPinCode = null;
+
       this.editor.node.classList.remove('Presentation');
       // NOTE: this makes `Document not active` error occasionally, but I'm not sure how to prevent it.
       document.exitFullscreen().catch(() => {});;

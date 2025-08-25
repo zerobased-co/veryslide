@@ -41,6 +41,7 @@ class Veryslide extends State {
 
     const doc = this.doc = new Document(this.info);
     const editor = this.editor = new Editor({ doc });
+    editor.firebase = this.firebase;
 
     this.documentController = new DocumentController({ doc, editor });
     this.documentController.firebase = this.firebase;

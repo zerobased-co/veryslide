@@ -19,6 +19,7 @@ import {
   serverTimestamp as sts ,
 } from 'firebase/firestore';
 import { getStorage } from "firebase/storage";
+import { getDatabase, ref, set, onValue, off } from 'firebase/database';
 
 class Firebase {
   constructor() {
@@ -26,6 +27,7 @@ class Firebase {
     this.auth = getAuth(this.app);
     this.db = getFirestore(this.app);
     this.storage = getStorage(this.app);
+    this.rtdb = getDatabase(this.app);
   }
 
   /* Auth */
@@ -58,6 +60,41 @@ class Firebase {
     uid: this.auth.currentUser.uid,
     info: info,
   });
+
+  /* Realtime Database for Remote Control */
+  setPresentationState = (pinCode, currentPage, totalPages, ownerId) => {
+    return set(ref(this.rtdb, `presentations/${pinCode}`), {
+      currentPage,
+      totalPages,
+      command: null,
+      ownerId,
+      timestamp: Date.now()
+    });
+  };
+
+  updatePresentationPage = (pinCode, currentPage) => {
+    return set(ref(this.rtdb, `presentations/${pinCode}/currentPage`), currentPage);
+  };
+
+  sendRemoteCommand = (pinCode, command) => {
+    return set(ref(this.rtdb, `presentations/${pinCode}/command`), command);
+  };
+
+  listenToPresentationCommands = (pinCode, callback) => {
+    const commandRef = ref(this.rtdb, `presentations/${pinCode}/command`);
+    onValue(commandRef, callback);
+    return commandRef;
+  };
+
+  listenToPresentationState = (pinCode, callback) => {
+    const presentationRef = ref(this.rtdb, `presentations/${pinCode}`);
+    onValue(presentationRef, callback);
+    return presentationRef;
+  };
+
+  stopListening = (dbRef) => {
+    off(dbRef);
+  };
 
   /* Misc */
   serverTimestamp = () => sts();

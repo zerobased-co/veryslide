@@ -647,6 +647,73 @@ class DocumentController extends State {
       }
       this.send('Property:setPanelFor', this.selected);
     });
+
+    // 프레젠테이션 모드 관련
+    this.presentationPinCode = null;
+    this.remoteCommandListener = null;
+
+    this.listen('Controller:startPresentation', (pinCode) => {
+      this.presentationPinCode = pinCode;
+
+      if (this.firebase) {
+        const currentPageIndex = this.doc.focusedPageIndex || 0;
+        const totalPages = this.doc.pages.length || 1;
+
+        console.log('Setting presentation state:', {
+          pinCode: this.presentationPinCode,
+          currentPageIndex,
+          totalPages
+        });
+
+        this.firebase.setPresentationState(
+          this.presentationPinCode,
+          currentPageIndex,
+          totalPages,
+          this.firebase.auth.currentUser?.uid
+        ).then(() => {
+          console.log('✅ Presentation state set successfully');
+        }).catch((error) => {
+          console.error('❌ Failed to set presentation state:', error);
+        });
+
+        // 리모콘 명령 수신 설정
+        console.log('Setting up command listener for PIN:', this.presentationPinCode);
+        this.remoteCommandListener = this.firebase.listenToPresentationCommands(
+          this.presentationPinCode,
+          (snapshot) => {
+            const command = snapshot.val();
+            console.log('Received remote command:', command);
+            if (command === 'next') {
+              console.log('Executing next page command');
+              this.send('Controller:nextPage');
+              // 명령 처리 후 null로 초기화
+              this.firebase.sendRemoteCommand(this.presentationPinCode, null);
+            } else if (command === 'prev') {
+              console.log('Executing prev page command');
+              this.send('Controller:prevPage');
+              // 명령 처리 후 null로 초기화
+              this.firebase.sendRemoteCommand(this.presentationPinCode, null);
+            }
+          }
+        );
+      }
+    });
+
+    this.listen('Controller:stopPresentation', () => {
+      if (this.remoteCommandListener && this.firebase) {
+        this.firebase.stopListening(this.remoteCommandListener);
+        this.remoteCommandListener = null;
+      }
+      this.presentationPinCode = null;
+    });
+
+    this.listen('Controller:getCurrentPageIndex', () => {
+      return this.doc.focusedPageIndex || 0;
+    });
+
+    this.listen('Controller:getTotalPages', () => {
+      return this.doc.pages.length || 1;
+    });
   }
 
   getExtension(file) {

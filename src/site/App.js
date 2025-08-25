@@ -12,6 +12,7 @@ import Account from './Account';
 import Admin from './Admin';
 import Footer from './Footer';
 import Slide, { SlideNew } from './Slide';
+import Remocon from './Remocon';
 
 import { withAuthentication } from './Session';
 import * as ROUTES from './constants/routes';
@@ -41,6 +42,7 @@ const App = () => {
           <Route path={ROUTES.SLIDE_NEW} element={<SlideNew />} />
         </Route>
         <Route path={ROUTES.SLIDE} element={<Slide />} />
+        <Route path={ROUTES.REMOCON} element={<Remocon />} />
       </Routes>
     </Router>
   );

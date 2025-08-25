@@ -7,3 +7,4 @@ export const ADMIN = '/admin';
 export const PASSWORD_FORGET = '/password-forget';
 export const SLIDE = '/slide/:id';
 export const SLIDE_NEW = '/slide/new';
+export const REMOCON = '/remocon';

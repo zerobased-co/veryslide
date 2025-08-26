@@ -35,7 +35,7 @@ class ExportDialog extends Dialog {
         }).pair(this, 'pages'),
         new ui.InputText({
           'placeholder': 'e.g. 1-4, 2, 10-',
-          'className': 'vs-inputtext-140',
+          'className': 'vs-inputtext wide',
         }).pair(this, 'customPage'),
       ),
       ui.H(
@@ -101,52 +101,79 @@ class ExportDialog extends Dialog {
 }
 
 
-class Menu extends View {
+class LeftPanel extends View {
   constructor(state) {
     super({
-      className: 'vs-menu',
-      editor: null,
+      className: 'vs-left-panel',
+      doc: null,
       ...state,
     });
 
-
     [
       ui.createText('VerySlide', 'vs-logo'),
-      new ui.Text({'title': 'Page'}),
-      ui.createButton('Add',    () => { this.send('Controller:addPage'); }),
-      this.btnUndo = ui.createButton('Undo', () => this.send('Controller:history', 'Undo')),
-      this.btnRedo = ui.createButton('Redo', () => this.send('Controller:history', 'Redo')),
-
-      new ui.Text({'title': 'Zoom'}),
-      ui.HGroup(
-        ui.createButton('-', () => { this.send('Viewport:zoomToPreset', -1); }, 'vs-button xs'),
-        this.zoomDisplay = new ui.InputText({
-          value: '100%',
-        }),
-        ui.createButton('+', () => { this.send('Viewport:zoomToPreset', 1); }, 'vs-button xs'),
-        ui.createButton('Reset', () => { this.resetZoom(); }),
-        this.btnSnap = ui.createButton('Snap', () => { this.toggleSnap(); }),
-      ),
-
-      new ui.Text({'title': 'Object'}),
-      ui.HGroup(
-        ui.createButton('TextBox',   () => { this.send('Controller:addObject', 'TextBox'); }),
-        ui.createButton('Image',     () => { this.openFileDialog(); }),
-        ui.createButton('ImageList', () => { this.send('Controller:addObject', 'ImageList'); }),
-      ),
-
-      new ui.Text({'title': 'Misc'}),
-      ui.HGroup(
-        ui.createButton('Export', () => { this.send('Editor:export'); }),
-        ui.createButton('Save',  () => { this.send('Veryslide:save'); }),
-        ui.createButton('Play',  () => { this.send('Viewport:setPresentationMode', true); }),
-      ),
-
-      ui.createButton('Close',   () => {
-        window.history.back();
-      }),
+      ui.createButton('+ Add Page', () => { this.send('Controller:addPage'); }),
+      new PageList(),
     ].forEach(item => this.appendChild(item));
+  }
+}
 
+class RightPanel extends View {
+  constructor(state) {
+    super({
+      className: 'vs-right-panel',
+      ...state,
+    });
+
+    [
+      ui.V(
+        ui.HGroup(
+          ui.createButton('Play', () => { this.send('Viewport:setPresentationMode', true); }),
+          ui.createButton('Save', () => { this.send('Veryslide:save'); }),
+          ui.createButton('Export', () => { this.send('Editor:export'); }),
+          ui.createButton('Close', () => { window.history.back(); }),
+        ),
+        this.toolbox = new ToolBox(),
+      ),
+    ].forEach(item => this.appendChild(item));
+  }
+}
+
+class FloatingMenu extends View {
+  constructor(state) {
+    super({
+      className: 'vs-floating-menu',
+      ...state,
+    });
+
+    [
+      ui.H(
+        new ui.Text({'title': 'Objects'}),
+        ui.HGroup(
+          ui.createButton('T', () => { this.send('Controller:addObject', 'TextBox'); }),
+          ui.createButton('IMG', () => { this.openFileDialog(); }),
+          ui.createButton('LIST', () => { this.send('Controller:addObject', 'ImageList'); }),
+        ),
+      ),
+      ui.H(
+        new ui.Text({'title': 'Zoom'}),
+        ui.HGroup(
+          ui.createButton('-', () => { this.send('Viewport:zoomToPreset', -1); }),
+          this.zoomDisplay = new ui.InputText({
+            value: '100%',
+          }),
+          ui.createButton('+', () => { this.send('Viewport:zoomToPreset', 1); }),
+          ui.createButton('Reset', () => { this.resetZoom(); }),
+        ),
+      ),
+      ui.H(
+        new ui.Text({'title': 'Actions'}),
+        ui.HGroup(
+          this.btnUndo = ui.createButton('↶', () => this.send('Controller:history', 'Undo')),
+          this.btnRedo = ui.createButton('↷', () => this.send('Controller:history', 'Redo')),
+          this.btnSnap = ui.createButton('⊞', () => { this.toggleSnap(); }),
+        ),
+      ),
+    ].forEach(item => this.appendChild(item));
 
     this.listen('Menu:resetZoom', this.resetZoom);
     this.listen('Menu:toggleSnap', this.toggleSnap);
@@ -175,9 +202,7 @@ class Menu extends View {
     this.zoomDisplay.value = Math.round(scale * 100) + '%';
   }
 
-
   openFileDialog() {
-    // create hidden file input
     var input = document.createElement('input');
     input.style.visibility = 'hidden';
     input.type = 'file';
@@ -207,24 +232,9 @@ class Menu extends View {
 
   toggleSnap() {
     let snap = this.send('Viewport:toggleSnap')[0];
-    // TBD: 나중에 눌림 버튼 만들어지면 교체
-    // if (snap) {
-    //   this.btnSnap.title = 'Snap On';
-    // } else {
-    //   this.btnSnap.title = 'Snap Off';
-    // }
   }
 }
 
-class Navigator extends View {
-  constructor(state) {
-    super({
-      className: 'vs-navigator',
-      children: [new PageList()],
-      ...state,
-    });
-  }
-}
 
 class Selector extends View {
   constructor(state) {
@@ -893,14 +903,20 @@ class Editor extends View {
 
   render() {
     super.render();
-    this.appendChild(this.menu = new Menu({editor: this}));
+    
+    let mainLayout = new ui.Horizon();
+    this.appendChild(mainLayout);
 
-    let row = new ui.Horizon();
-    this.appendChild(row);
+    this.leftPanel = new LeftPanel({doc: this.doc});
+    this.viewport = new Viewport({editor: this});
+    this.rightPanel = new RightPanel();
+    this.floatingMenu = new FloatingMenu();
 
-    row.appendChild(this.navigator = new Navigator());
-    row.appendChild(this.viewport = new Viewport({editor: this}));
-    row.appendChild(this.toolbox = new ToolBox());
+    mainLayout.appendChild(this.leftPanel);
+    mainLayout.appendChild(this.viewport);
+    mainLayout.appendChild(this.rightPanel);
+    
+    this.appendChild(this.floatingMenu);
 
     return this.node;
   }

@@ -1,4 +1,5 @@
 $border-color: #afafb2;
+$font-family-system: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
 @mixin no-select {
   -webkit-touch-callout: none;
@@ -32,10 +33,10 @@ $border-color: #afafb2;
   display: flex;
   width: 100%;
   height: 100%;
-  background: #ccc;
+  background: #f5f5f5;
   flex-direction: column;
   overflow: hidden;
-  font-family: sans-serif;
+  font-family: $font-family-system;
 
   * {
     box-sizing: border-box;
@@ -64,67 +65,87 @@ $border-color: #afafb2;
       }
     }
 
-    .vs-navigator,
-    .vs-menu,
-    .vs-toolbox {
+    .vs-left-panel,
+    .vs-right-panel,
+    .vs-floating-menu {
       display: none;
     }
   }
 }
 
-.vs-navigator {
-  width: 160px;
-  border: 1px solid $border-color;
-  height: 100%;
-  position: relative;
+.vs-left-panel {
+  width: 240px;
+  background: #2c2c2c;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  border-right: 1px solid #404040;
+
+  .vs-logo {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: #ffffff;
+  }
+
+  .vs-pagelist {
+    flex: 1;
+    margin-bottom: 16px;
+  }
 }
 
 .vs-pagelist {
-  position: absolute;
-  width: 100%;
-  height: 100%;
+  flex: 1;
   overflow-y: auto;
-  background: #E1E2E4;
+  background: transparent;
   counter-reset: number;
+  padding: 0;
 }
 
 .vs-pagethumb {
   background: transparent;
   display: flex;
   counter-increment: number;
+  margin-bottom: 12px;
+  position: relative;
 
   &.select {
-    background: #FF206F;
-
     .holder {
-      box-shadow: none;
+      border: 2px solid #0066ff;
     }
   }
 
   &.focus {
     .holder {
-      outline: 2px solid #FFC120;
-      box-shadow: 0 0 5px 3px #AAA;
+      box-shadow: 0 0 8px rgba(0, 102, 255, 0.5);
     }
   }
 
   .holder {
     background: white;
     display: inline-block;
-    margin: 8px auto;
+    margin: 0 auto;
     width: 100%;
     height: auto;
-    border: 1px solid #ccc;
-    box-shadow: 0 0 5px 2px #ddd;
-    transition: all 0.1s ease-out;
+    border: 1px solid #555;
+    border-radius: 4px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+    cursor: pointer;
+
+    &:hover {
+      border-color: #777;
+    }
 
     &::before {
       content: counter(number)" ";
       position: absolute;
-      padding: 2px 5px;
+      padding: 2px 6px;
       font-size: 10px;
-      background: gray;
+      background: #444;
       color: white;
+      border-radius: 0 0 4px 0;
     }
 
     img {
@@ -168,21 +189,34 @@ $border-color: #afafb2;
   overflow: hidden;
   position: relative;
   outline: none;
-  border: 1px solid $border-color;
-  border-width: 1px 0;
-  background: #C7CDD4;
+  background: #f8f9fa;
 
   .vs-pageholder {
     transform-origin: top left;
   }
 }
 
-.vs-toolbox {
-  width: 328px;
-  border: 1px solid $border-color;
-  overflow-y: auto;
+.vs-right-panel {
+  width: 280px;
+  background: #2c2c2c;
+  color: #ffffff;
   display: flex;
   flex-direction: column;
+  padding: 16px;
+  border-left: 1px solid #404040;
+
+  .vs-separator {
+    height: 1px;
+    background: #404040;
+    margin: 16px 0;
+  }
+
+  .vs-toolbox {
+    flex: 1;
+    background: transparent;
+    border: none;
+    overflow-y: auto;
+  }
 }
 
 .vs-property {
@@ -236,4 +270,27 @@ $border-color: #afafb2;
 .vs-showme {
   opacity: 1.0 !important;
   transition: opacity 0.2s ease-out;
+}
+
+.vs-floating-menu {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2c2c2c;
+  border: 1px solid #404040;
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+
+  .vs-text {
+    color: #999;
+    font-size: 12px;
+    margin-right: 8px;
+  }
+
 }

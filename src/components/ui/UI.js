@@ -40,7 +40,7 @@ class UI {
   }
 
   /* shortcuts */
-  createText(title, className='vs-text-80') {
+  createText(title, className='vs-text medium') {
     return new Text({title, className});
   }
 

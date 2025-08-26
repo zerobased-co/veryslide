@@ -107,7 +107,7 @@ class Filter extends View {
     // We cannot render ambiguous filters
     if (this.fields === global.ambiguous) {
       this.appendChild(
-        ui.createText('Cannot be displayed', 'vs-text-140')
+        ui.createText('Cannot be displayed', 'vs-text wide')
       );
     } else {
       this.update_candidates();
@@ -116,7 +116,7 @@ class Filter extends View {
       this.fields.forEach((field) => {
 
         let row = ui.H(
-          ui.createText(field, 'vs-text-140'),
+          ui.createText(field, 'vs-text wide'),
           this.operators[idx] = new ui.Select({
             options: options,
             value: this.get_currentFilter(idx, 'operator'),

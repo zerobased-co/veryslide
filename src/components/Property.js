@@ -276,7 +276,7 @@ class PanelForImageList extends PanelForBox {
         }).pair(this.object, 'asset'),
         ui.createText(
           '&nbsp;' + this.object.selectedItems.length + ' of ' + this.object.items.length + ' Item(s)',
-          'vs-text-140',
+          'vs-text wide',
         ),
       ),
 

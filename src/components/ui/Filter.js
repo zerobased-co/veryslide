@@ -1,7 +1,7 @@
 import View from './View';
 import ui from './UI';
 import Text from './Text';
-import global from '/core/Global';
+import global from 'core/Global';
 
 const options = [
   ['', '----'],
@@ -106,7 +106,7 @@ class Filter extends View {
 
     // We cannot render ambiguous filters
     if (this.fields === global.ambiguous) {
-      this.appendChild(
+      this.append(
         ui.createText('Cannot be displayed', 'vs-text wide')
       );
     } else {
@@ -138,7 +138,7 @@ class Filter extends View {
           }),
         );
 
-        this.appendChild(row);
+        this.append(row);
         idx += 1;
       });
     }

@@ -1,10 +1,10 @@
 import ui from './ui/UI';
 import View from './ui/View';
 import Panel from './ui/Panel';
-import Node from '/core/Node';
+import Node from 'core/Node';
 import A from 'core/Array';
-import global from '/core/Global';
-import channel from '/core/Channel';
+import global from 'core/Global';
+import channel from 'core/Channel';
 
 const FONTLIST = [
   ['serif', 'Serif'],
@@ -27,7 +27,7 @@ const FONTLIST = [
 class PanelForDocument extends Panel {
   render() {
     super.render();
-    this.appendChild(ui.createText('PanelForDocument'));
+    this.append(ui.createText('PanelForDocument'));
     return this.node;
   }
 }
@@ -50,7 +50,7 @@ class PanelForPage extends Panel {
 
       new ui.TitleBar({'title': 'Action'}),
       ui.createButton('Duplicate', () => this.duplicatePage() ),
-    ].forEach(item => this.appendChild(item));
+    ].forEach(item => this.append(item));
     return this.node;
   }
 }
@@ -157,7 +157,7 @@ class PanelForBox extends Panel {
         ui.createText('Clipping'),
         new ui.CheckBox({}).pair(this.object, 'clip'),
       ),
-    ].forEach(item => this.appendChild(item));
+    ].forEach(item => this.append(item));
     return this.node;
   }
 }
@@ -223,7 +223,7 @@ class PanelForTextBox extends PanelForBox {
         new ui.InputText().pair(this.object, 'link'),
       ),
 
-    ].forEach(item => this.appendChild(item));
+    ].forEach(item => this.append(item));
 
     return this.node;
   }
@@ -247,7 +247,7 @@ class PanelForImageBox extends PanelForBox {
           }),
         ),
       ),
-    ].forEach(item => this.appendChild(item));
+    ].forEach(item => this.append(item));
 
     return this.node;
   }
@@ -359,7 +359,7 @@ class PanelForImageList extends PanelForBox {
         filter: this.object.filter,
         onChange: value => { this.object.filter = value },
       }),
-    ].forEach(item => this.appendChild(item));
+    ].forEach(item => this.append(item));
 
     return this.node;
   }
@@ -420,11 +420,11 @@ function createProxy(objects) {
         }
       }
 
+      let value = null;
       switch(prop) {
         case 'pairings':
           return proxyObj[prop];
         default:
-          let value = null;
           for(let i = 0; i < objects.length; i++) {
             if (value === null) {
               value = objects[i][prop];
@@ -532,7 +532,7 @@ class Property extends View {
         return null;
     }
 
-    this.appendChild(this.panel);
+    this.append(this.panel);
     this.send('ToolBox:activeTab', 'Property');
     return this.panel;
   }

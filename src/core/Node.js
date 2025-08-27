@@ -84,7 +84,7 @@ class Node extends State {
       target = this.node;
     }
 
-    if (handler.hasOwnProperty('prototype') !== false) {
+    if (Object.hasOwn(handler, 'prototype') !== false) {
       handler = handler.bind(this);
     }
 

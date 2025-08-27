@@ -142,3 +142,7 @@ export function unescapeHtml(html) {
   var doc = new DOMParser().parseFromString(html, "text/html");
   return doc.documentElement.textContent;
 }
+
+export function generatePinCode() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}

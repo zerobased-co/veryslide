@@ -90,7 +90,7 @@ class State {
 
   serialize() {
     function replacer(k, v) {
-      if (v.hasOwnProperty('__TYPE__')) {
+      if (Object.hasOwn(v, '__TYPE__')) {
         switch(v['__TYPE__']) {
           case 'State':
             return v.state;

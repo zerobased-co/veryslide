@@ -1,8 +1,8 @@
 import './TextBox.scss';
 import Box from './Box';
-import global from '/core/Global';
+import global from 'core/Global';
 import ResizeObserver from 'resize-observer-polyfill';
-import { escapeHtml } from '/core/Util';
+import { escapeHtml } from 'core/Util';
 
 class TextBox extends Box {
   constructor(state) {

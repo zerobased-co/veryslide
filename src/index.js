@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 
-import App from "./site/App.js";
+import App from "./site/App";
 import Firebase, { FirebaseContext } from './site/Firebase';
 
 const root = ReactDOM.createRoot(document.getElementById("root") || document.createElement('div'));

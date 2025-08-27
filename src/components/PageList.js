@@ -63,7 +63,7 @@ class PageThumb extends View {
 
     this.holder = document.createElement('div');
     this.holder.className = 'holder';
-    this.appendChild(this.holder);
+    this.append(this.holder);
 
     this.img = document.createElement('img');
     this.holder.appendChild(this.img);

@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": {
+      "/*": ["*"]
+    },
+    "module": "es6",
+    "target": "es5",
+    "allowJs": true,
+    "checkJs": false
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "coverage"
+  ]
+}

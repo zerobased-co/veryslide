@@ -85,7 +85,7 @@ class ImageList extends Box {
 
   deserialize(data) {
     // remove duplicated filter items (this was a bug!)
-    if (data.hasOwnProperty('filter')) {
+    if (Object.hasOwn(data, 'filter')) {
       data['filter'] = data['filter'].filter((item, index, self) =>
         index === self.findIndex((t) => (
           t.field === item.field

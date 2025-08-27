@@ -1,4 +1,4 @@
-import Node from '/core/Node';
+import Node from 'core/Node';
 import A from 'core/Array';
 
 class View extends Node {
@@ -42,6 +42,7 @@ class View extends Node {
     return this.enable(false);
   }
 
+  // eslint-disable-next-line no-unused-vars
   afterChange(value) {
   }
 
@@ -84,19 +85,25 @@ class View extends Node {
     return this.node;
   }
 
-  appendChild(child) {
-    // TBD: only View can be added as child
-    if (child.hasOwnProperty('children') && child.hasOwnProperty('state')) {
-      child.parent = this;
-      this.children.push(child);
-      this.node.appendChild(child.node);
+  append(child) {
+    function __addChild(child) {
+      if (child instanceof View) {
+        child.parent = this;
+        this.children.push(child);
+        this.node.appendChild(child.node);
+      } else {
+        this.node.appendChild(child);
+      }
+    }
+    if (Array.isArray(child)) {
+      child.forEach(c => __addChild(c));
     } else {
-      this.node.appendChild(child);
+      __addChild(child);
     }
   }
 
-  removeChild(child) {
-    if (child.hasOwnProperty('children') && child.hasOwnProperty('state')) {
+  remove(child) {
+    if (child instanceof View) {
       A.remove(this.children, child);
       this.node.removeChild(child.node);
     } else {

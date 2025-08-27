@@ -1,5 +1,5 @@
-import View from './View.js';
-import global from '/core/Global.js';
+import View from './View';
+import global from 'core/Global';
 
 class CheckBox extends View {
   constructor(state) {

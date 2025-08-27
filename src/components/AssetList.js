@@ -1,4 +1,3 @@
-import State from 'core/State';
 import View from './ui/View';
 import ui from './ui/UI';
 
@@ -11,12 +10,6 @@ class AssetList extends View {
 
     this.listen('AssetList:addAsset', this.addAsset);
     this.listen('AssetList:removeAsset', this.removeAsset);
-  }
-
-  render() {
-    super.render();
-    this.node.className = 'vs-assetlist';
-    return this.node;
   }
 
   addAsset(asset) {
@@ -33,7 +26,6 @@ class AssetList extends View {
       })
     );
 
-    // Update asset
     asset.node = assetItem;
     if (asset.assetType !== 'URL') {
       asset.node.loading(true);
@@ -41,10 +33,11 @@ class AssetList extends View {
     }
 
     this.loading(false);
-    this.assetList.appendChild(assetItem);
+    this.assetList.append(assetItem);
   }
 
-  removeAsset(asset) {
+  removeAsset() {
+    // TBD: do something while removing assets
     this.loading(false);
   }
 
@@ -79,7 +72,7 @@ class AssetList extends View {
         new ui.TitleBar({'title': 'Asset list'}),
         this.assetList = ui.V(),
       ),
-    ].forEach(item => this.appendChild(item));
+    ].forEach(item => this.append(item));
 
     this.inputFile.onChange = (file) => {
       this.loading(true);

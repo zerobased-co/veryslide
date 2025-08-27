@@ -1,8 +1,8 @@
 import Editor from './components/Editor';
 import Document from './components/Document';
 import DocumentController from './components/DocumentController';
-import channel from 'core/Channel.js';
-import State from 'core/State.js';
+import channel from 'core/Channel';
+import State from 'core/State';
 
 import {
   getFirestore,

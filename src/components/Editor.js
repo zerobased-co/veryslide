@@ -1,14 +1,13 @@
 import './Editor.scss';
-import global from '/core/Global';
-import A from '/core/Array';
+import global from 'core/Global';
+import A from 'core/Array';
+import generatePinCode from 'core/Util';
 import ui from './ui/UI';
 import View from './ui/View';
-import Panel from './ui/Panel';
 import Dialog from './ui/Dialog';
 import PageList from './PageList';
 import AssetList from './AssetList';
 import Property from './Property';
-import Handler from './Handler';
 
 
 class ExportDialog extends Dialog {
@@ -96,7 +95,7 @@ class ExportDialog extends Dialog {
         }),
         ui.createButton('Close', () => { this.close(); }),
       ),
-    ].forEach(item => this.appendChild(item));
+    ].forEach(item => this.append(item));
   }
 }
 
@@ -113,7 +112,7 @@ class LeftPanel extends View {
       ui.createText('VerySlide', 'vs-logo'),
       ui.createButton('+ Add Page', () => { this.send('Controller:addPage'); }),
       new PageList(),
-    ].forEach(item => this.appendChild(item));
+    ].forEach(item => this.append(item));
   }
 }
 
@@ -134,7 +133,7 @@ class RightPanel extends View {
         ),
         this.toolbox = new ToolBox(),
       ),
-    ].forEach(item => this.appendChild(item));
+    ].forEach(item => this.append(item));
   }
 }
 
@@ -173,7 +172,7 @@ class FloatingMenu extends View {
           this.btnSnap = ui.createButton('⊞', () => { this.toggleSnap(); }),
         ),
       ),
-    ].forEach(item => this.appendChild(item));
+    ].forEach(item => this.append(item));
 
     this.listen('Menu:resetZoom', this.resetZoom);
     this.listen('Menu:toggleSnap', this.toggleSnap);
@@ -231,7 +230,7 @@ class FloatingMenu extends View {
   }
 
   toggleSnap() {
-    let snap = this.send('Viewport:toggleSnap')[0];
+    this.send('Viewport:toggleSnap')[0];
   }
 }
 
@@ -470,7 +469,7 @@ class Viewport extends View {
     }
   }
 
-  onMouseUp = (event) => {
+  onMouseUp = () => {
     this.removeEventListener('mousemove', document);
     this.removeEventListener('mouseup', document);
     this.resetMode();
@@ -734,11 +733,11 @@ class Viewport extends View {
     });
   }
 
-  copy(event) {
+  copy() {
     this.send('Controller:copy');
   }
 
-  cut(event) {
+  cut() {
     this.send('Controller:copy');
     this.send('Controller:remove');
   }
@@ -748,10 +747,6 @@ class Viewport extends View {
       return;
     }
     this.send('Controller:paste');
-  }
-
-  generatePinCode() {
-    return Math.floor(100000 + Math.random() * 900000).toString();
   }
 
   showPresentationInfo(pinCode) {
@@ -794,7 +789,7 @@ class Viewport extends View {
     this.isPresentationMode = mode;
 
     if (this.isPresentationMode) {
-      this.presentationPinCode = this.generatePinCode();
+      this.presentationPinCode = generatePinCode();
 
       // 프레젠테이션 상태를 Controller에 알림
       this.send('Controller:startPresentation', this.presentationPinCode);
@@ -833,7 +828,7 @@ class Viewport extends View {
     this.node.tabIndex = '0';
     this.pageHolder = document.createElement('div');
     this.pageHolder.className = 'vs-pageholder';
-    this.appendChild(this.pageHolder);
+    this.append(this.pageHolder);
 
     this.pageSnap = document.createElement('div');
     this.pageSnap.className = 'vs-pagesnap';
@@ -843,7 +838,7 @@ class Viewport extends View {
       viewport: this,
     });
     this.selector.hide();
-    this.appendChild(this.selector);
+    this.append(this.selector);
 
     return this.node;
   }
@@ -870,7 +865,7 @@ class ToolBox extends View {
       ['Asset', new AssetList()],
     ]});
 
-    this.appendChild(this.tabGroup);
+    this.append(this.tabGroup);
     return this.node;
   }
 }
@@ -885,7 +880,7 @@ class Editor extends View {
 
     this.listen('Editor:export', () => {
       const dialog = new ExportDialog({doc: this.doc});
-      this.appendChild(dialog);
+      this.append(dialog);
       dialog.modal();
     });
   }
@@ -903,20 +898,20 @@ class Editor extends View {
 
   render() {
     super.render();
-    
+
     let mainLayout = new ui.Horizon();
-    this.appendChild(mainLayout);
+    this.append(mainLayout);
 
     this.leftPanel = new LeftPanel({doc: this.doc});
     this.viewport = new Viewport({editor: this});
     this.rightPanel = new RightPanel();
     this.floatingMenu = new FloatingMenu();
 
-    mainLayout.appendChild(this.leftPanel);
-    mainLayout.appendChild(this.viewport);
-    mainLayout.appendChild(this.rightPanel);
-    
-    this.appendChild(this.floatingMenu);
+    mainLayout.append(this.leftPanel);
+    mainLayout.append(this.viewport);
+    mainLayout.append(this.rightPanel);
+
+    this.append(this.floatingMenu);
 
     return this.node;
   }

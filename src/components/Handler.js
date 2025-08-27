@@ -1,4 +1,4 @@
-import global from '/core/Global';
+import global from 'core/Global';
 import View from './ui/View'
 
 // Clockwise, from northwest

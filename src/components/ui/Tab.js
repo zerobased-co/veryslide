@@ -62,13 +62,13 @@ class TabGroup extends View {
 
     this.activeTab = tab;
     this.contentview.node.innerHTML = '';
-    this.contentview.appendChild(this.tabs[index][1]);
+    this.contentview.append(this.tabs[index][1]);
   }
 
   render() {
     super.render();
 
-    this.appendChild(new Vertical({children: [
+    this.append(new Vertical({children: [
       this.tabView = new Horizon(),
       this.contentview = new View(),
     ]}));
@@ -78,7 +78,7 @@ class TabGroup extends View {
         let data = this.tabs[i];
         let tab = new Tab({'title': data[0], tabGroup: this, tabIndex: i});
         this.tabs[i].tab = tab;
-        this.tabView.appendChild(tab);
+        this.tabView.append(tab);
       }
     }
     this.selectTabAt(0);

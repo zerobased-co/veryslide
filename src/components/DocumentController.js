@@ -6,7 +6,7 @@ import { saveAs } from 'file-saver';
 import { uuid, defaultDomToImageOption } from 'core/Util';
 import A from 'core/Array';
 import State from 'core/State';
-import global from '/core/Global';
+import global from 'core/Global';
 
 import { Page } from './Document';
 import History from './History';

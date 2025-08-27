@@ -1,4 +1,4 @@
-import View from './View.js';
+import View from './View';
 import '@easylogic/colorpicker/dist/colorpicker.css';
 import ColorPickerUI from '@easylogic/colorpicker'
 import { properTextColor } from 'core/Util';

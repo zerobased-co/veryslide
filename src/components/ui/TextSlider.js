@@ -1,7 +1,7 @@
-import View from './View.js';
-import InputText from './InputText.js';
-import Slider from './Slider.js';
-import global from '/core/Global';
+import View from './View';
+import InputText from './InputText';
+import Slider from './Slider';
+import global from 'core/Global';
 
 class TextSlider extends View {
   constructor(state) {
@@ -39,11 +39,11 @@ class TextSlider extends View {
 
     this.inputtext = new InputText();
     this.inputtext.onChange = this.change.bind(this);
-    this.appendChild(this.inputtext);
+    this.append(this.inputtext);
 
     this.slider = new Slider({min: this.min, max: this.max, step: this.step});
     this.slider.onChange = this.change.bind(this);
-    this.appendChild(this.slider);
+    this.append(this.slider);
 
 
     return this.node;

@@ -1,4 +1,4 @@
-import Node from '/core/Node';
+import Node from 'core/Node';
 import { uuid } from 'core/Util';
 import global from 'core/Global';
 import './BaseObject.scss';

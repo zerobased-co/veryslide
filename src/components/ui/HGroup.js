@@ -1,4 +1,4 @@
-import View from './View.js';
+import View from './View';
 
 class HGroup extends View {
   constructor(state) {

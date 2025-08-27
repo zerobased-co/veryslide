@@ -1,5 +1,5 @@
-import View from './View.js';
-import global from '/core/Global';
+import View from './View';
+import global from 'core/Global';
 
 class Slider extends View {
   constructor(state) {
